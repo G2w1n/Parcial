@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horarios de vuelo — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Horarios de salidas y llegadas del Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vuelos.css">
+</head>
+<body>
+
+  <!-- Encabezado y navegación -->
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Horarios de vuelo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="index.html#como-funciona">Cómo funciona</a>
+        <a href="index.html#formulario">Formulario</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="vuelos">
+      <div class="wrap">
+        <picture>
+          <source media="(max-width: 600px)" srcset="img/pista-vuelos-mobile.jpg">
+          <source media="(min-width: 601px)" srcset="img/pista-vuelos.jpg">
+          <img src="img/pista-vuelos.jpg" alt="Pista del Aeropuerto Internacional Qorikancha" class="foto-banner">
+        </picture>
+
+        <div class="vuelos-header">
+          <h1>Horarios de vuelo</h1>
+          <svg class="avion-header" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M2 16l20-6-6 8-3-1-2 3-2-6z"/>
+          </svg>
+        </div>
+
+        <p class="aerolineas-label">Aerolíneas que operan en Qorikancha</p>
+        <ul class="aerolineas">
+          <li>LATAM</li>
+          <li>Sky Airline</li>
+          <li>JetSmart</li>
+          <li>Avianca</li>
+          <li>Star Perú</li>
+        </ul>
+
+        <p class="section-intro">Horarios referenciales de salidas y llegadas del Aeropuerto Qorikancha (código CUZ). Los tiempos pueden variar según la aerolínea.</p>
+
+        <ul class="leyenda-estados">
+          <li><span class="estado-badge estado-a-tiempo">A tiempo</span></li>
+          <li><span class="estado-badge estado-embarcando">Embarcando</span></li>
+          <li><span class="estado-badge estado-demorado">Demorado</span></li>
+          <li><span class="estado-badge estado-cancelado">Cancelado</span></li>
+        </ul>
+
+        <div class="tabla-scroll">
+          <table>
+            <caption class="visually-hidden">Horarios de vuelo del Aeropuerto Qorikancha</caption>
+            <thead>
+              <tr>
+                <th scope="col">Vuelo</th>
+                <th scope="col">Aerolínea</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Origen / Destino</th>
+                <th scope="col">Hora</th>
+                <th scope="col">Puerta</th>
+                <th scope="col">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="vuelo-proximo"><td>QK 214</td><td>LATAM</td><td>Salida</td><td>Lima (LIM)</td><td>08:45</td><td>3</td><td><span class="estado-badge estado-a-tiempo">A tiempo</span></td></tr>
+              <tr><td>QK 108</td><td>LATAM</td><td>Llegada</td><td>Lima (LIM)</td><td>09:20</td><td>1</td><td><span class="estado-badge estado-a-tiempo">A tiempo</span></td></tr>
+              <tr><td>QK 331</td><td>Sky Airline</td><td>Salida</td><td>Arequipa (AQP)</td><td>10:05</td><td>2</td><td><span class="estado-badge estado-embarcando">Embarcando</span></td></tr>
+              <tr><td>QK 450</td><td>JetSmart</td><td>Llegada</td><td>Puerto Maldonado (PEM)</td><td>11:15</td><td>1</td><td><span class="estado-badge estado-demorado">Demorado</span></td></tr>
+              <tr><td>QK 217</td><td>Avianca</td><td>Salida</td><td>Lima (LIM)</td><td>13:30</td><td>3</td><td><span class="estado-badge estado-a-tiempo">A tiempo</span></td></tr>
+              <tr><td>QK 522</td><td>Star Perú</td><td>Llegada</td><td>Arequipa (AQP)</td><td>15:00</td><td>2</td><td><span class="estado-badge estado-a-tiempo">A tiempo</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="nota">Los horarios se actualizan cada 15 minutos. Ante cambios de última hora, consulta directamente con tu aerolínea.</p>
+
+        <h2 class="titulo-faq">Preguntas frecuentes</h2>
+        <div class="faq">
+          <details>
+            <summary>¿Con cuánta anticipación debo llegar al aeropuerto?</summary>
+            <p>Se recomienda llegar 2 horas antes en vuelos nacionales y 3 horas antes en vuelos internacionales.</p>
+          </details>
+          <details>
+            <summary>¿Qué hago si mi vuelo aparece como "Demorado"?</summary>
+            <p>Consulta directamente con el counter de tu aerolínea o revisa el estado en su página web, ya que los tiempos en esta tabla son referenciales.</p>
+          </details>
+          <details>
+            <summary>¿Hasta qué hora puedo hacer el check-in?</summary>
+            <p>El check-in en counter cierra 45 minutos antes de la hora de salida programada; el check-in web suele cerrar antes.</p>
+          </details>
+          <details>
+            <summary>¿Qué pasa si mi vuelo se cancela?</summary>
+            <p>La aerolínea debe reprogramarte en el siguiente vuelo disponible o gestionar tu devolución, según su política de cancelación.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+</body>
+</html>

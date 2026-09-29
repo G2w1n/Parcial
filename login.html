@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesión — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Inicia sesión o crea una cuenta en el Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+
+  <!-- Encabezado y navegación -->
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Horarios de vuelo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="index.html#como-funciona">Cómo funciona</a>
+        <a href="index.html#formulario">Formulario</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="login-seccion">
+      <div class="container" id="container">
+
+        <div class="form-container sign-up-container">
+          <form id="form-crear-cuenta" class="formulario" action="#" method="post">
+            <h1>Crear cuenta</h1>
+
+            <div class="social-container">
+              <!-- Íconos de acceso social: placeholder, sin funcionar todavía -->
+              <a href="#" class="social" aria-label="Continuar con Facebook" tabindex="-1">f</a>
+              <a href="#" class="social" aria-label="Continuar con Google" tabindex="-1">G</a>
+              <a href="#" class="social" aria-label="Continuar con LinkedIn" tabindex="-1">in</a>
+            </div>
+            <span>o usa tu correo para registrarte</span>
+
+            <input type="text" id="cc-nombre" name="nombre" placeholder="Nombre completo" required minlength="3">
+            <input type="email" id="cc-correo" name="correo" placeholder="Correo electrónico" required>
+
+            <div class="campo-password">
+              <input type="password" id="cc-contrasena" name="contrasena" placeholder="Contraseña" required minlength="6">
+              <button type="button" class="toggle-password" data-target="cc-contrasena" aria-label="Mostrar contraseña">👁</button>
+            </div>
+
+            <p class="login-error" id="registro-error"></p>
+
+            <button type="submit">Crear cuenta</button>
+          </form>
+        </div>
+
+        <div class="form-container sign-in-container">
+          <form id="form-iniciar-sesion" class="formulario" action="#" method="post">
+            <h1>Iniciar sesión</h1>
+
+            <div class="social-container">
+              <a href="#" class="social" aria-label="Continuar con Facebook" tabindex="-1">f</a>
+              <a href="#" class="social" aria-label="Continuar con Google" tabindex="-1">G</a>
+              <a href="#" class="social" aria-label="Continuar con LinkedIn" tabindex="-1">in</a>
+            </div>
+            <span>o usa tu cuenta</span>
+
+            <input type="email" id="li-correo" name="correo" placeholder="Correo electrónico" required>
+
+            <div class="campo-password">
+              <input type="password" id="li-contrasena" name="contrasena" placeholder="Contraseña" required minlength="6">
+              <button type="button" class="toggle-password" data-target="li-contrasena" aria-label="Mostrar contraseña">👁</button>
+            </div>
+
+            <!-- Placeholder: aún no hay recuperación de contraseña -->
+            <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+
+            <p class="login-error" id="login-error"></p>
+
+            <button type="submit">Iniciar sesión</button>
+          </form>
+        </div>
+
+        <div class="overlay-container">
+          <div class="overlay">
+            <div class="overlay-panel overlay-left">
+              <h1>¡Bienvenido de nuevo!</h1>
+              <p>Para seguir conectado con nosotros, inicia sesión con tus datos.</p>
+              <button class="ghost" id="signIn" type="button">Iniciar sesión</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+              <h1>¡Hola, pasajero!</h1>
+              <p>Ingresa tus datos y reserva tu estacionamiento con anticipación.</p>
+              <button class="ghost" id="signUp" type="button">Crear cuenta</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/auth/login.js"></script>
+
+</body>
+</html>

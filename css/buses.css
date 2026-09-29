@@ -1,0 +1,138 @@
+
+:root {
+  --color-primary: #163a5c;
+  --color-primary-dark: #0f2740;
+  --color-accent: #f2994a;
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-line: #e1e6ea;
+  --color-ink: #16232e;
+  --color-ink-soft: #55636e;
+  --radius: 10px;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+/* Encabezado */
+.site-header {
+  background: var(--color-primary-dark);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.site-header .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #fff;
+  text-decoration: none;
+}
+nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #cfe0ea;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+nav a:hover { color: var(--color-accent); }
+
+/* Sección principal */
+.buses { padding: 40px 0 56px; }
+h1 { color: var(--color-primary); font-family: var(--font-display); font-size: 1.6rem; margin: 0 0 24px; }
+h2 { color: var(--color-primary); font-family: var(--font-display); font-size: 1.15rem; margin: 24px 0 12px; }
+
+.buses-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+.bus-img { border-radius: var(--radius); width: 100%; max-height: 320px; object-fit: cover; }
+.buses-info p { color: var(--color-ink-soft); margin: 0; }
+
+/* Tarifario */
+.tarifario {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.tarifa-col {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+}
+.tarifa-titulo {
+  margin: 0;
+  padding: 12px;
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+.tarifa-regular .tarifa-titulo { background: var(--color-primary); }
+.tarifa-oferta .tarifa-titulo { background: #6b2d91; }
+.tarifa-fila {
+  margin: 0;
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-line);
+}
+
+.btn-reserva {
+  display: inline-block;
+  background: var(--color-primary);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.btn-reserva:hover { background: var(--color-primary-dark); }
+
+/* Pie de página */
+.site-footer {
+  background: var(--color-primary-dark);
+  color: #fff;
+  padding: 32px 0;
+  margin-top: 40px;
+}
+.footer-grid {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-grid .logo { color: #fff; }
+address { font-style: normal; color: #cfe0ea; }
+address a { color: #fff; text-decoration: underline; }
+
+@media (max-width: 700px) {
+  .buses-grid { grid-template-columns: 1fr; }
+  .tarifario { grid-template-columns: 1fr; }
+}

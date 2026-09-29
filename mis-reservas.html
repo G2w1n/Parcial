@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis reservas — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Consulta el estado de tus reservas de estacionamiento en el Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mis-reservas.css">
+</head>
+<body>
+
+  <!-- Encabezado y navegación -->
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Horarios de vuelo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="index.html#como-funciona">Cómo funciona</a>
+        <a href="Transporte.html">Reservar estacionamiento</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="mis-reservas">
+      <div class="wrap">
+        <h1>Mis reservas de estacionamiento</h1>
+        <p class="section-intro">Consulta el estado de las reservas registradas con tu cuenta.</p>
+
+        <form id="form-buscar-codigo" class="buscador-codigo" action="#" method="get">
+          <label for="buscar-codigo" class="visually-hidden">Buscar por código de seguimiento</label>
+          <input type="text" id="buscar-codigo" name="codigo" placeholder="Buscar por código de seguimiento (ej. COD-12345678)">
+          <button type="submit" class="btn">Buscar</button>
+        </form>
+        <p id="busqueda-resultado" class="busqueda-resultado"></p>
+
+        <div class="tabla-scroll">
+          <table>
+            <caption class="visually-hidden">Mis reservas de estacionamiento</caption>
+            <thead>
+              <tr>
+                <th scope="col">Código</th>
+                <th scope="col">Placa</th>
+                <th scope="col">Entrada</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Registrado el</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-reservas-body">
+              <!-- filas generadas por consulta.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <p id="reservas-vacio" class="reservas-vacio">Cargando tus reservas...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/consulta/consulta.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actualizar reserva — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Actualiza tu reserva de estacionamiento en el Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/actualizar.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Horarios de vuelo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="mis-reservas.html">Mis reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="actualizar">
+      <div class="wrap">
+        <h1>Actualizar reserva</h1>
+        <p class="section-intro">Edita los datos de tu reserva mientras siga en estado "registrado".</p>
+
+        <div id="solo-lectura-aviso" class="aviso-solo-lectura"></div>
+
+        <form id="form-actualizar" class="formulario" action="#" method="post">
+          <div class="campo">
+            <label for="ac-nombre">Nombre completo</label>
+            <input type="text" id="ac-nombre" name="nombre_pasajero" required minlength="3">
+          </div>
+
+          <div class="campo-grupo">
+            <div class="campo">
+              <label for="ac-placa">Placa del vehículo</label>
+              <input type="text" id="ac-placa" name="placa" required pattern="[A-Za-z0-9-]{6,10}">
+            </div>
+            <div class="campo">
+              <label for="ac-fecha">Fecha y hora de entrada</label>
+              <input type="datetime-local" id="ac-fecha" name="fecha_hora_entrada" required>
+            </div>
+          </div>
+
+          <div class="botones-actualizar">
+            <a href="mis-reservas.html" class="btn btn-outline">Cancelar</a>
+            <button type="submit" class="btn">Guardar cambios</button>
+          </div>
+        </form>
+
+        <p id="actualizar-confirmacion" class="confirmacion-estacionamiento"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/actualizar/actualizar.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+
+</body>
+</html> 

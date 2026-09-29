@@ -1,0 +1,382 @@
+:root {
+  --color-primary: #163a5c;
+  --color-primary-dark: #0f2740;
+  --color-accent: #f2994a;
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-line: #e1e6ea;
+  --color-ink: #16232e;
+  --color-ink-soft: #55636e;
+  --cancel: #d64545;
+  --radius: 10px;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+/* Reset básico */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Encabezado */
+.site-header {
+  background: var(--color-primary-dark);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.site-header .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #fff;
+  text-decoration: none;
+}
+nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #cfe0ea;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+nav a:hover { color: var(--color-accent); }
+
+/* Menú desplegable del usuario (cuando hay sesión activa) */
+.nav-usuario {
+  position: relative;
+  display: inline-block;
+  margin-left: 20px;
+}
+.nav-usuario-boton {
+  background: none;
+  border: none;
+  color: #cfe0ea;
+  font-weight: 500;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease;
+}
+.nav-usuario-boton:hover { color: var(--color-accent); }
+.nav-usuario-flecha { font-size: 0.7rem; }
+.nav-usuario-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  min-width: 160px;
+  overflow: hidden;
+  z-index: 200;
+}
+.nav-usuario.abierto .nav-usuario-menu { display: block; }
+.nav-usuario-menu a {
+  display: block;
+  padding: 10px 16px;
+  color: var(--color-ink);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.nav-usuario-menu a:hover { background: var(--color-bg); }
+
+/* Títulos y textos generales */
+h2 { font-family: var(--font-display); font-size: 1.6rem; margin: 0 0 8px; }
+.section-intro { color: var(--color-ink-soft); margin: 0 0 10px; }
+.nota { color: var(--color-ink-soft); font-size: 0.88rem; margin-top: 12px; }
+
+/* Botones */
+.btn {
+  display: inline-block;
+  background: var(--color-accent);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid var(--color-accent);
+}
+.btn:hover { opacity: 0.9; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.5);
+  color: #fff;
+}
+.btn-outline:hover { background: rgba(255,255,255,0.1); opacity: 1; }
+
+/* Tablas (estacionamiento) */
+.tabla-scroll { overflow-x: auto; margin-top: 16px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+th, td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-line);
+  font-size: 0.92rem;
+}
+thead th {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+tbody tr:last-child td { border-bottom: none; }
+
+/* Pie de página */
+.site-footer {
+  background: var(--color-primary-dark);
+  color: #fff;
+  padding: 32px 0;
+  margin-top: 40px;
+}
+.footer-grid {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-grid .logo { color: #fff; }
+address { font-style: normal; color: #cfe0ea; }
+address a { color: #fff; text-decoration: underline; }
+
+/* Hero */
+.hero {
+  background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url("/imagenes/aeropierto.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 56px 0;
+}
+.hero-panel {
+  display: inline-block;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  max-width: 620px;
+}
+h1 { color: #fff; font-family: var(--font-display); font-size: 2rem; margin: 8px 0 14px; text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
+.kicker { color: #fff; font-weight: 600; letter-spacing: 0.03em; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,0.7); }
+.lede { color: #fff; max-width: 640px; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,0.7); }
+.hero-actions { display: flex; gap: 14px; margin-top: 18px; flex-wrap: wrap; align-items: center; }
+
+/* Efecto SVG: avión despegando, animado */
+.avion-despegando {
+  width: 26px;
+  height: 26px;
+  color: var(--color-accent);
+  animation: despegar 2.2s ease-in-out infinite;
+}
+@keyframes despegar {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  70%  { transform: translate(18px, -14px) rotate(-12deg); opacity: 0.4; }
+  100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+}
+
+/* Fotos dentro de una sección (servicios, estacionamiento) */
+.foto-seccion {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  margin-top: 16px;
+}
+
+/* Resumen de servicios en Inicio */
+.resumen-servicios {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 40px;
+}
+.resumen-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #e4e9ed;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  text-decoration: none;
+  color: var(--color-ink);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.resumen-item:hover { border-color: var(--color-accent); transform: translateY(-2px); }
+.resumen-item strong { font-family: var(--font-display); font-size: 1rem; }
+.resumen-item span { color: var(--color-ink-soft); font-size: 0.85rem; }
+
+/* Sección Servicios y trámites */
+.servicios { padding: 48px 0; }
+.subtitulo {
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-line);
+}
+.servicios .subtitulo:first-of-type { margin-top: 24px; padding-top: 0; border-top: none; }
+
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+.tarjeta {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.tarjeta:hover { border-color: var(--color-accent); transform: translateY(-2px); }
+.tarjeta svg { width: 30px; height: 30px; color: var(--color-primary); margin-bottom: 10px; transition: color 0.25s ease; }
+.tarjeta:hover svg { color: var(--color-accent); }
+.tarjeta h3 { margin: 0 0 6px; font-family: var(--font-display); font-size: 1rem; }
+.tarjeta p { color: var(--color-ink-soft); font-size: 0.92rem; margin: 0; }
+.tarjeta-link { display: block; cursor: pointer; text-decoration: none; }
+
+/* Cómo funciona / Requisitos */
+.como-funciona { padding: 48px 0; background: var(--color-surface); }
+.tramites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+.tramite-bloque {
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+}
+.tramite-bloque h3 { margin: 0 0 4px; font-family: var(--font-display); font-size: 1.05rem; }
+.pasos {
+  margin: 10px 0 14px;
+  padding-left: 20px;
+  color: var(--color-ink-soft);
+  font-size: 0.92rem;
+}
+.pasos li { margin-bottom: 6px; }
+.requisito {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--color-ink-soft);
+  background: var(--color-bg);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.requisito strong { color: var(--color-ink); }
+
+/* Formulario */
+.contacto { padding: 48px 0 56px; }
+.formulario {
+  margin-top: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 28px;
+  max-width: 640px;
+}
+.campo { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
+.campo-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+label { font-size: 0.9rem; font-weight: 500; color: var(--color-ink); }
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+select,
+textarea {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.15);
+}
+input[required], select[required], textarea[required] {
+  border-left: 3px solid var(--color-accent);
+}
+input:invalid:not(:placeholder-shown) { border-color: var(--cancel); }
+
+.campo-check { flex-direction: row; align-items: flex-start; gap: 10px; }
+input[type="checkbox"] { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--color-accent); }
+.campo-check label { font-weight: 400; color: var(--color-ink-soft); font-size: 0.85rem; }
+
+button.btn {
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+/* Feedback visual al enviar el formulario (truco :target, sin JS) */
+.confirmacion-formulario {
+  display: none;
+  max-width: 640px;
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: #e3f6ea;
+  color: #1f8a4c;
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+#confirmacion-formulario:target {
+  display: block;
+  animation: aparecer-confirmacion 0.4s ease forwards;
+}
+@keyframes aparecer-confirmacion {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+  .resumen-servicios { grid-template-columns: 1fr; }
+  .campo-grupo { grid-template-columns: 1fr; }
+  h1 { font-size: 1.6rem; }
+}

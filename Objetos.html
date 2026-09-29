@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Objetos perdidos — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Reporta un objeto perdido en el Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/Objetos.css">
+</head>
+<body>
+
+  <!-- Encabezado y navegación -->
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Horarios de vuelo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="index.html#como-funciona">Cómo funciona</a>
+        <a href="index.html#formulario">Formulario</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="objetos-perdidos">
+      <div class="wrap">
+        <h1>Objetos perdidos</h1>
+
+        <p class="op-texto">Nuestro personal custodia los objetos que son reportados como olvidados dentro del terminal aéreo y, luego de la verificación pertinente, se coordina la entrega con sus propietarios, de manera presencial. A la fecha, no realizamos envío de ítems a domicilio.</p>
+
+        <ul class="op-lista">
+          <li>Horario de atención: de 8am a 8pm (lunes a domingo, incluido feriados).</li>
+          <li>Ubicación de la oficina: nivel 1, junto a información turística, al lado izquierdo del control de seguridad.</li>
+          <li>Para ver la lista completa de artículos que no serán custodiados, revisa el reglamento en el counter de información.</li>
+        </ul>
+
+        <div class="op-form-card">
+          <h2>Proporcione sus datos</h2>
+          <p class="section-intro">Complete el siguiente formulario para que podamos contactarlo una vez que se encuentre su artículo.</p>
+
+          <form class="formulario" action="#" method="post">
+            <div class="campo-grupo">
+              <div class="campo">
+                <label for="op-nombre">Nombre *</label>
+                <input type="text" id="op-nombre" name="nombre" required minlength="2" placeholder="Nombres">
+              </div>
+              <div class="campo">
+                <label for="op-apellido">Apellido *</label>
+                <input type="text" id="op-apellido" name="apellido" required minlength="2" placeholder="Apellidos">
+              </div>
+            </div>
+
+            <div class="campo-grupo">
+              <div class="campo">
+                <label for="op-correo">Email *</label>
+                <input type="email" id="op-correo" name="correo" required placeholder="nombre@correo.com">
+              </div>
+              <div class="campo">
+                <label for="op-telefono">Número de teléfono</label>
+                <input type="tel" id="op-telefono" name="telefono" placeholder="+51 900 000 000">
+              </div>
+            </div>
+
+            <div class="campo-grupo">
+              <div class="campo">
+                <label for="op-fecha">Fecha de la pérdida *</label>
+                <input type="date" id="op-fecha" name="fecha" required>
+              </div>
+              <div class="campo">
+                <label for="op-hora">¿Cuándo lo perdió? (hora aproximada)</label>
+                <input type="time" id="op-hora" name="hora">
+              </div>
+            </div>
+
+            <div class="campo">
+              <label for="op-descripcion">Describe el objeto perdido *</label>
+              <textarea id="op-descripcion" name="descripcion" rows="4" required minlength="10" placeholder="Tipo de objeto, color, marca, lugar aproximado donde lo perdió"></textarea>
+            </div>
+
+            <div class="campo campo-check">
+              <input type="checkbox" id="op-acepto" name="acepto" required>
+              <label for="op-acepto">Reconozco la política de privacidad de datos y los términos del servicio de objetos perdidos.</label>
+            </div>
+
+            <button type="submit" class="btn">Enviar solicitud</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+</body>
+</html>

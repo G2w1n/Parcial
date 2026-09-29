@@ -1,0 +1,258 @@
+:root {
+  --color-primary: #163a5c;
+  --color-primary-dark: #0f2740;
+  --color-accent: #f2994a;
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-line: #e1e6ea;
+  --color-ink: #16232e;
+  --color-ink-soft: #55636e;
+  --cancel: #d64545;
+  --radius: 10px;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+a { color: inherit; }
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* Encabezado */
+.site-header {
+  background: var(--color-primary-dark);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.site-header .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #fff;
+  text-decoration: none;
+}
+nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #cfe0ea;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+nav a:hover { color: var(--color-accent); }
+
+/* Menú desplegable del usuario (cuando hay sesión activa) */
+.nav-usuario {
+  position: relative;
+  display: inline-block;
+  margin-left: 20px;
+}
+.nav-usuario-boton {
+  background: none;
+  border: none;
+  color: #cfe0ea;
+  font-weight: 500;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease;
+}
+.nav-usuario-boton:hover { color: var(--color-accent); }
+.nav-usuario-flecha { font-size: 0.7rem; }
+.nav-usuario-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  min-width: 160px;
+  overflow: hidden;
+  z-index: 200;
+}
+.nav-usuario.abierto .nav-usuario-menu { display: block; }
+.nav-usuario-menu a {
+  display: block;
+  padding: 10px 16px;
+  color: var(--color-ink);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.nav-usuario-menu a:hover { background: var(--color-bg); }
+
+/* Sección principal */
+.transporte { padding: 40px 0 56px; }
+.subtitulo-transporte {
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  margin: 0 0 16px;
+}
+.subtitulo-transporte:not(:first-child) { margin-top: 40px; }
+
+/* Grilla de tarjetas (sin descripción, más compactas) */
+.transporte-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+}
+.servicio-card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 20px;
+  min-height: 110px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.servicio-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
+
+.card-icono {
+  width: 28px;
+  height: 28px;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+  display: block;
+}
+.servicio-card h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+.card-flecha {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  color: var(--color-ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.servicio-card:hover .card-flecha { background: var(--color-primary); color: #fff; }
+
+/* Tarjeta del formulario de reserva */
+.reserva-card {
+  margin-top: 40px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  max-width: 640px;
+}
+.reserva-card h2 {
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin: 0 0 6px;
+}
+.section-intro { color: var(--color-ink-soft); margin: 0 0 16px; }
+
+.formulario { margin-top: 0; }
+.campo { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
+.campo-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+label { font-size: 0.9rem; font-weight: 500; color: var(--color-ink); }
+
+input[type="text"],
+input[type="datetime-local"] {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  width: 100%;
+}
+input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.15);
+}
+input[required] { border-left: 3px solid var(--color-accent); }
+input:invalid:not(:placeholder-shown) { border-color: var(--cancel); }
+
+.btn {
+  display: inline-block;
+  background: var(--color-accent);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: var(--radius);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+.btn:hover { opacity: 0.9; }
+
+/* Animación de confirmación (misma de la Semana 5, ahora activada por JS) */
+.confirmacion-estacionamiento {
+  display: none;
+  margin-top: 16px;
+  padding: 10px 14px;
+  background: #e3f6ea;
+  color: #1f8a4c;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.confirmacion-estacionamiento.visible {
+  display: block;
+  animation: aparecer-confirmacion 0.4s ease forwards;
+}
+.confirmacion-estacionamiento a { color: #1f8a4c; text-decoration: underline; }
+@keyframes aparecer-confirmacion {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Pie de página */
+.site-footer {
+  background: var(--color-primary-dark);
+  color: #fff;
+  padding: 32px 0;
+  margin-top: 40px;
+}
+.footer-grid {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-grid .logo { color: #fff; }
+address { font-style: normal; color: #cfe0ea; }
+address a { color: #fff; text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .campo-grupo { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de gestión — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Panel de administrador y empleado del Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="wrap">
+        <h1>Panel de gestión — Reservas de estacionamiento</h1>
+        <p class="section-intro">Crea, edita y elimina cualquier reserva del sistema.</p>
+
+        <div class="panel-crear">
+          <h2>Nueva reserva (atención presencial)</h2>
+          <form id="form-crear-panel" class="formulario" action="#" method="post">
+            <div class="campo">
+              <label for="pn-nombre">Nombre completo</label>
+              <input type="text" id="pn-nombre" name="nombre_pasajero" required minlength="3">
+            </div>
+            <div class="campo-grupo">
+              <div class="campo">
+                <label for="pn-placa">Placa del vehículo</label>
+                <input type="text" id="pn-placa" name="placa" required pattern="[A-Za-z0-9-]{6,10}">
+              </div>
+              <div class="campo">
+                <label for="pn-fecha">Fecha y hora de entrada</label>
+                <input type="datetime-local" id="pn-fecha" name="fecha_hora_entrada" required>
+              </div>
+            </div>
+            <button type="submit" class="btn">Registrar reserva</button>
+          </form>
+          <p id="panel-confirmacion" class="confirmacion-estacionamiento"></p>
+        </div>
+
+        <h2 class="titulo-tabla">Todas las reservas</h2>
+
+        <div class="buscador-panel">
+          <label for="buscar-panel" class="visually-hidden">Buscar reserva</label>
+          <input type="text" id="buscar-panel" placeholder="Buscar por código, nombre o placa...">
+        </div>
+
+        <div class="tabla-scroll">
+          <table>
+            <caption class="visually-hidden">Todas las reservas de estacionamiento</caption>
+            <thead>
+              <tr>
+                <th scope="col">Código</th>
+                <th scope="col">Pasajero</th>
+                <th scope="col">Placa</th>
+                <th scope="col">Entrada</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-panel-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal-editar" class="modal-editar">
+    <div class="modal-contenido">
+      <h2>Editar reserva</h2>
+      <form id="form-editar-panel" class="formulario" action="#" method="post">
+        <input type="hidden" id="pe-id">
+        <div class="campo">
+          <label for="pe-nombre">Nombre completo</label>
+          <input type="text" id="pe-nombre" required minlength="3">
+        </div>
+        <div class="campo-grupo">
+          <div class="campo">
+            <label for="pe-placa">Placa</label>
+            <input type="text" id="pe-placa" required>
+          </div>
+          <div class="campo">
+            <label for="pe-estado">Estado</label>
+            <select id="pe-estado" required>
+              <option value="registrado">Registrado</option>
+              <option value="atendido">Atendido</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-botones">
+          <button type="button" id="btn-cancelar-editar" class="btn btn-outline">Cancelar</button>
+          <button type="submit" class="btn">Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/panel/panel.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+
+</body>
+</html>

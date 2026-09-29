@@ -1,0 +1,229 @@
+:root {
+  --color-primary: #163a5c;
+  --color-primary-dark: #0f2740;
+  --color-accent: #f2994a;
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-line: #e1e6ea;
+  --color-ink: #16232e;
+  --color-ink-soft: #55636e;
+  --radius: 10px;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+/* Reset básico */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+a { color: inherit; }
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Encabezado */
+.site-header {
+  background: var(--color-primary-dark);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.site-header .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #fff;
+  text-decoration: none;
+}
+nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #cfe0ea;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+nav a:hover { color: var(--color-accent); }
+
+/* Títulos y textos generales */
+h1 { color: var(--color-ink); font-family: var(--font-display); font-size: 1.8rem; margin: 0 0 10px; }
+h2 { color: var(--color-ink); font-family: var(--font-display); font-size: 1.4rem; margin: 0 0 8px; }
+.section-intro { color: var(--color-ink-soft); margin: 0 0 10px; max-width: 640px; }
+.nota { color: var(--color-ink-soft); font-size: 0.88rem; margin-top: 12px; }
+
+/* Sección principal */
+.vuelos { padding: 44px 0 56px; }
+.foto-banner {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+
+/* Efecto: degradado azul cielo en el encabezado de esta página + ícono de avión animado (animación) */
+.vuelos-header {
+  position: relative;
+  background: linear-gradient(180deg, #8fd3f4, #e9f7fd);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.vuelos-header h1 { margin: 0; }
+.avion-header {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  width: 28px;
+  height: 28px;
+  color: var(--color-primary);
+  transform: translateY(-50%);
+  animation: avion-mover 4s ease-in-out infinite;
+}
+@keyframes avion-mover {
+  0%   { left: 5%; }
+  50%  { left: 85%; }
+  100% { left: 5%; }
+}
+
+/* Franja de aerolíneas */
+.aerolineas-label {
+  color: var(--color-ink-soft);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+.aerolineas {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 20px;
+  padding: 0;
+}
+.aerolineas li {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Leyenda y badges de estado */
+.leyenda-estados {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 0;
+}
+.estado-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.estado-a-tiempo { background: #e3f6ea; color: #1f8a4c; }
+.estado-embarcando { background: #e3edf9; color: #1c5fa8; }
+.estado-demorado { background: #fdf1de; color: #b5720c; }
+.estado-cancelado { background: #fbe5e5; color: #b53030; }
+
+/* FAQ */
+.titulo-faq {
+  margin-top: 44px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-line);
+}
+.faq details {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+.faq summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+.faq p { color: var(--color-ink-soft); margin: 10px 0 0; }
+
+/* Tabla de horarios */
+.tabla-scroll { overflow-x: auto; margin-top: 16px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(22, 58, 92, 0.12);
+}
+th, td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-line);
+  font-size: 0.92rem;
+}
+thead th {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr { transition: background-color 0.2s ease; }
+tbody tr:hover { background-color: var(--color-bg); }
+
+/* Animación: resaltado del vuelo próximo a salir */
+.vuelo-proximo { animation: resaltar-vuelo 1.6s ease-in-out infinite alternate; }
+@keyframes resaltar-vuelo {
+  from { background-color: transparent; }
+  to   { background-color: #fdf1de; }
+}
+
+/* Pie de página */
+.site-footer {
+  background: var(--color-primary-dark);
+  color: #fff;
+  padding: 32px 0;
+  margin-top: 40px;
+}
+.footer-grid {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-grid .logo { color: #fff; }
+address { font-style: normal; color: #cfe0ea; }
+address a { color: #fff; text-decoration: underline; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .vuelos-header h1 { font-size: 1.4rem; }
+  .avion-header { width: 20px; height: 20px; }
+}
