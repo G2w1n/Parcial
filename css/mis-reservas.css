@@ -218,3 +218,36 @@ address a { color: #fff; text-decoration: underline; }
 @media (max-width: 600px) {
   .buscador-codigo { flex-direction: column; }
 }
+/* Transiciones y animaciones de la tabla */
+.estado-badge { transition: background-color 0.5s ease, color 0.5s ease; }
+
+.fila-entrada { animation: fila-entrar 0.4s ease both; }
+@keyframes fila-entrar {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fila-nueva { animation: destello-nueva 3.2s ease 0.5s both; }
+@keyframes destello-nueva {
+  0%, 45% { background-color: #d7f0e0; }
+  100%    { background-color: transparent; }
+}
+
+.fila-esqueleto td { padding-top: 16px; padding-bottom: 16px; }
+.barra-esqueleto {
+  display: block;
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eceff3 25%, #f7f9fb 50%, #eceff3 75%);
+  background-size: 200% 100%;
+  animation: brillo 1.2s linear infinite;
+}
+@keyframes brillo {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fila-entrada, .barra-esqueleto { animation: none; }
+  .fila-nueva { animation: none; background-color: #d7f0e0; }
+}

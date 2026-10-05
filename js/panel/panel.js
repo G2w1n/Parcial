@@ -1,5 +1,5 @@
 import { sql } from '../config/neon-config.js';
-import { exigirSesion } from '../auth/auth.js';
+import { exigirSesion, consultarTurno, textoTurno, tipoTurno, expulsar } from '../auth/auth.js';
 
 const usuario = exigirSesion();
 
@@ -9,6 +9,7 @@ if (usuario && usuario.rol === 'cliente') {
 
 const puedeUsarPanel = !!usuario && usuario.rol !== 'cliente';
 const esAdministrador = !!usuario && usuario.rol === 'administrador';
+const esEmpleado = !!usuario && usuario.rol === 'empleado';
 
 // ---------- Elementos de la página ----------
 const filtroTurno = document.getElementById('filtro-turno');
@@ -45,6 +46,45 @@ function mostrarSoloAdmin() {
   });
 }
 
+// ---------- Control de horario (solo empleados) ----------
+function mostrarTurno(turno) {
+  const info = document.getElementById('info-turno');
+  const texto = textoTurno(turno);
+  if (!info || !texto) return;
+  info.textContent = `Tu horario de trabajo: ${texto} (turno ${tipoTurno(turno)}, hora de Perú)`;
+  info.style.display = 'block';
+}
+
+async function verificarAcceso() {
+  if (!esEmpleado) return true;
+  try {
+    const turno = await consultarTurno(usuario.id);
+    if (!turno || !turno.activo) {
+      expulsar('desactivada');
+      return false;
+    }
+    if (!turno.en_turno) {
+      expulsar('turno');
+      return false;
+    }
+    mostrarTurno(turno);
+    return true;
+  } catch (error) {
+    console.error(error);
+    return true; // si falla la consulta no se expulsa por un error de red
+  }
+}
+
+async function asegurarTurno() {
+  if (!(await verificarAcceso())) {
+    throw new Error('Fuera de turno');
+  }
+}
+
+function esFueraDeTurno(error) {
+  return error && error.message === 'Fuera de turno';
+}
+
 // ---------- Consultas: reservas ----------
 export async function listarTodos() {
   return await sql`SELECT * FROM reservas_estacionamiento ORDER BY fecha_registro DESC;`;
@@ -59,6 +99,7 @@ export async function listarDeHoy() {
 }
 
 export async function crearRegistro(datos) {
+  await asegurarTurno();
   const codigo = 'COD-' + Date.now().toString().slice(-8);
   await sql`
     INSERT INTO reservas_estacionamiento
@@ -70,6 +111,7 @@ export async function crearRegistro(datos) {
 }
 
 export async function actualizarComoPanel(id, datos) {
+  await asegurarTurno();
   await sql`
     UPDATE reservas_estacionamiento
     SET nombre_pasajero = ${datos.nombre_pasajero}, placa = ${datos.placa}, estado = ${datos.estado},
@@ -79,6 +121,7 @@ export async function actualizarComoPanel(id, datos) {
 }
 
 export async function marcarAtendido(id) {
+  await asegurarTurno();
   await sql`
     UPDATE reservas_estacionamiento
     SET estado = 'atendido', gestionado_por = ${usuario.id}, fecha_gestion = NOW()
@@ -126,18 +169,25 @@ export async function empleadoConMasGestiones() {
 
 // ---------- Consultas: empleados ----------
 export async function listarEmpleados() {
-  return await sql`SELECT id, nombre, correo, activo FROM usuarios WHERE rol = 'empleado' ORDER BY nombre;`;
+  return await sql`
+    SELECT id, nombre, correo, activo, hora_inicio, hora_fin
+    FROM usuarios WHERE rol = 'empleado' ORDER BY nombre;
+  `;
 }
 
 export async function crearEmpleado(datos) {
   await sql`
-    INSERT INTO usuarios (nombre, correo, contrasena, rol)
-    VALUES (${datos.nombre}, ${datos.correo}, ${datos.contrasena}, 'empleado');
+    INSERT INTO usuarios (nombre, correo, contrasena, rol, hora_inicio, hora_fin)
+    VALUES (${datos.nombre}, ${datos.correo}, ${datos.contrasena}, 'empleado', ${datos.hora_inicio}, ${datos.hora_fin});
   `;
 }
 
 export async function cambiarEstadoEmpleado(id, activo) {
   await sql`UPDATE usuarios SET activo = ${activo} WHERE id = ${id} AND rol = 'empleado';`;
+}
+
+export async function cambiarHorarioEmpleado(id, inicio, fin) {
+  await sql`UPDATE usuarios SET hora_inicio = ${inicio}, hora_fin = ${fin} WHERE id = ${id} AND rol = 'empleado';`;
 }
 
 // ---------- Consultas: auditoría ----------
@@ -193,6 +243,8 @@ function aplicarFiltros() {
   });
 }
 
+let primeraCarga = true;
+
 async function cargarTabla(soloHoy = false) {
   const cuerpoTabla = document.getElementById('tabla-panel-body');
   if (!cuerpoTabla) return;
@@ -200,11 +252,16 @@ async function cargarTabla(soloHoy = false) {
   try {
     const reservas = soloHoy ? await listarDeHoy() : await listarTodos();
     cuerpoTabla.innerHTML = '';
-    reservas.forEach((reserva) => {
+    reservas.forEach((reserva, i) => {
       const tr = pintarFila(reserva);
 
+      if (primeraCarga) {
+        tr.classList.add('fila-entrada');
+        tr.style.animationDelay = `${Math.min(i * 40, 600)}ms`;
+      }
+
       const botonAtender = tr.querySelector('.btn-atender');
-      if (botonAtender) botonAtender.addEventListener('click', () => marcarComoAtendida(reserva.id));
+      if (botonAtender) botonAtender.addEventListener('click', () => marcarComoAtendida(reserva.id, tr));
 
       tr.querySelector('.btn-editar').addEventListener('click', () => abrirModalEditar(reserva));
 
@@ -213,6 +270,7 @@ async function cargarTabla(soloHoy = false) {
 
       cuerpoTabla.appendChild(tr);
     });
+    primeraCarga = false;
     aplicarFiltros();
   } catch (error) {
     console.error(error);
@@ -253,11 +311,22 @@ async function cargarEstadisticas() {
 }
 
 // ---------- Acciones sobre reservas ----------
-async function marcarComoAtendida(id) {
+async function marcarComoAtendida(id, fila) {
   try {
     await marcarAtendido(id);
-    recargarTodo();
+
+    // El badge cambia de color con transición antes de recargar la tabla
+    const badge = fila.querySelector('.estado-badge');
+    badge.className = 'estado-badge estado-atendido';
+    badge.textContent = 'atendido';
+    fila.dataset.estado = 'atendido';
+    const botonAtender = fila.querySelector('.btn-atender');
+    if (botonAtender) botonAtender.remove();
+    fila.classList.add('fila-destacada');
+
+    setTimeout(recargarTodo, 900);
   } catch (error) {
+    if (esFueraDeTurno(error)) return;
     console.error(error);
     alert('Ocurrió un error al marcar la reserva como atendida.');
   }
@@ -303,6 +372,7 @@ if (formCrear) {
       formCrear.reset();
       recargarTodo();
     } catch (error) {
+      if (esFueraDeTurno(error)) return;
       console.error(error);
       mostrarMensaje(confirmacionEl, 'Ocurrió un error al registrar la reserva.', true);
     }
@@ -340,6 +410,7 @@ formEditar.addEventListener('submit', async (evento) => {
     modal.classList.remove('abierto');
     recargarTodo();
   } catch (error) {
+    if (esFueraDeTurno(error)) return;
     console.error(error);
     alert('Ocurrió un error al guardar los cambios.');
   }
@@ -393,7 +464,17 @@ async function exportarCSV() {
 const botonExportar = document.getElementById('btn-exportar-csv');
 if (botonExportar) botonExportar.addEventListener('click', exportarCSV);
 
-// ---------- Gestión de empleados (administrador) ----------
+// ---------- Gestión de empleados y horarios (administrador) ----------
+async function guardarHorario(id, inicio, fin) {
+  try {
+    await cambiarHorarioEmpleado(id, inicio, fin);
+    cargarEmpleados();
+  } catch (error) {
+    console.error(error);
+    alert('Ocurrió un error al guardar el horario.');
+  }
+}
+
 async function cargarEmpleados() {
   const cuerpo = document.getElementById('tabla-empleados-body');
   if (!cuerpo) return;
@@ -402,14 +483,43 @@ async function cargarEmpleados() {
     const empleados = await listarEmpleados();
     cuerpo.innerHTML = '';
     empleados.forEach((emp) => {
+      const tipo = tipoTurno(emp);
+      const inicio = emp.hora_inicio ? emp.hora_inicio.slice(0, 5) : '';
+      const fin = emp.hora_fin ? emp.hora_fin.slice(0, 5) : '';
+
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${escaparHTML(emp.nombre)}</td>
         <td>${escaparHTML(emp.correo)}</td>
         <td><span class="estado-badge ${emp.activo ? 'estado-registrado' : 'estado-cancelado'}">${emp.activo ? 'activo' : 'desactivado'}</span></td>
-        <td><button type="button" class="btn-fila ${emp.activo ? 'btn-eliminar' : 'btn-editar'}">${emp.activo ? 'Desactivar' : 'Activar'}</button></td>
+        <td>
+          <div class="editor-horario">
+            <input type="time" class="hora-inicio" value="${inicio}" aria-label="Hora de entrada">
+            <span>a</span>
+            <input type="time" class="hora-fin" value="${fin}" aria-label="Hora de salida">
+            <button type="button" class="btn-fila btn-editar btn-guardar-horario">Guardar</button>
+            <button type="button" class="btn-fila btn-quitar-horario">Sin límite</button>
+          </div>
+          <span class="etiqueta-turno turno-${tipo || 'libre'}">${tipo ? 'Turno ' + tipo : 'Sin restricción de horario'}</span>
+        </td>
+        <td><button type="button" class="btn-fila btn-cambiar-estado ${emp.activo ? 'btn-eliminar' : 'btn-editar'}">${emp.activo ? 'Desactivar' : 'Activar'}</button></td>
       `;
-      tr.querySelector('button').addEventListener('click', async () => {
+
+      tr.querySelector('.btn-guardar-horario').addEventListener('click', () => {
+        const nuevoInicio = tr.querySelector('.hora-inicio').value;
+        const nuevoFin = tr.querySelector('.hora-fin').value;
+        if (!nuevoInicio || !nuevoFin) {
+          alert('Completa la hora de entrada y la de salida, o usa "Sin límite".');
+          return;
+        }
+        guardarHorario(emp.id, nuevoInicio, nuevoFin);
+      });
+
+      tr.querySelector('.btn-quitar-horario').addEventListener('click', () => {
+        guardarHorario(emp.id, null, null);
+      });
+
+      tr.querySelector('.btn-cambiar-estado').addEventListener('click', async () => {
         try {
           await cambiarEstadoEmpleado(emp.id, !emp.activo);
           cargarEmpleados();
@@ -418,6 +528,7 @@ async function cargarEmpleados() {
           alert('Ocurrió un error al cambiar el estado del empleado.');
         }
       });
+
       cuerpo.appendChild(tr);
     });
   } catch (error) {
@@ -429,12 +540,22 @@ const formEmpleado = document.getElementById('form-crear-empleado');
 if (formEmpleado) {
   formEmpleado.addEventListener('submit', async (evento) => {
     evento.preventDefault();
+    const inicio = document.getElementById('em-inicio').value || null;
+    const fin = document.getElementById('em-fin').value || null;
+    const mensajeEl = document.getElementById('empleado-confirmacion');
+
+    if ((inicio && !fin) || (!inicio && fin)) {
+      mostrarMensaje(mensajeEl, 'Completa la entrada y la salida del turno, o deja ambas vacías.', true);
+      return;
+    }
+
     const datos = {
       nombre: document.getElementById('em-nombre').value,
       correo: document.getElementById('em-correo').value,
       contrasena: document.getElementById('em-contrasena').value,
+      hora_inicio: inicio,
+      hora_fin: fin,
     };
-    const mensajeEl = document.getElementById('empleado-confirmacion');
     try {
       await crearEmpleado(datos);
       mostrarMensaje(mensajeEl, '✓ Cuenta de empleado creada.');
@@ -507,10 +628,25 @@ if (botonLimpiarAudit) {
 }
 
 // ---------- Arranque ----------
-if (puedeUsarPanel) {
+async function iniciar() {
+  if (!puedeUsarPanel) return;
+
+  // Un empleado fuera de su horario no llega a ver datos
+  if (!(await verificarAcceso())) return;
+
   recargarTodo();
   if (esAdministrador) {
     mostrarSoloAdmin();
     cargarEmpleados();
   }
+
+  if (esEmpleado) {
+    // Revisa el horario cada 30 segundos y al volver a esta pestaña
+    setInterval(verificarAcceso, 30000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) verificarAcceso();
+    });
+  }
 }
+
+iniciar();

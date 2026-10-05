@@ -26,6 +26,7 @@
       <div class="wrap">
         <h1>Panel de gestión — Reservas de estacionamiento</h1>
         <p class="section-intro">Gestiona las reservas del sistema según tu rol.</p>
+        <p id="info-turno" class="info-turno"></p>
 
         <div class="resumen-turno">
           <h2>Resumen de hoy</h2>
@@ -102,7 +103,7 @@
         <div class="barra-tabla">
           <label class="filtro-turno-label">
             <input type="checkbox" id="filtro-turno">
-            Ver solo reservas de hoy (mi turno)
+            Ver solo reservas de hoy
           </label>
 
           <div class="buscador-panel">
@@ -158,6 +159,16 @@
                   <input type="password" id="em-contrasena" required minlength="6">
                 </div>
               </div>
+              <div class="campo-grupo">
+                <div class="campo">
+                  <label for="em-inicio">Entrada del turno (hora de Perú)</label>
+                  <input type="time" id="em-inicio" value="06:00">
+                </div>
+                <div class="campo">
+                  <label for="em-fin">Salida del turno (hora de Perú)</label>
+                  <input type="time" id="em-fin" value="18:00">
+                </div>
+              </div>
               <button type="submit" class="btn">Crear empleado</button>
             </form>
             <p id="empleado-confirmacion" class="confirmacion-estacionamiento"></p>
@@ -171,6 +182,7 @@
                   <th scope="col">Nombre</th>
                   <th scope="col">Correo</th>
                   <th scope="col">Estado</th>
+                  <th scope="col">Horario de trabajo (hora de Perú)</th>
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>

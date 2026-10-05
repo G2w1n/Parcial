@@ -1,5 +1,4 @@
-// js/auth/login.js
-import { registrarUsuario, iniciarSesion } from './auth.js';
+import { registrarUsuario, iniciarSesion, textoTurno } from './auth.js';
 
 const formIniciar = document.getElementById('form-iniciar-sesion');
 const formCrear = document.getElementById('form-crear-cuenta');
@@ -21,6 +20,16 @@ function redirigirSegunRol(usuario) {
   window.location.href = usuario.rol === 'cliente' ? 'Transporte.html' : 'panel.html';
 }
 
+// Mensaje cuando el sistema cerró la sesión por turno terminado o cuenta desactivada
+const motivo = new URLSearchParams(window.location.search).get('motivo');
+const mensajesMotivo = {
+  turno: 'Tu turno terminó o fue modificado, por eso se cerró tu sesión.',
+  desactivada: 'Tu cuenta fue desactivada. Consulta con el administrador.',
+};
+if (motivo && mensajesMotivo[motivo]) {
+  mostrarError('login-error', mensajesMotivo[motivo]);
+}
+
 if (formIniciar) {
   formIniciar.addEventListener('submit', async (evento) => {
     evento.preventDefault();
@@ -37,6 +46,11 @@ if (formIniciar) {
       }
       redirigirSegunRol(usuario);
     } catch (error) {
+      if (error.name === 'FueraDeTurno') {
+        const horario = textoTurno(error.turno);
+        mostrarError('login-error', `Estás fuera de tu horario de trabajo (${horario}, hora de Perú). Podrás ingresar durante tu turno.`);
+        return;
+      }
       console.error(error);
       mostrarError('login-error', 'Ocurrió un error al iniciar sesión. Intenta de nuevo.');
     }

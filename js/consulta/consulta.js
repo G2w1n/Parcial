@@ -22,6 +22,16 @@ export async function buscarReservaPorCodigo(codigo) {
   return filas[0] || null;
 }
 
+function escaparHTML(texto) {
+  if (texto === null || texto === undefined) return '';
+  return String(texto)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function formatearFecha(valor) {
   if (!valor) return '—';
   const fecha = new Date(valor);
@@ -30,25 +40,44 @@ function formatearFecha(valor) {
 
 function pintarFila(reserva) {
   const tr = document.createElement('tr');
+  tr.dataset.codigo = reserva.codigo_seguimiento;
+
   const accion = reserva.estado === 'registrado'
-    ? `<a href="actualizar.html?codigo=${reserva.codigo_seguimiento}" class="btn-editar-fila">Editar</a>`
+    ? `<a href="actualizar.html?codigo=${encodeURIComponent(reserva.codigo_seguimiento)}" class="btn-editar-fila">Editar</a>`
     : '—';
 
   tr.innerHTML = `
-    <td>${reserva.codigo_seguimiento}</td>
-    <td>${reserva.placa}</td>
+    <td>${escaparHTML(reserva.codigo_seguimiento)}</td>
+    <td>${escaparHTML(reserva.placa)}</td>
     <td>${formatearFecha(reserva.fecha_hora_entrada)}</td>
-    <td><span class="estado-badge">${reserva.estado}</span></td>
+    <td><span class="estado-badge estado-${reserva.estado}">${reserva.estado}</span></td>
     <td>${formatearFecha(reserva.fecha_registro)}</td>
     <td>${accion}</td>
   `;
   return tr;
 }
 
+// Esqueleto de carga mientras llegan los datos
+function mostrarEsqueleto(cuerpoTabla) {
+  cuerpoTabla.innerHTML = '';
+  for (let i = 0; i < 4; i++) {
+    const tr = document.createElement('tr');
+    tr.className = 'fila-esqueleto';
+    tr.setAttribute('aria-hidden', 'true');
+    tr.innerHTML = '<td><span class="barra-esqueleto"></span></td>'.repeat(6);
+    cuerpoTabla.appendChild(tr);
+  }
+}
+
 async function cargarMisReservas() {
   const cuerpoTabla = document.getElementById('tabla-reservas-body');
   const vacioEl = document.getElementById('reservas-vacio');
   if (!cuerpoTabla) return;
+
+  mostrarEsqueleto(cuerpoTabla);
+
+  // Si venimos de reservar, el código llega en la URL para resaltar esa fila
+  const codigoNuevo = new URLSearchParams(window.location.search).get('nueva');
 
   try {
     const reservas = await consultarMisReservas();
@@ -61,9 +90,27 @@ async function cargarMisReservas() {
     }
 
     vacioEl.style.display = 'none';
-    reservas.forEach((reserva) => cuerpoTabla.appendChild(pintarFila(reserva)));
+
+    let filaNueva = null;
+    reservas.forEach((reserva, i) => {
+      const tr = pintarFila(reserva);
+
+      if (codigoNuevo && reserva.codigo_seguimiento === codigoNuevo) {
+        tr.classList.add('fila-nueva');          // la reserva recién creada parpadea en verde
+        filaNueva = tr;
+      } else {
+        tr.classList.add('fila-entrada');        // las demás entran escalonadas
+        tr.style.animationDelay = `${Math.min(i * 60, 600)}ms`;
+      }
+      cuerpoTabla.appendChild(tr);
+    });
+
+    if (filaNueva) {
+      filaNueva.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   } catch (error) {
     console.error(error);
+    cuerpoTabla.innerHTML = '';
     vacioEl.textContent = 'Ocurrió un error al cargar tus reservas.';
     vacioEl.style.display = 'block';
   }

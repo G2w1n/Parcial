@@ -7,11 +7,10 @@
   <meta name="description" content="Transporte y estacionamiento del Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/Transporte.css">
+  <link rel="stylesheet" href="css/Transporte.css">
 </head>
 <body>
 
-  <!-- Encabezado y navegación -->
   <header class="site-header">
     <div class="wrap">
       <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
@@ -83,38 +82,98 @@
 
         </div>
 
-        <div class="reserva-card">
-          <h2>Reserva de estacionamiento</h2>
-          <p class="section-intro">Crea una cuenta o inicia sesión para reservar tu espacio con anticipación.</p>
+        <div class="reserva-layout">
 
-          <form id="form-reserva-estacionamiento" class="formulario" action="#" method="post">
-            <div class="campo">
-              <label for="re-nombre">Nombre completo</label>
-              <input type="text" id="re-nombre" name="nombre_pasajero" required minlength="3" placeholder="Nombres y apellidos">
-            </div>
+          <div class="reserva-card" id="reserva-card">
+            <h2>Reserva de estacionamiento</h2>
+            <p class="section-intro">Completa tus datos para reservar tu espacio con anticipación.</p>
 
-            <div class="campo-grupo">
-              <div class="campo">
-                <label for="re-placa">Placa del vehículo</label>
-                <input type="text" id="re-placa" name="placa" required pattern="[A-Za-z0-9-]{6,10}" placeholder="ABC-123">
+            <form id="form-reserva-estacionamiento" class="formulario" action="#" method="post" novalidate>
+              <div class="campo-flotante campo-entrada">
+                <input type="text" id="re-nombre" name="nombre_pasajero" placeholder=" " required minlength="3" autocomplete="name" aria-describedby="msg-nombre">
+                <label for="re-nombre">Nombre completo</label>
+                <span class="mensaje-campo" id="msg-nombre"></span>
               </div>
-              <div class="campo">
-                <label for="re-fecha">Fecha y hora de entrada</label>
-                <input type="datetime-local" id="re-fecha" name="fecha_hora_entrada" required>
+
+              <div class="campo-grupo">
+                <div class="campo-flotante campo-entrada">
+                  <input type="text" id="re-placa" name="placa" placeholder=" " required pattern="[A-Za-z0-9-]{6,10}" maxlength="10" aria-describedby="msg-placa">
+                  <label for="re-placa">Placa del vehículo</label>
+                  <span class="mensaje-campo" id="msg-placa"></span>
+                </div>
+                <div class="campo-flotante campo-entrada">
+                  <input type="datetime-local" id="re-fecha" name="fecha_hora_entrada" placeholder=" " required aria-describedby="msg-fecha">
+                  <label for="re-fecha">Fecha y hora de entrada</label>
+                  <span class="mensaje-campo" id="msg-fecha"></span>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-reservar">
+                <span class="btn-texto">Reservar estacionamiento</span>
+                <svg class="btn-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+              </button>
+            </form>
+
+            <p id="reserva-confirmacion" class="confirmacion-estacionamiento"></p>
+
+            <div id="ticket-reserva" class="ticket-reserva" hidden>
+              <div class="ticket-principal">
+                <p class="ticket-etiqueta">Reserva confirmada</p>
+                <p class="ticket-codigo" id="tk-codigo">COD-00000000</p>
+                <div class="ticket-datos">
+                  <div><span>Pasajero</span><strong id="tk-nombre">—</strong></div>
+                  <div><span>Placa</span><strong id="tk-placa">—</strong></div>
+                  <div><span>Entrada</span><strong id="tk-fecha">—</strong></div>
+                </div>
+              </div>
+              <div class="ticket-talon">
+                <button type="button" id="btn-copiar" class="btn-copiar">Copiar código</button>
+                <a href="mis-reservas.html" id="tk-ver" class="ticket-link">Ver mis reservas</a>
+                <div class="ticket-barras" aria-hidden="true"></div>
               </div>
             </div>
+          </div>
 
-            <button type="submit" class="btn">Reservar estacionamiento</button>
-          </form>
+          <aside class="resumen-vivo" aria-live="polite">
+            <h3>Tu reserva</h3>
+            <dl>
+              <div class="resumen-fila"><dt>Pasajero</dt><dd id="rv-nombre">—</dd></div>
+              <div class="resumen-fila"><dt>Placa</dt><dd id="rv-placa">—</dd></div>
+              <div class="resumen-fila"><dt>Entrada</dt><dd id="rv-fecha">—</dd></div>
+            </dl>
+            <p class="resumen-listo" id="rv-listo">✓ Todo listo para reservar</p>
+          </aside>
 
-          <p id="reserva-confirmacion" class="confirmacion-estacionamiento"></p>
         </div>
 
-        <div class="reserva-card">
+        <div class="mis-reservas-card">
           <h2>Mis reservas</h2>
-          <div id="lista-reservas">
-            <p class="reservas-vacio">Cargando tus reservas…</p>
+
+          <form id="form-buscar-codigo" class="buscador-codigo" action="#" method="get">
+            <label for="buscar-codigo" class="visually-hidden">Buscar por código de seguimiento</label>
+            <input type="text" id="buscar-codigo" name="codigo" placeholder="Buscar por código (ej. COD-12345678)">
+            <button type="submit" class="btn">Buscar</button>
+          </form>
+          <p id="busqueda-resultado" class="busqueda-resultado"></p>
+
+          <div class="tabla-scroll">
+            <table>
+              <caption class="visually-hidden">Mis reservas de estacionamiento</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Código</th>
+                  <th scope="col">Placa</th>
+                  <th scope="col">Entrada</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Registrado el</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-reservas-body"></tbody>
+            </table>
           </div>
+
+          <p id="reservas-vacio" class="reservas-vacio">Cargando tus reservas...</p>
         </div>
 
       </div>
@@ -135,8 +194,8 @@
   </footer>
 
   <script type="module" src="js/registro/registro.js"></script>
+  <script type="module" src="js/consulta/consulta.js"></script>
   <script type="module" src="js/auth/nav-sesion.js"></script>
-  <script type="module" src="js/consulta.js"></script>
 
 </body>
 </html>

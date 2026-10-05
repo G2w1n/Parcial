@@ -257,3 +257,57 @@ address a { color: #fff; text-decoration: underline; }
 @media (max-width: 700px) {
   .campo-grupo { grid-template-columns: 1fr; }
 }
+
+.estado-badge { transition: background-color 0.5s ease, color 0.5s ease; }
+
+.fila-entrada { animation: fila-entrar 0.4s ease both; }
+@keyframes fila-entrar {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fila-destacada { animation: destello-fila 1.4s ease both; }
+@keyframes destello-fila {
+  0%   { background-color: #d9e8f8; }
+  100% { background-color: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fila-entrada, .fila-destacada { animation: none; }
+}
+
+/* Horarios de empleados */
+.info-turno {
+  display: none;
+  margin: -12px 0 20px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #e3edf9;
+  color: #1c5fa8;
+  font-size: 0.9rem;
+  font-weight: 600;
+  max-width: 640px;
+}
+input[type="time"] {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  width: 100%;
+}
+.editor-horario { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.editor-horario input[type="time"] { width: auto; padding: 6px 8px; }
+.etiqueta-turno {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.turno-diurno { background: #fdf1de; color: #b5720c; }
+.turno-nocturno { background: #e8e6f7; color: #4b3fa0; }
+.turno-libre { background: var(--color-bg); color: var(--color-ink-soft); }
