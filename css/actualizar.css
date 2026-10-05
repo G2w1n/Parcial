@@ -180,3 +180,49 @@ address a { color: #fff; text-decoration: underline; }
   .campo-grupo { grid-template-columns: 1fr; }
   .botones-actualizar { flex-direction: column; }
 }
+
+/* ====== Tipo de servicio y costo ====== */
+.campo-servicio { border: 0; padding: 0; margin: 0 0 20px; min-width: 0; }
+.campo-servicio legend {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  padding: 0;
+  margin-bottom: 8px;
+}
+.opciones-servicio { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.opcion-servicio { position: relative; cursor: pointer; display: block; }
+.opcion-servicio input { position: absolute; opacity: 0; pointer-events: none; }
+.opcion-caja {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--color-line);
+  border-radius: 10px;
+  background: var(--color-bg);
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.opcion-servicio:hover .opcion-caja { border-color: #b9c5d0; }
+.opcion-servicio input:checked + .opcion-caja {
+  border-color: var(--color-primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.12);
+}
+.opcion-servicio input[value="vip"]:checked + .opcion-caja {
+  border-color: #b5720c;
+  background: #fffaf2;
+  box-shadow: 0 0 0 3px rgba(242, 153, 74, 0.25);
+}
+.opcion-servicio input:focus-visible + .opcion-caja { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.opcion-caja strong { font-family: var(--font-display); font-size: 0.95rem; color: var(--color-primary); }
+.opcion-precio { font-weight: 700; font-size: 1.05rem; }
+.opcion-desc { font-size: 0.75rem; color: var(--color-ink-soft); }
+
+.costo-linea { margin: 0 0 20px; font-size: 1rem; color: var(--color-ink-soft); }
+.costo-linea strong { color: var(--color-primary); font-size: 1.15rem; }
+
+@media (max-width: 600px) {
+  .opciones-servicio { grid-template-columns: 1fr; }
+}

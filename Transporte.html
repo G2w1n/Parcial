@@ -108,6 +108,28 @@
                 </div>
               </div>
 
+              <fieldset class="campo-servicio campo-entrada">
+                <legend>Tipo de servicio</legend>
+                <div class="opciones-servicio">
+                  <label class="opcion-servicio">
+                    <input type="radio" name="tipo_servicio" value="normal" checked>
+                    <span class="opcion-caja">
+                      <strong data-etiqueta="normal">Taxi normal</strong>
+                      <span class="opcion-precio" data-precio="normal">—</span>
+                      <span class="opcion-desc">Servicio estándar</span>
+                    </span>
+                  </label>
+                  <label class="opcion-servicio">
+                    <input type="radio" name="tipo_servicio" value="vip">
+                    <span class="opcion-caja">
+                      <strong data-etiqueta="vip">Taxi VIP</strong>
+                      <span class="opcion-precio" data-precio="vip">—</span>
+                      <span class="opcion-desc">Vehículo ejecutivo, acceso preferente</span>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
               <button type="submit" class="btn btn-reservar">
                 <span class="btn-texto">Reservar estacionamiento</span>
                 <svg class="btn-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
@@ -124,6 +146,8 @@
                   <div><span>Pasajero</span><strong id="tk-nombre">—</strong></div>
                   <div><span>Placa</span><strong id="tk-placa">—</strong></div>
                   <div><span>Entrada</span><strong id="tk-fecha">—</strong></div>
+                  <div><span>Servicio</span><strong id="tk-servicio">—</strong></div>
+                  <div><span>Costo estimado</span><strong id="tk-costo">—</strong></div>
                 </div>
               </div>
               <div class="ticket-talon">
@@ -140,6 +164,8 @@
               <div class="resumen-fila"><dt>Pasajero</dt><dd id="rv-nombre">—</dd></div>
               <div class="resumen-fila"><dt>Placa</dt><dd id="rv-placa">—</dd></div>
               <div class="resumen-fila"><dt>Entrada</dt><dd id="rv-fecha">—</dd></div>
+              <div class="resumen-fila"><dt>Servicio</dt><dd id="rv-servicio">—</dd></div>
+              <div class="resumen-fila resumen-total"><dt>Costo estimado</dt><dd id="rv-costo">—</dd></div>
             </dl>
             <p class="resumen-listo" id="rv-listo">✓ Todo listo para reservar</p>
           </aside>
@@ -163,6 +189,8 @@
                 <tr>
                   <th scope="col">Código</th>
                   <th scope="col">Placa</th>
+                  <th scope="col">Servicio</th>
+                  <th scope="col">Costo estimado</th>
                   <th scope="col">Entrada</th>
                   <th scope="col">Estado</th>
                   <th scope="col">Registrado el</th>

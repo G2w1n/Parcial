@@ -1,11 +1,12 @@
 import { sql } from '../config/neon-config.js';
 import { exigirSesion } from '../auth/auth.js';
+import { etiquetaServicio, formatearSoles } from '../config/tarifas.js';
 
 const usuario = exigirSesion();
 
 export async function consultarMisReservas() {
   const filas = await sql`
-    SELECT codigo_seguimiento, placa, fecha_hora_entrada, estado, fecha_registro
+    SELECT codigo_seguimiento, placa, fecha_hora_entrada, estado, fecha_registro, tipo_servicio, costo_estimado
     FROM reservas_estacionamiento
     WHERE usuario_id = ${usuario.id}
     ORDER BY fecha_registro DESC;
@@ -15,7 +16,7 @@ export async function consultarMisReservas() {
 
 export async function buscarReservaPorCodigo(codigo) {
   const filas = await sql`
-    SELECT codigo_seguimiento, placa, fecha_hora_entrada, estado, fecha_registro
+    SELECT codigo_seguimiento, placa, fecha_hora_entrada, estado, fecha_registro, tipo_servicio, costo_estimado
     FROM reservas_estacionamiento
     WHERE codigo_seguimiento = ${codigo} AND usuario_id = ${usuario.id};
   `;
@@ -49,6 +50,8 @@ function pintarFila(reserva) {
   tr.innerHTML = `
     <td>${escaparHTML(reserva.codigo_seguimiento)}</td>
     <td>${escaparHTML(reserva.placa)}</td>
+    <td><span class="servicio-badge servicio-${reserva.tipo_servicio}">${etiquetaServicio(reserva.tipo_servicio)}</span></td>
+    <td>${formatearSoles(reserva.costo_estimado)}</td>
     <td>${formatearFecha(reserva.fecha_hora_entrada)}</td>
     <td><span class="estado-badge estado-${reserva.estado}">${reserva.estado}</span></td>
     <td>${formatearFecha(reserva.fecha_registro)}</td>
@@ -64,7 +67,7 @@ function mostrarEsqueleto(cuerpoTabla) {
     const tr = document.createElement('tr');
     tr.className = 'fila-esqueleto';
     tr.setAttribute('aria-hidden', 'true');
-    tr.innerHTML = '<td><span class="barra-esqueleto"></span></td>'.repeat(6);
+    tr.innerHTML = '<td><span class="barra-esqueleto"></span></td>'.repeat(8);
     cuerpoTabla.appendChild(tr);
   }
 }
@@ -96,10 +99,10 @@ async function cargarMisReservas() {
       const tr = pintarFila(reserva);
 
       if (codigoNuevo && reserva.codigo_seguimiento === codigoNuevo) {
-        tr.classList.add('fila-nueva');          // la reserva recién creada parpadea en verde
+        tr.classList.add('fila-nueva');
         filaNueva = tr;
       } else {
-        tr.classList.add('fila-entrada');        // las demás entran escalonadas
+        tr.classList.add('fila-entrada');
         tr.style.animationDelay = `${Math.min(i * 60, 600)}ms`;
       }
       cuerpoTabla.appendChild(tr);
@@ -133,7 +136,7 @@ if (formBuscar) {
         resultadoEl.classList.add('no-encontrado');
         return;
       }
-      resultadoEl.textContent = `✓ Encontrada: placa ${reserva.placa}, estado "${reserva.estado}".`;
+      resultadoEl.textContent = `✓ Encontrada: placa ${reserva.placa}, ${etiquetaServicio(reserva.tipo_servicio)} (${formatearSoles(reserva.costo_estimado)}), estado "${reserva.estado}".`;
       resultadoEl.classList.add('encontrado');
     } catch (error) {
       console.error(error);

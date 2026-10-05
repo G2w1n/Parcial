@@ -1,5 +1,6 @@
 import { sql } from '../config/neon-config.js';
 import { exigirSesion, consultarTurno, textoTurno, tipoTurno, expulsar } from '../auth/auth.js';
+import { costoEstimado, etiquetaServicio, formatearSoles, llenarSelectorServicio } from '../config/tarifas.js';
 
 const usuario = exigirSesion();
 
@@ -19,6 +20,26 @@ const inputBuscar = document.getElementById('buscar-panel');
 const filtroEstado = document.getElementById('filtro-estado');
 const filtroAuditEmpleado = document.getElementById('filtro-audit-empleado');
 const filtroAuditFecha = document.getElementById('filtro-audit-fecha');
+
+// Selectores de tipo de servicio (crear y editar) con su costo estimado
+const selectCrearTipo = document.getElementById('pn-tipo');
+const costoCrear = document.getElementById('pn-costo');
+const selectEditarTipo = document.getElementById('pe-tipo');
+const costoEditar = document.getElementById('pe-costo');
+
+function mostrarCosto(select, destino) {
+  if (select && destino) destino.textContent = formatearSoles(costoEstimado(select.value));
+}
+
+if (selectCrearTipo) {
+  llenarSelectorServicio(selectCrearTipo);
+  mostrarCosto(selectCrearTipo, costoCrear);
+  selectCrearTipo.addEventListener('change', () => mostrarCosto(selectCrearTipo, costoCrear));
+}
+if (selectEditarTipo) {
+  llenarSelectorServicio(selectEditarTipo);
+  selectEditarTipo.addEventListener('change', () => mostrarCosto(selectEditarTipo, costoEditar));
+}
 
 // ---------- Utilidades ----------
 function escaparHTML(texto) {
@@ -271,9 +292,10 @@ export async function crearRegistro(datos) {
   const codigo = 'COD-' + Date.now().toString().slice(-8);
   await sql`
     INSERT INTO reservas_estacionamiento
-      (codigo_seguimiento, nombre_pasajero, placa, fecha_hora_entrada, estado, notas, gestionado_por, fecha_gestion)
+      (codigo_seguimiento, nombre_pasajero, placa, fecha_hora_entrada, estado, notas, tipo_servicio, costo_estimado, gestionado_por, fecha_gestion)
     VALUES
-      (${codigo}, ${datos.nombre_pasajero}, ${datos.placa}, ${datos.fecha_hora_entrada}, 'registrado', ${datos.notas}, ${usuario.id}, NOW());
+      (${codigo}, ${datos.nombre_pasajero}, ${datos.placa}, ${datos.fecha_hora_entrada}, 'registrado', ${datos.notas},
+       ${datos.tipo_servicio}, ${datos.costo_estimado}, ${usuario.id}, NOW());
   `;
   return codigo;
 }
@@ -283,7 +305,8 @@ export async function actualizarComoPanel(id, datos) {
   await sql`
     UPDATE reservas_estacionamiento
     SET nombre_pasajero = ${datos.nombre_pasajero}, placa = ${datos.placa}, estado = ${datos.estado},
-        notas = ${datos.notas}, gestionado_por = ${usuario.id}, fecha_gestion = NOW()
+        notas = ${datos.notas}, tipo_servicio = ${datos.tipo_servicio}, costo_estimado = ${datos.costo_estimado},
+        gestionado_por = ${usuario.id}, fecha_gestion = NOW()
     WHERE id = ${id};
   `;
 }
@@ -386,6 +409,8 @@ function pintarFila(reserva) {
     <td>${escaparHTML(reserva.codigo_seguimiento)}</td>
     <td>${escaparHTML(reserva.nombre_pasajero)}</td>
     <td>${escaparHTML(reserva.placa)}</td>
+    <td><span class="servicio-badge servicio-${reserva.tipo_servicio}">${etiquetaServicio(reserva.tipo_servicio)}</span></td>
+    <td>${formatearSoles(reserva.costo_estimado)}</td>
     <td>${formatearFecha(reserva.fecha_hora_entrada)}</td>
     <td><span class="estado-badge estado-${reserva.estado}">${reserva.estado}</span></td>
     <td class="celda-notas">${escaparHTML(reserva.notas) || '—'}</td>
@@ -429,7 +454,7 @@ function aplicarFiltros() {
     if (!vacia) {
       vacia = document.createElement('tr');
       vacia.className = 'fila-vacia';
-      vacia.innerHTML = '<td colspan="7">No hay reservas que coincidan con tu búsqueda.</td>';
+      vacia.innerHTML = '<td colspan="9">No hay reservas que coincidan con tu búsqueda.</td>';
       cuerpo.appendChild(vacia);
     }
   } else if (vacia) {
@@ -443,7 +468,7 @@ async function cargarTabla(soloHoy = false, destacar = null) {
   const cuerpoTabla = document.getElementById('tabla-panel-body');
   if (!cuerpoTabla) return;
 
-  if (!cuerpoTabla.dataset.cargado) mostrarEsqueleto(cuerpoTabla, 7);
+  if (!cuerpoTabla.dataset.cargado) mostrarEsqueleto(cuerpoTabla, 9);
 
   try {
     const reservas = soloHoy ? await listarDeHoy() : await listarTodos();
@@ -599,11 +624,14 @@ const formCrear = document.getElementById('form-crear-panel');
 if (formCrear) {
   formCrear.addEventListener('submit', async (evento) => {
     evento.preventDefault();
+    const tipo = selectCrearTipo.value;
     const datos = {
       nombre_pasajero: document.getElementById('pn-nombre').value,
       placa: document.getElementById('pn-placa').value,
       fecha_hora_entrada: document.getElementById('pn-fecha').value,
       notas: document.getElementById('pn-notas').value.trim() || null,
+      tipo_servicio: tipo,
+      costo_estimado: costoEstimado(tipo),
     };
     const confirmacionEl = document.getElementById('panel-confirmacion');
     const boton = formCrear.querySelector('button[type="submit"]');
@@ -612,6 +640,7 @@ if (formCrear) {
       mostrarMensaje(confirmacionEl, `✓ Reserva registrada. Código: ${codigo}.`);
       avisar(`Reserva ${codigo} registrada.`);
       formCrear.reset();
+      mostrarCosto(selectCrearTipo, costoCrear);
       recargarTodo(codigo);
     } catch (error) {
       if (esFueraDeTurno(error)) return;
@@ -632,6 +661,8 @@ function abrirModalEditar(reserva) {
   document.getElementById('pe-placa').value = reserva.placa;
   document.getElementById('pe-estado').value = reserva.estado;
   document.getElementById('pe-notas').value = reserva.notas || '';
+  selectEditarTipo.value = reserva.tipo_servicio || 'normal';
+  mostrarCosto(selectEditarTipo, costoEditar);
   modal.classList.remove('cerrando');
   modal.classList.add('abierto');
   setTimeout(() => document.getElementById('pe-nombre').focus(), 50);
@@ -654,11 +685,14 @@ document.addEventListener('keydown', (evento) => {
 formEditar.addEventListener('submit', async (evento) => {
   evento.preventDefault();
   const id = document.getElementById('pe-id').value;
+  const tipo = selectEditarTipo.value;
   const datos = {
     nombre_pasajero: document.getElementById('pe-nombre').value,
     placa: document.getElementById('pe-placa').value,
     estado: document.getElementById('pe-estado').value,
     notas: document.getElementById('pe-notas').value.trim() || null,
+    tipo_servicio: tipo,
+    costo_estimado: costoEstimado(tipo),
   };
   const boton = formEditar.querySelector('button[type="submit"]');
   try {
@@ -689,11 +723,13 @@ function celdaCSV(valor) {
 async function exportarCSV() {
   try {
     const reservas = await listarTodos();
-    const encabezados = ['Código', 'Pasajero', 'Placa', 'Entrada', 'Estado', 'Notas', 'Registrado el'];
+    const encabezados = ['Código', 'Pasajero', 'Placa', 'Servicio', 'Costo estimado (S/)', 'Entrada', 'Estado', 'Notas', 'Registrado el'];
     const filas = reservas.map((r) => [
       r.codigo_seguimiento,
       r.nombre_pasajero,
       r.placa,
+      etiquetaServicio(r.tipo_servicio),
+      r.costo_estimado === null || r.costo_estimado === undefined ? '' : Number(r.costo_estimado).toFixed(2),
       formatearFecha(r.fecha_hora_entrada),
       r.estado,
       r.notas,

@@ -544,3 +544,23 @@ address a { color: #fff; text-decoration: underline; }
   .revelar { opacity: 1; transform: none; transition: none; }
   .turno-progreso, .barra-estados .seg { transition: none; }
 }
+
+/* ====== Tipo de servicio y costo ====== */
+.servicio-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.servicio-normal { background: #eef1f5; color: #3b4a5a; }
+.servicio-vip { background: #fdf1de; color: #b5720c; }
+
+.etiqueta-costo { font-size: 0.9rem; font-weight: 500; color: var(--color-ink); }
+.costo-linea {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 1.05rem;
+  color: var(--color-primary);
+}

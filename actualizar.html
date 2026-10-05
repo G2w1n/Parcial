@@ -49,6 +49,30 @@
             </div>
           </div>
 
+          <fieldset class="campo-servicio">
+            <legend>Tipo de servicio</legend>
+            <div class="opciones-servicio">
+              <label class="opcion-servicio">
+                <input type="radio" name="tipo_servicio" value="normal" checked>
+                <span class="opcion-caja">
+                  <strong data-etiqueta="normal">Taxi normal</strong>
+                  <span class="opcion-precio" data-precio="normal">—</span>
+                  <span class="opcion-desc">Servicio estándar</span>
+                </span>
+              </label>
+              <label class="opcion-servicio">
+                <input type="radio" name="tipo_servicio" value="vip">
+                <span class="opcion-caja">
+                  <strong data-etiqueta="vip">Taxi VIP</strong>
+                  <span class="opcion-precio" data-precio="vip">—</span>
+                  <span class="opcion-desc">Vehículo ejecutivo, acceso preferente</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <p class="costo-linea">Costo estimado: <strong id="ac-costo">—</strong></p>
+
           <div class="botones-actualizar">
             <a href="mis-reservas.html" class="btn btn-outline">Cancelar</a>
             <button type="submit" class="btn">Guardar cambios</button>
@@ -77,4 +101,4 @@
   <script type="module" src="js/auth/nav-sesion.js"></script>
 
 </body>
-</html> 
+</html>

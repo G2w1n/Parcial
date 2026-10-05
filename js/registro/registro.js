@@ -1,13 +1,16 @@
 import { sql } from '../config/neon-config.js';
 import { exigirSesion } from '../auth/auth.js';
+import { costoEstimado, etiquetaServicio, formatearSoles, pintarPrecios } from '../config/tarifas.js';
 
 const usuario = exigirSesion();
 
 export async function guardarReservaEstacionamiento(datos) {
   const codigo = 'COD-' + Date.now().toString().slice(-8);
   const resultado = await sql`
-    INSERT INTO reservas_estacionamiento (codigo_seguimiento, nombre_pasajero, placa, fecha_hora_entrada, usuario_id)
-    VALUES (${codigo}, ${datos.nombre_pasajero}, ${datos.placa}, ${datos.fecha_hora_entrada}, ${usuario.id})
+    INSERT INTO reservas_estacionamiento
+      (codigo_seguimiento, nombre_pasajero, placa, fecha_hora_entrada, tipo_servicio, costo_estimado, usuario_id)
+    VALUES
+      (${codigo}, ${datos.nombre_pasajero}, ${datos.placa}, ${datos.fecha_hora_entrada}, ${datos.tipo_servicio}, ${datos.costo_estimado}, ${usuario.id})
     RETURNING codigo_seguimiento;
   `;
   return resultado[0].codigo_seguimiento;
@@ -33,6 +36,8 @@ if (formReserva) {
     nombre: document.getElementById('rv-nombre'),
     placa: document.getElementById('rv-placa'),
     fecha: document.getElementById('rv-fecha'),
+    servicio: document.getElementById('rv-servicio'),
+    costo: document.getElementById('rv-costo'),
   };
 
   const campos = [
@@ -54,6 +59,14 @@ if (formReserva) {
   ];
 
   let codigoActual = '';
+
+  // Precios y nombres de los servicios, tomados de tarifas.js
+  pintarPrecios();
+
+  function tipoElegido() {
+    const marcado = formReserva.querySelector('input[name="tipo_servicio"]:checked');
+    return marcado ? marcado.value : 'normal';
+  }
 
   // Los campos entran uno tras otro cuando el formulario se ve en pantalla
   if (sinAnimaciones || !('IntersectionObserver' in window)) {
@@ -106,9 +119,15 @@ if (formReserva) {
     actualizarDato(resumen.nombre, nombre.value.trim());
     actualizarDato(resumen.placa, placa.value.trim().toUpperCase());
     actualizarDato(resumen.fecha, formatearFecha(fecha.value));
+    actualizarDato(resumen.servicio, etiquetaServicio(tipoElegido()));
+    actualizarDato(resumen.costo, formatearSoles(costoEstimado(tipoElegido())));
     const todoOk = campos.every((c) => c.validar(c.input.value) === '');
     listoEl.classList.toggle('visible', todoOk);
   }
+
+  // Valores iniciales del resumen (sin animación)
+  resumen.servicio.textContent = etiquetaServicio(tipoElegido());
+  resumen.costo.textContent = formatearSoles(costoEstimado(tipoElegido()));
 
   function limpiarEstados() {
     formReserva.querySelectorAll('.campo-flotante').forEach((c) => c.classList.remove('valido', 'invalido'));
@@ -122,6 +141,10 @@ if (formReserva) {
       actualizarResumen();
     });
     campo.input.addEventListener('blur', () => validarCampo(campo, true));
+  });
+
+  formReserva.querySelectorAll('input[name="tipo_servicio"]').forEach((radio) => {
+    radio.addEventListener('change', actualizarResumen);
   });
 
   // Sacudida del formulario
@@ -183,6 +206,8 @@ if (formReserva) {
     document.getElementById('tk-nombre').textContent = datos.nombre_pasajero;
     document.getElementById('tk-placa').textContent = datos.placa;
     document.getElementById('tk-fecha').textContent = formatearFecha(datos.fecha_hora_entrada);
+    document.getElementById('tk-servicio').textContent = etiquetaServicio(datos.tipo_servicio);
+    document.getElementById('tk-costo').textContent = formatearSoles(datos.costo_estimado);
     document.getElementById('tk-ver').href = 'mis-reservas.html?nueva=' + encodeURIComponent(codigo);
 
     ticket.hidden = false;
@@ -229,10 +254,13 @@ if (formReserva) {
       return;
     }
 
+    const tipo = tipoElegido();
     const datos = {
       nombre_pasajero: nombre.value.trim(),
       placa: placa.value.trim().toUpperCase(),
       fecha_hora_entrada: fecha.value,
+      tipo_servicio: tipo,
+      costo_estimado: costoEstimado(tipo),
     };
 
     confirmacionEl.classList.remove('visible', 'error');
