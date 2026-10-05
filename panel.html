@@ -25,7 +25,51 @@
     <section class="panel">
       <div class="wrap">
         <h1>Panel de gestión — Reservas de estacionamiento</h1>
-        <p class="section-intro">Crea, edita y elimina cualquier reserva del sistema.</p>
+        <p class="section-intro">Gestiona las reservas del sistema según tu rol.</p>
+
+        <div class="resumen-turno">
+          <h2>Resumen de hoy</h2>
+          <div class="tarjetas-resumen">
+            <div class="tarjeta-resumen resumen-registrado">
+              <span class="resumen-numero" id="cnt-registrado">0</span>
+              <span class="resumen-etiqueta">Registradas</span>
+            </div>
+            <div class="tarjeta-resumen resumen-atendido">
+              <span class="resumen-numero" id="cnt-atendido">0</span>
+              <span class="resumen-etiqueta">Atendidas</span>
+            </div>
+            <div class="tarjeta-resumen resumen-cancelado">
+              <span class="resumen-numero" id="cnt-cancelado">0</span>
+              <span class="resumen-etiqueta">Canceladas</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="seccion-estadisticas" class="seccion-admin" data-solo-admin style="display: none;">
+          <h2>Estadísticas generales</h2>
+          <div class="tarjetas-resumen">
+            <div class="tarjeta-resumen">
+              <span class="resumen-numero" id="est-total">0</span>
+              <span class="resumen-etiqueta">Total de reservas</span>
+            </div>
+            <div class="tarjeta-resumen resumen-registrado">
+              <span class="resumen-numero" id="est-registrado">0</span>
+              <span class="resumen-etiqueta">Registradas</span>
+            </div>
+            <div class="tarjeta-resumen resumen-atendido">
+              <span class="resumen-numero" id="est-atendido">0</span>
+              <span class="resumen-etiqueta">Atendidas</span>
+            </div>
+            <div class="tarjeta-resumen resumen-cancelado">
+              <span class="resumen-numero" id="est-cancelado">0</span>
+              <span class="resumen-etiqueta">Canceladas</span>
+            </div>
+            <div class="tarjeta-resumen">
+              <span class="resumen-texto" id="est-top-empleado">—</span>
+              <span class="resumen-etiqueta">Empleado con más gestiones</span>
+            </div>
+          </div>
+        </div>
 
         <div class="panel-crear">
           <h2>Nueva reserva (atención presencial)</h2>
@@ -44,6 +88,10 @@
                 <input type="datetime-local" id="pn-fecha" name="fecha_hora_entrada" required>
               </div>
             </div>
+            <div class="campo">
+              <label for="pn-notas">Notas (opcional)</label>
+              <textarea id="pn-notas" name="notas" rows="2" placeholder="Ej. llegó sin ticket, cobró en efectivo"></textarea>
+            </div>
             <button type="submit" class="btn">Registrar reserva</button>
           </form>
           <p id="panel-confirmacion" class="confirmacion-estacionamiento"></p>
@@ -51,9 +99,25 @@
 
         <h2 class="titulo-tabla">Todas las reservas</h2>
 
-        <div class="buscador-panel">
-          <label for="buscar-panel" class="visually-hidden">Buscar reserva</label>
-          <input type="text" id="buscar-panel" placeholder="Buscar por código, nombre o placa...">
+        <div class="barra-tabla">
+          <label class="filtro-turno-label">
+            <input type="checkbox" id="filtro-turno">
+            Ver solo reservas de hoy (mi turno)
+          </label>
+
+          <div class="buscador-panel">
+            <label for="buscar-panel" class="visually-hidden">Buscar reserva</label>
+            <input type="text" id="buscar-panel" placeholder="Buscar por código, nombre o placa...">
+          </div>
+
+          <select id="filtro-estado" class="filtro-select" aria-label="Filtrar por estado">
+            <option value="">Todos los estados</option>
+            <option value="registrado">Solo pendientes (registrado)</option>
+            <option value="atendido">Atendido</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+
+          <button type="button" id="btn-exportar-csv" class="btn btn-outline btn-exportar" data-solo-admin style="display: none;">Exportar CSV</button>
         </div>
 
         <div class="tabla-scroll">
@@ -66,11 +130,84 @@
                 <th scope="col">Placa</th>
                 <th scope="col">Entrada</th>
                 <th scope="col">Estado</th>
+                <th scope="col">Notas</th>
                 <th scope="col">Acciones</th>
               </tr>
             </thead>
             <tbody id="tabla-panel-body"></tbody>
           </table>
+        </div>
+
+        <div id="seccion-empleados" class="seccion-admin" data-solo-admin style="display: none;">
+          <h2 class="titulo-tabla">Gestión de empleados</h2>
+
+          <div class="panel-crear">
+            <h2>Nueva cuenta de empleado</h2>
+            <form id="form-crear-empleado" class="formulario" action="#" method="post">
+              <div class="campo">
+                <label for="em-nombre">Nombre completo</label>
+                <input type="text" id="em-nombre" required minlength="3">
+              </div>
+              <div class="campo-grupo">
+                <div class="campo">
+                  <label for="em-correo">Correo</label>
+                  <input type="email" id="em-correo" required>
+                </div>
+                <div class="campo">
+                  <label for="em-contrasena">Contraseña</label>
+                  <input type="password" id="em-contrasena" required minlength="6">
+                </div>
+              </div>
+              <button type="submit" class="btn">Crear empleado</button>
+            </form>
+            <p id="empleado-confirmacion" class="confirmacion-estacionamiento"></p>
+          </div>
+
+          <div class="tabla-scroll">
+            <table>
+              <caption class="visually-hidden">Cuentas de empleados</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Correo</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-empleados-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="seccion-auditoria" class="seccion-admin" data-solo-admin style="display: none;">
+          <h2 class="titulo-tabla">Registro de actividad de empleados</h2>
+
+          <div class="barra-tabla">
+            <select id="filtro-audit-empleado" class="filtro-select" aria-label="Filtrar por empleado">
+              <option value="">Todos los empleados</option>
+            </select>
+            <label class="filtro-turno-label">
+              Fecha:
+              <input type="date" id="filtro-audit-fecha" class="filtro-fecha">
+            </label>
+            <button type="button" id="btn-limpiar-audit" class="btn btn-outline btn-exportar">Limpiar filtros</button>
+          </div>
+
+          <div class="tabla-scroll">
+            <table>
+              <caption class="visually-hidden">Reservas gestionadas por empleados</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Código</th>
+                  <th scope="col">Pasajero</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Gestionado por</th>
+                  <th scope="col">Fecha de gestión</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-auditoria-body"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -98,6 +235,10 @@
               <option value="cancelado">Cancelado</option>
             </select>
           </div>
+        </div>
+        <div class="campo">
+          <label for="pe-notas">Notas</label>
+          <textarea id="pe-notas" rows="3" placeholder="Ej. llegó sin ticket, cobró en efectivo"></textarea>
         </div>
         <div class="modal-botones">
           <button type="button" id="btn-cancelar-editar" class="btn btn-outline">Cancelar</button>

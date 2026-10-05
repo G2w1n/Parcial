@@ -1,4 +1,3 @@
-// js/auth/auth.js
 import { sql } from '../config/neon-config.js';
 
 export async function registrarUsuario(nombre, correo, contrasena) {
@@ -8,7 +7,7 @@ export async function registrarUsuario(nombre, correo, contrasena) {
 export async function iniciarSesion(correo, contrasena) {
   const filas = await sql`
     SELECT id, nombre, rol FROM usuarios
-    WHERE correo = ${correo} AND contrasena = ${contrasena};
+    WHERE correo = ${correo} AND contrasena = ${contrasena} AND activo = TRUE;
   `;
   if (filas.length === 0) return null;
   sessionStorage.setItem('usuario', JSON.stringify(filas[0]));
