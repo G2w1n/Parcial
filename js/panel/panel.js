@@ -11,6 +11,8 @@ const puedeUsarPanel = !!usuario && usuario.rol !== 'cliente';
 const esAdministrador = !!usuario && usuario.rol === 'administrador';
 const esEmpleado = !!usuario && usuario.rol === 'empleado';
 
+const sinAnimaciones = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 // ---------- Elementos de la página ----------
 const filtroTurno = document.getElementById('filtro-turno');
 const inputBuscar = document.getElementById('buscar-panel');
@@ -46,13 +48,179 @@ function mostrarSoloAdmin() {
   });
 }
 
+// Aviso emergente (usa la animación de la Semana 5 al entrar)
+function avisar(texto, tipo = 'exito') {
+  let contenedor = document.getElementById('avisos');
+  if (!contenedor) {
+    contenedor = document.createElement('div');
+    contenedor.id = 'avisos';
+    contenedor.className = 'avisos';
+    contenedor.setAttribute('role', 'status');
+    contenedor.setAttribute('aria-live', 'polite');
+    document.body.appendChild(contenedor);
+  }
+
+  const aviso = document.createElement('div');
+  aviso.className = `aviso aviso-${tipo}`;
+  aviso.innerHTML = `
+    <span class="aviso-icono" aria-hidden="true">${tipo === 'error' ? '!' : '✓'}</span>
+    <span class="aviso-texto"></span>
+    <span class="aviso-barra"></span>
+  `;
+  aviso.querySelector('.aviso-texto').textContent = texto;
+  contenedor.appendChild(aviso);
+
+  const quitar = () => {
+    aviso.classList.add('saliendo');
+    aviso.addEventListener('animationend', (evento) => {
+      if (evento.target === aviso) aviso.remove();
+    });
+    setTimeout(() => aviso.remove(), 600);
+  };
+  aviso.addEventListener('click', quitar);
+  setTimeout(quitar, 3800);
+}
+
+// Botón con círculo que gira mientras se ejecuta una acción
+async function conCarga(boton, accion) {
+  if (boton) {
+    boton.disabled = true;
+    boton.classList.add('cargando');
+  }
+  try {
+    return await accion();
+  } finally {
+    if (boton) {
+      boton.disabled = false;
+      boton.classList.remove('cargando');
+    }
+  }
+}
+
+// Número que cuenta hasta su valor
+function animarNumero(elemento, destino) {
+  if (!elemento) return;
+  const inicio = Number(elemento.dataset.valor || 0);
+  const esPrimera = elemento.dataset.valor === undefined;
+  if (!esPrimera && inicio === destino) return;
+  elemento.dataset.valor = destino;
+
+  if (sinAnimaciones) {
+    elemento.textContent = destino;
+    return;
+  }
+
+  if (!esPrimera) {
+    elemento.classList.remove('latido');
+    void elemento.offsetWidth;
+    elemento.classList.add('latido');
+    elemento.addEventListener('animationend', () => elemento.classList.remove('latido'), { once: true });
+  }
+
+  const duracion = 700;
+  const t0 = performance.now();
+  elemento._animacion = t0;
+
+  function paso(ahora) {
+    if (elemento._animacion !== t0) return;
+    const progreso = Math.min((ahora - t0) / duracion, 1);
+    const suave = 1 - Math.pow(1 - progreso, 3);
+    elemento.textContent = Math.round(inicio + (destino - inicio) * suave);
+    if (progreso < 1) requestAnimationFrame(paso);
+  }
+  requestAnimationFrame(paso);
+}
+
+// Filas grises con brillo mientras llegan los datos
+function mostrarEsqueleto(cuerpo, columnas, filas = 4) {
+  cuerpo.innerHTML = '';
+  for (let i = 0; i < filas; i++) {
+    const tr = document.createElement('tr');
+    tr.className = 'fila-esqueleto';
+    tr.setAttribute('aria-hidden', 'true');
+    tr.innerHTML = '<td><span class="barra-esqueleto"></span></td>'.repeat(columnas);
+    cuerpo.appendChild(tr);
+  }
+}
+
+// Las secciones aparecen suavemente al hacer scroll
+function prepararRevelado() {
+  if (sinAnimaciones || !('IntersectionObserver' in window)) return;
+
+  const objetivos = document.querySelectorAll('.panel > .wrap > .panel-crear, #seccion-empleados, #seccion-auditoria');
+  const observador = new IntersectionObserver((entradas) => {
+    entradas.forEach((entrada) => {
+      if (entrada.isIntersecting) {
+        entrada.target.classList.add('visible');
+        observador.unobserve(entrada.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  objetivos.forEach((elemento) => {
+    elemento.classList.add('revelar');
+    observador.observe(elemento);
+  });
+}
+
 // ---------- Control de horario (solo empleados) ----------
+function horaPeruEnMinutos() {
+  const partes = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'America/Lima', hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(new Date());
+  const horas = Number(partes.find((p) => p.type === 'hour').value) % 24;
+  const minutos = Number(partes.find((p) => p.type === 'minute').value);
+  return horas * 60 + minutos;
+}
+
+function aMinutos(hora) {
+  const [h, m] = hora.split(':');
+  return Number(h) * 60 + Number(m);
+}
+
+function progresoTurno(turno) {
+  const inicio = aMinutos(turno.hora_inicio);
+  const fin = aMinutos(turno.hora_fin);
+  const ahora = horaPeruEnMinutos();
+
+  const total = inicio < fin ? fin - inicio : 1440 - inicio + fin;
+  let transcurrido = ahora - inicio;
+  if (transcurrido < 0) transcurrido += 1440;
+  transcurrido = Math.min(Math.max(transcurrido, 0), total);
+
+  return { total, transcurrido, restante: total - transcurrido };
+}
+
+function textoRestante(minutos) {
+  const horas = Math.floor(minutos / 60);
+  const resto = minutos % 60;
+  return horas > 0 ? `${horas} h ${resto} min` : `${resto} min`;
+}
+
 function mostrarTurno(turno) {
   const info = document.getElementById('info-turno');
   const texto = textoTurno(turno);
   if (!info || !texto) return;
-  info.textContent = `Tu horario de trabajo: ${texto} (turno ${tipoTurno(turno)}, hora de Perú)`;
+
+  let progreso = info.querySelector('.turno-progreso');
+  if (!progreso) {
+    info.innerHTML = `
+      <span class="punto-turno" aria-hidden="true"></span>
+      <span class="turno-texto"></span>
+      <span class="turno-barra" aria-hidden="true"><span class="turno-progreso"></span></span>
+    `;
+    progreso = info.querySelector('.turno-progreso');
+  }
+
+  const datos = progresoTurno(turno);
+  info.querySelector('.turno-texto').textContent =
+    `Tu horario: ${texto} (turno ${tipoTurno(turno)}, hora de Perú) · Te quedan ${textoRestante(datos.restante)}`;
+
   info.style.display = 'block';
+  const porcentaje = Math.round((datos.transcurrido / datos.total) * 100);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { progreso.style.width = `${porcentaje}%`; });
+  });
 }
 
 async function verificarAcceso() {
@@ -233,29 +401,62 @@ function pintarFila(reserva) {
 function aplicarFiltros() {
   const termino = inputBuscar ? inputBuscar.value.trim().toLowerCase() : '';
   const estado = filtroEstado ? filtroEstado.value : '';
+  const cuerpo = document.getElementById('tabla-panel-body');
+  if (!cuerpo) return;
 
-  document.querySelectorAll('#tabla-panel-body tr').forEach((fila) => {
+  const filas = cuerpo.querySelectorAll('tr[data-estado]');
+  let visibles = 0;
+
+  filas.forEach((fila) => {
     // Se busca solo en código, pasajero y placa (no en los textos de los botones)
     const texto = [0, 1, 2].map((i) => fila.cells[i].textContent).join(' ').toLowerCase();
-    const coincideTexto = texto.includes(termino);
-    const coincideEstado = !estado || fila.dataset.estado === estado;
-    fila.style.display = coincideTexto && coincideEstado ? '' : 'none';
+    const coincide = texto.includes(termino) && (!estado || fila.dataset.estado === estado);
+    const estabaOculta = fila.style.display === 'none';
+
+    fila.style.display = coincide ? '' : 'none';
+    if (coincide) {
+      visibles++;
+      if (estabaOculta && !sinAnimaciones) {
+        fila.classList.remove('fila-aparece');
+        void fila.offsetWidth;
+        fila.classList.add('fila-aparece');
+      }
+    }
   });
+
+  let vacia = cuerpo.querySelector('.fila-vacia');
+  if (filas.length > 0 && visibles === 0) {
+    if (!vacia) {
+      vacia = document.createElement('tr');
+      vacia.className = 'fila-vacia';
+      vacia.innerHTML = '<td colspan="7">No hay reservas que coincidan con tu búsqueda.</td>';
+      cuerpo.appendChild(vacia);
+    }
+  } else if (vacia) {
+    vacia.remove();
+  }
 }
 
 let primeraCarga = true;
 
-async function cargarTabla(soloHoy = false) {
+async function cargarTabla(soloHoy = false, destacar = null) {
   const cuerpoTabla = document.getElementById('tabla-panel-body');
   if (!cuerpoTabla) return;
+
+  if (!cuerpoTabla.dataset.cargado) mostrarEsqueleto(cuerpoTabla, 7);
 
   try {
     const reservas = soloHoy ? await listarDeHoy() : await listarTodos();
     cuerpoTabla.innerHTML = '';
+    let filaDestacada = null;
+
     reservas.forEach((reserva, i) => {
       const tr = pintarFila(reserva);
 
-      if (primeraCarga) {
+      if (destacar && reserva.codigo_seguimiento === destacar) {
+        tr.classList.add('fila-nueva');
+        filaDestacada = tr;
+      } else if (primeraCarga) {
         tr.classList.add('fila-entrada');
         tr.style.animationDelay = `${Math.min(i * 40, 600)}ms`;
       }
@@ -266,14 +467,22 @@ async function cargarTabla(soloHoy = false) {
       tr.querySelector('.btn-editar').addEventListener('click', () => abrirModalEditar(reserva));
 
       const botonEliminar = tr.querySelector('.btn-eliminar');
-      if (botonEliminar) botonEliminar.addEventListener('click', () => confirmarEliminar(reserva.id));
+      if (botonEliminar) botonEliminar.addEventListener('click', () => confirmarEliminar(reserva.id, tr));
 
       cuerpoTabla.appendChild(tr);
     });
+
+    cuerpoTabla.dataset.cargado = '1';
     primeraCarga = false;
     aplicarFiltros();
+
+    if (filaDestacada) {
+      filaDestacada.scrollIntoView({ behavior: sinAnimaciones ? 'auto' : 'smooth', block: 'nearest' });
+    }
   } catch (error) {
     console.error(error);
+    cuerpoTabla.innerHTML = '';
+    avisar('No se pudieron cargar las reservas.', 'error');
   }
 }
 
@@ -283,12 +492,39 @@ async function cargarContadores() {
     const filas = await contarDeHoyPorEstado();
     const totales = { registrado: 0, atendido: 0, cancelado: 0 };
     filas.forEach((f) => { totales[f.estado] = f.total; });
-    document.getElementById('cnt-registrado').textContent = totales.registrado;
-    document.getElementById('cnt-atendido').textContent = totales.atendido;
-    document.getElementById('cnt-cancelado').textContent = totales.cancelado;
+    animarNumero(document.getElementById('cnt-registrado'), totales.registrado);
+    animarNumero(document.getElementById('cnt-atendido'), totales.atendido);
+    animarNumero(document.getElementById('cnt-cancelado'), totales.cancelado);
   } catch (error) {
     console.error(error);
   }
+}
+
+function actualizarBarraEstados(totales, total) {
+  const seccion = document.getElementById('seccion-estadisticas');
+  if (!seccion) return;
+
+  let barra = seccion.querySelector('.barra-estados');
+  if (!barra) {
+    barra = document.createElement('div');
+    barra.className = 'barra-estados';
+    barra.setAttribute('role', 'img');
+    barra.innerHTML = '<span class="seg seg-registrado"></span><span class="seg seg-atendido"></span><span class="seg seg-cancelado"></span>';
+    seccion.appendChild(barra);
+  }
+
+  barra.setAttribute('aria-label',
+    `Registradas ${totales.registrado}, atendidas ${totales.atendido}, canceladas ${totales.cancelado}`);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      ['registrado', 'atendido', 'cancelado'].forEach((clave) => {
+        const segmento = barra.querySelector(`.seg-${clave}`);
+        segmento.style.width = total ? `${(totales[clave] / total) * 100}%` : '0%';
+        segmento.title = `${clave}: ${totales[clave]}`;
+      });
+    });
+  });
 }
 
 async function cargarEstadisticas() {
@@ -298,10 +534,11 @@ async function cargarEstadisticas() {
     filas.forEach((f) => { totales[f.estado] = f.total; });
     const total = totales.registrado + totales.atendido + totales.cancelado;
 
-    document.getElementById('est-total').textContent = total;
-    document.getElementById('est-registrado').textContent = totales.registrado;
-    document.getElementById('est-atendido').textContent = totales.atendido;
-    document.getElementById('est-cancelado').textContent = totales.cancelado;
+    animarNumero(document.getElementById('est-total'), total);
+    animarNumero(document.getElementById('est-registrado'), totales.registrado);
+    animarNumero(document.getElementById('est-atendido'), totales.atendido);
+    animarNumero(document.getElementById('est-cancelado'), totales.cancelado);
+    actualizarBarraEstados(totales, total);
 
     const top = await empleadoConMasGestiones();
     document.getElementById('est-top-empleado').textContent = top ? `${top.nombre} (${top.total})` : '—';
@@ -324,29 +561,32 @@ async function marcarComoAtendida(id, fila) {
     if (botonAtender) botonAtender.remove();
     fila.classList.add('fila-destacada');
 
-    setTimeout(recargarTodo, 900);
+    avisar('Reserva marcada como atendida.');
+    setTimeout(() => recargarTodo(), sinAnimaciones ? 0 : 900);
   } catch (error) {
     if (esFueraDeTurno(error)) return;
     console.error(error);
-    alert('Ocurrió un error al marcar la reserva como atendida.');
+    avisar('No se pudo marcar la reserva como atendida.', 'error');
   }
 }
 
-async function confirmarEliminar(id) {
+async function confirmarEliminar(id, fila) {
   const seguro = confirm('¿Seguro que quieres eliminar esta reserva? Esta acción no se puede deshacer.');
   if (!seguro) return;
 
   try {
     await eliminarRegistro(id);
-    recargarTodo();
+    avisar('Reserva eliminada.');
+    fila.classList.add('fila-saliendo');
+    setTimeout(() => recargarTodo(), sinAnimaciones ? 0 : 450);
   } catch (error) {
     console.error(error);
-    alert('Ocurrió un error al eliminar la reserva.');
+    avisar('No se pudo eliminar la reserva.', 'error');
   }
 }
 
-function recargarTodo() {
-  cargarTabla(filtroTurno ? filtroTurno.checked : false);
+function recargarTodo(destacar = null) {
+  cargarTabla(filtroTurno ? filtroTurno.checked : false, destacar);
   cargarContadores();
   if (esAdministrador) {
     cargarEstadisticas();
@@ -366,15 +606,18 @@ if (formCrear) {
       notas: document.getElementById('pn-notas').value.trim() || null,
     };
     const confirmacionEl = document.getElementById('panel-confirmacion');
+    const boton = formCrear.querySelector('button[type="submit"]');
     try {
-      const codigo = await crearRegistro(datos);
+      const codigo = await conCarga(boton, () => crearRegistro(datos));
       mostrarMensaje(confirmacionEl, `✓ Reserva registrada. Código: ${codigo}.`);
+      avisar(`Reserva ${codigo} registrada.`);
       formCrear.reset();
-      recargarTodo();
+      recargarTodo(codigo);
     } catch (error) {
       if (esFueraDeTurno(error)) return;
       console.error(error);
       mostrarMensaje(confirmacionEl, 'Ocurrió un error al registrar la reserva.', true);
+      avisar('No se pudo registrar la reserva.', 'error');
     }
   });
 }
@@ -389,11 +632,23 @@ function abrirModalEditar(reserva) {
   document.getElementById('pe-placa').value = reserva.placa;
   document.getElementById('pe-estado').value = reserva.estado;
   document.getElementById('pe-notas').value = reserva.notas || '';
+  modal.classList.remove('cerrando');
   modal.classList.add('abierto');
+  setTimeout(() => document.getElementById('pe-nombre').focus(), 50);
 }
 
-document.getElementById('btn-cancelar-editar').addEventListener('click', () => {
-  modal.classList.remove('abierto');
+function cerrarModal() {
+  if (!modal.classList.contains('abierto') || modal.classList.contains('cerrando')) return;
+  modal.classList.add('cerrando');
+  setTimeout(() => modal.classList.remove('abierto', 'cerrando'), sinAnimaciones ? 0 : 180);
+}
+
+document.getElementById('btn-cancelar-editar').addEventListener('click', cerrarModal);
+modal.addEventListener('click', (evento) => {
+  if (evento.target === modal) cerrarModal();
+});
+document.addEventListener('keydown', (evento) => {
+  if (evento.key === 'Escape') cerrarModal();
 });
 
 formEditar.addEventListener('submit', async (evento) => {
@@ -405,14 +660,16 @@ formEditar.addEventListener('submit', async (evento) => {
     estado: document.getElementById('pe-estado').value,
     notas: document.getElementById('pe-notas').value.trim() || null,
   };
+  const boton = formEditar.querySelector('button[type="submit"]');
   try {
-    await actualizarComoPanel(id, datos);
-    modal.classList.remove('abierto');
+    await conCarga(boton, () => actualizarComoPanel(id, datos));
+    cerrarModal();
+    avisar('Cambios guardados.');
     recargarTodo();
   } catch (error) {
     if (esFueraDeTurno(error)) return;
     console.error(error);
-    alert('Ocurrió un error al guardar los cambios.');
+    avisar('No se pudieron guardar los cambios.', 'error');
   }
 });
 
@@ -455,39 +712,54 @@ async function exportarCSV() {
     enlace.click();
     enlace.remove();
     URL.revokeObjectURL(url);
+    avisar('Archivo CSV descargado.');
   } catch (error) {
     console.error(error);
-    alert('Ocurrió un error al exportar el archivo.');
+    avisar('No se pudo exportar el archivo.', 'error');
   }
 }
 
 const botonExportar = document.getElementById('btn-exportar-csv');
-if (botonExportar) botonExportar.addEventListener('click', exportarCSV);
+if (botonExportar) {
+  botonExportar.addEventListener('click', () => conCarga(botonExportar, exportarCSV));
+}
 
 // ---------- Gestión de empleados y horarios (administrador) ----------
-async function guardarHorario(id, inicio, fin) {
+let primeraCargaEmpleados = true;
+
+async function guardarHorario(id, inicio, fin, boton) {
   try {
-    await cambiarHorarioEmpleado(id, inicio, fin);
-    cargarEmpleados();
+    await conCarga(boton, () => cambiarHorarioEmpleado(id, inicio, fin));
+    avisar(inicio ? 'Horario actualizado.' : 'Se quitó la restricción de horario.');
+    cargarEmpleados(id);
   } catch (error) {
     console.error(error);
-    alert('Ocurrió un error al guardar el horario.');
+    avisar('No se pudo guardar el horario.', 'error');
   }
 }
 
-async function cargarEmpleados() {
+async function cargarEmpleados(destacarId = null) {
   const cuerpo = document.getElementById('tabla-empleados-body');
   if (!cuerpo) return;
+
+  if (!cuerpo.dataset.cargado) mostrarEsqueleto(cuerpo, 5, 3);
 
   try {
     const empleados = await listarEmpleados();
     cuerpo.innerHTML = '';
-    empleados.forEach((emp) => {
+    empleados.forEach((emp, i) => {
       const tipo = tipoTurno(emp);
       const inicio = emp.hora_inicio ? emp.hora_inicio.slice(0, 5) : '';
       const fin = emp.hora_fin ? emp.hora_fin.slice(0, 5) : '';
 
       const tr = document.createElement('tr');
+      if (destacarId !== null && emp.id === destacarId) {
+        tr.classList.add('fila-destacada');
+      } else if (primeraCargaEmpleados) {
+        tr.classList.add('fila-entrada');
+        tr.style.animationDelay = `${Math.min(i * 60, 400)}ms`;
+      }
+
       tr.innerHTML = `
         <td>${escaparHTML(emp.nombre)}</td>
         <td>${escaparHTML(emp.correo)}</td>
@@ -505,34 +777,42 @@ async function cargarEmpleados() {
         <td><button type="button" class="btn-fila btn-cambiar-estado ${emp.activo ? 'btn-eliminar' : 'btn-editar'}">${emp.activo ? 'Desactivar' : 'Activar'}</button></td>
       `;
 
-      tr.querySelector('.btn-guardar-horario').addEventListener('click', () => {
+      const botonGuardar = tr.querySelector('.btn-guardar-horario');
+      botonGuardar.addEventListener('click', () => {
         const nuevoInicio = tr.querySelector('.hora-inicio').value;
         const nuevoFin = tr.querySelector('.hora-fin').value;
         if (!nuevoInicio || !nuevoFin) {
-          alert('Completa la hora de entrada y la de salida, o usa "Sin límite".');
+          avisar('Completa la hora de entrada y la de salida, o usa "Sin límite".', 'error');
           return;
         }
-        guardarHorario(emp.id, nuevoInicio, nuevoFin);
+        guardarHorario(emp.id, nuevoInicio, nuevoFin, botonGuardar);
       });
 
-      tr.querySelector('.btn-quitar-horario').addEventListener('click', () => {
-        guardarHorario(emp.id, null, null);
+      const botonQuitar = tr.querySelector('.btn-quitar-horario');
+      botonQuitar.addEventListener('click', () => {
+        guardarHorario(emp.id, null, null, botonQuitar);
       });
 
-      tr.querySelector('.btn-cambiar-estado').addEventListener('click', async () => {
+      const botonEstado = tr.querySelector('.btn-cambiar-estado');
+      botonEstado.addEventListener('click', async () => {
         try {
-          await cambiarEstadoEmpleado(emp.id, !emp.activo);
-          cargarEmpleados();
+          await conCarga(botonEstado, () => cambiarEstadoEmpleado(emp.id, !emp.activo));
+          avisar(emp.activo ? 'Cuenta desactivada.' : 'Cuenta activada.');
+          cargarEmpleados(emp.id);
         } catch (error) {
           console.error(error);
-          alert('Ocurrió un error al cambiar el estado del empleado.');
+          avisar('No se pudo cambiar el estado del empleado.', 'error');
         }
       });
 
       cuerpo.appendChild(tr);
     });
+    cuerpo.dataset.cargado = '1';
+    primeraCargaEmpleados = false;
   } catch (error) {
     console.error(error);
+    cuerpo.innerHTML = '';
+    avisar('No se pudieron cargar los empleados.', 'error');
   }
 }
 
@@ -556,33 +836,47 @@ if (formEmpleado) {
       hora_inicio: inicio,
       hora_fin: fin,
     };
+    const boton = formEmpleado.querySelector('button[type="submit"]');
     try {
-      await crearEmpleado(datos);
+      await conCarga(boton, () => crearEmpleado(datos));
       mostrarMensaje(mensajeEl, '✓ Cuenta de empleado creada.');
+      avisar('Cuenta de empleado creada.');
       formEmpleado.reset();
       cargarEmpleados();
     } catch (error) {
       console.error(error);
       mostrarMensaje(mensajeEl, 'No se pudo crear la cuenta. Verifica que el correo no esté ya registrado.', true);
+      avisar('No se pudo crear la cuenta del empleado.', 'error');
     }
   });
 }
 
 // ---------- Auditoría (administrador) ----------
+let primeraCargaAuditoria = true;
+
 function aplicarFiltrosAuditoria() {
   const empleado = filtroAuditEmpleado ? filtroAuditEmpleado.value : '';
   const fecha = filtroAuditFecha ? filtroAuditFecha.value : '';
 
-  document.querySelectorAll('#tabla-auditoria-body tr').forEach((fila) => {
-    const coincideEmpleado = !empleado || fila.dataset.empleado === empleado;
-    const coincideFecha = !fecha || fila.dataset.fecha === fecha;
-    fila.style.display = coincideEmpleado && coincideFecha ? '' : 'none';
+  document.querySelectorAll('#tabla-auditoria-body tr[data-empleado]').forEach((fila) => {
+    const coincide = (!empleado || fila.dataset.empleado === empleado)
+      && (!fecha || fila.dataset.fecha === fecha);
+    const estabaOculta = fila.style.display === 'none';
+
+    fila.style.display = coincide ? '' : 'none';
+    if (coincide && estabaOculta && !sinAnimaciones) {
+      fila.classList.remove('fila-aparece');
+      void fila.offsetWidth;
+      fila.classList.add('fila-aparece');
+    }
   });
 }
 
 async function cargarAuditoria() {
   const cuerpo = document.getElementById('tabla-auditoria-body');
   if (!cuerpo) return;
+
+  if (!cuerpo.dataset.cargado) mostrarEsqueleto(cuerpo, 5);
 
   try {
     const registros = await listarAuditoria();
@@ -596,10 +890,14 @@ async function cargarAuditoria() {
     filtroAuditEmpleado.value = seleccionado;
 
     cuerpo.innerHTML = '';
-    registros.forEach((r) => {
+    registros.forEach((r, i) => {
       const tr = document.createElement('tr');
       tr.dataset.empleado = r.empleado_id;
       tr.dataset.fecha = r.fecha_dia;
+      if (primeraCargaAuditoria) {
+        tr.classList.add('fila-entrada');
+        tr.style.animationDelay = `${Math.min(i * 40, 500)}ms`;
+      }
       tr.innerHTML = `
         <td>${escaparHTML(r.codigo_seguimiento)}</td>
         <td>${escaparHTML(r.nombre_pasajero)}</td>
@@ -609,9 +907,12 @@ async function cargarAuditoria() {
       `;
       cuerpo.appendChild(tr);
     });
+    cuerpo.dataset.cargado = '1';
+    primeraCargaAuditoria = false;
     aplicarFiltrosAuditoria();
   } catch (error) {
     console.error(error);
+    cuerpo.innerHTML = '';
   }
 }
 
@@ -634,7 +935,9 @@ async function iniciar() {
   // Un empleado fuera de su horario no llega a ver datos
   if (!(await verificarAcceso())) return;
 
+  prepararRevelado();
   recargarTodo();
+
   if (esAdministrador) {
     mostrarSoloAdmin();
     cargarEmpleados();
