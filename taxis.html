@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
   <title>Taxis autorizados — Aeropuerto Internacional Qorikancha</title>
   <meta name="description" content="Taxis autorizados y taxi remisse VIP del Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/taxis.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/taxis.css">
 </head>
 <body>
 
@@ -20,13 +23,14 @@
         <a href="vuelos.html">Horarios de vuelo</a>
         <a href="index.html#servicios">Servicios</a>
         <a href="index.html#como-funciona">Cómo funciona</a>
-        <a href="index.html#formulario">Formulario</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
       </nav>
     </div>
   </header>
 
   <div class="banner-titulo">
-    <img src="imagenes/taxi-banner.jpg" alt="Taxis en la zona de embarque del Aeropuerto Qorikancha">
+    <img src="imagenes/aeropuerto-banner.webp" alt="Terminal del Aeropuerto Internacional Qorikancha">
     <h1>Taxis autorizados</h1>
   </div>
 
@@ -67,7 +71,7 @@
 
         <h2>Taxi Remisse (VIP)</h2>
         <div class="taxi-bloque">
-          <img class="taxi-img" src="/imagenes/taxi_vip.jpg" alt="Taxi remisse VIP del Aeropuerto Qorikancha">
+          <img class="taxi-img" src="imagenes/taxi_vip.jpg" alt="Taxi remisse VIP del Aeropuerto Qorikancha">
           <div class="taxi-info">
             <p>Ofrece un exclusivo servicio de traslado desde y hacia el aeropuerto en vehículos VIP (Mercedes, Lexus, entre otros) para funcionarios, ejecutivos y turistas. Nuestros vehículos pasan por un proceso de desinfección diaria. Cuenta con acceso a la primera vía del aeropuerto para mayor exclusividad y comodidad de sus pasajeros.</p>
             <div class="proveedores">
@@ -105,6 +109,7 @@
       </address>
     </div>
   </footer>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
 
 </body>
 </html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <title>Página no encontrada — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="La página que buscas no existe. Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <style>
+    .no-encontrada { padding: 72px 0 40px; text-align: center; }
+    .tablero-error {
+      display: inline-flex;
+      gap: 6px;
+      margin-bottom: 28px;
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 14vw, 6rem);
+      font-weight: 700;
+      line-height: 1;
+    }
+    .tablero-error span {
+      display: inline-block;
+      min-width: 0.8em;
+      padding: 12px 10px;
+      border-radius: 10px;
+      background: var(--color-primary-dark);
+      color: var(--color-accent);
+      box-shadow: inset 0 -50% 0 rgba(255,255,255,0.04), 0 10px 24px rgba(15,39,64,0.18);
+      animation: voltear 0.6s ease both;
+    }
+    .tablero-error span:nth-child(2) { animation-delay: 0.12s; }
+    .tablero-error span:nth-child(3) { animation-delay: 0.24s; }
+    @keyframes voltear {
+      from { transform: rotateX(90deg); opacity: 0; }
+      to   { transform: rotateX(0); opacity: 1; }
+    }
+    .no-encontrada h1 { font-family: var(--font-display); color: var(--color-primary); margin: 0 0 8px; }
+    .no-encontrada p { color: var(--color-ink-soft); max-width: 460px; margin: 0 auto 28px; }
+    .acciones-404 { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .acciones-404 a {
+      padding: 12px 22px;
+      border-radius: var(--radius);
+      border: 1px solid var(--color-accent);
+      background: var(--color-accent);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .acciones-404 a + a { background: transparent; border-color: var(--color-line); color: var(--color-ink); }
+    @media (prefers-reduced-motion: reduce) { .tablero-error span { animation: none; } }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Horarios de vuelo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="index.html#como-funciona">Cómo funciona</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="no-encontrada">
+      <div class="wrap">
+        <div class="tablero-error" aria-hidden="true"><span>4</span><span>0</span><span>4</span></div>
+        <h1>Este vuelo no existe</h1>
+        <p>La página que buscas cambió de puerta o fue cancelada. Revisa la dirección o vuelve al inicio.</p>
+        <div class="acciones-404">
+          <a href="index.html">Volver al inicio</a>
+          <a href="vuelos.html">Ver horarios de vuelo</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+
+</body>
+</html>

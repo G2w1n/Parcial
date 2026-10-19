@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
   <title>Alquiler de autos — Aeropuerto Internacional Qorikancha</title>
   <meta name="description" content="Alquiler de autos en el Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/alquiler.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/alquiler.css">
 </head>
 <body>
 
@@ -20,13 +23,14 @@
         <a href="vuelos.html">Horarios de vuelo</a>
         <a href="index.html#servicios">Servicios</a>
         <a href="index.html#como-funciona">Cómo funciona</a>
-        <a href="index.html#formulario">Formulario</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
       </nav>
     </div>
   </header>
 
   <div class="banner-titulo">
-    <img src="/imagenes/alquiler-banner.jpg" alt="Entrega de llaves de auto en el Aeropuerto Qorikancha">
+    <img src="imagenes/aeropuerto-banner.webp" alt="Terminal del Aeropuerto Internacional Qorikancha">
     <h1>Alquiler de autos</h1>
   </div>
 
@@ -37,7 +41,7 @@
         <div class="alquiler-grid">
           <div class="alquiler-intro">
             <p>Las principales marcas de alquiler de autos están presentes en el Aeropuerto Qorikancha. Puedes encontrarlas en los counters de atención en el nivel 1 de la terminal y reservar el servicio de tu preferencia.</p>
-            <img src="/imagenes/alquiler.jpg" alt="Entrega de llaves de un auto rentado" class="alquiler-img">
+            <img src="imagenes/alquiler.jpg" alt="Entrega de llaves de un auto rentado" class="alquiler-img">
           </div>
 
           <div class="faq-alquiler">
@@ -109,6 +113,7 @@
       </address>
     </div>
   </footer>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
 
 </body>
 </html>
