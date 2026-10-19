@@ -16,6 +16,7 @@
       <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
       <nav aria-label="Navegación principal">
         <a href="index.html#inicio">Inicio</a>
+        <a href="caja.html" id="enlace-caja" hidden>Caja</a>
         <a href="login.html" id="nav-sesion">Iniciar sesión</a>
       </nav>
     </div>
@@ -69,6 +70,14 @@
               <span class="resumen-texto" id="est-top-empleado">—</span>
               <span class="resumen-etiqueta">Empleado con más gestiones</span>
             </div>
+            <div class="tarjeta-resumen resumen-registrado">
+              <span class="resumen-numero" id="est-recaudado">S/ 0.00</span>
+              <span class="resumen-etiqueta">Recaudado hoy</span>
+            </div>
+            <div class="tarjeta-resumen resumen-pendiente">
+              <span class="resumen-numero" id="est-porcobrar">S/ 0.00</span>
+              <span class="resumen-etiqueta" id="est-porcobrar-detalle">Por cobrar</span>
+            </div>
           </div>
         </div>
 
@@ -91,11 +100,23 @@
             </div>
             <div class="campo-grupo">
               <div class="campo">
-                <label for="pn-tipo">Tipo de servicio</label>
-                <select id="pn-tipo" name="tipo_servicio" required></select>
+                <label for="pn-horas">Horas de estacionamiento</label>
+                <input type="number" id="pn-horas" name="horas" value="1" required min="0.5" max="240" step="0.5">
               </div>
               <div class="campo">
-                <span class="etiqueta-costo">Costo estimado</span>
+                <label for="pn-vehiculo">Tipo de vehículo</label>
+                <select id="pn-vehiculo" name="tipo_vehiculo">
+                  <option value="auto">Auto</option>
+                  <option value="bus_camion">Bus o camión (+50 %)</option>
+                </select>
+              </div>
+            </div>
+            <div class="campo-grupo">
+              <label class="campo-check-simple">
+                <input type="checkbox" id="pn-vip" name="zona_vip"> Zona techada VIP (+ S/ 15.00)
+              </label>
+              <div class="campo">
+                <span class="etiqueta-costo">Monto estimado</span>
                 <p class="costo-linea"><strong id="pn-costo">—</strong></p>
               </div>
             </div>
@@ -139,8 +160,9 @@
                 <th scope="col">Código</th>
                 <th scope="col">Pasajero</th>
                 <th scope="col">Placa</th>
-                <th scope="col">Servicio</th>
-                <th scope="col">Costo estimado</th>
+                <th scope="col">Estadía</th>
+                <th scope="col">Monto</th>
+                <th scope="col">Pago</th>
                 <th scope="col">Entrada</th>
                 <th scope="col">Estado</th>
                 <th scope="col">Notas</th>
@@ -262,14 +284,27 @@
         </div>
         <div class="campo-grupo">
           <div class="campo">
-            <label for="pe-tipo">Tipo de servicio</label>
-            <select id="pe-tipo" required></select>
+            <label for="pe-horas">Horas</label>
+            <input type="number" id="pe-horas" required min="0.5" max="240" step="0.5">
           </div>
           <div class="campo">
-            <span class="etiqueta-costo">Costo estimado</span>
+            <label for="pe-vehiculo">Tipo de vehículo</label>
+            <select id="pe-vehiculo">
+              <option value="auto">Auto</option>
+              <option value="bus_camion">Bus o camión (+50 %)</option>
+            </select>
+          </div>
+        </div>
+        <div class="campo-grupo">
+          <label class="campo-check-simple">
+            <input type="checkbox" id="pe-vip"> Zona techada VIP (+ S/ 15.00)
+          </label>
+          <div class="campo">
+            <span class="etiqueta-costo">Monto</span>
             <p class="costo-linea"><strong id="pe-costo">—</strong></p>
           </div>
         </div>
+        <p id="pe-aviso-pago" class="aviso-pago" hidden>Esta reserva ya fue pagada: el monto, las horas y el tipo de vehículo no se pueden cambiar, ni cancelarla desde aquí.</p>
         <div class="campo">
           <label for="pe-notas">Notas</label>
           <textarea id="pe-notas" rows="3" placeholder="Ej. llegó sin ticket, cobró en efectivo"></textarea>

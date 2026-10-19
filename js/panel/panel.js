@@ -1,62 +1,33 @@
 import { sql } from '../config/neon-config.js';
-import { exigirSesion, consultarTurno, textoTurno, tipoTurno, expulsar } from '../auth/auth.js';
-import { costoEstimado, etiquetaServicio, formatearSoles, llenarSelectorServicio } from '../config/tarifas.js';
+import { exigirRol, consultarTurno, textoTurno, tipoTurno, expulsar } from '../auth/auth.js';
+import { calcularMontoServicio, formatearSoles, NOMBRES_VEHICULO } from '../registro/tarifario.js';
+import {
+  escaparHTML, formatearFecha, avisar, conCarga, animarNumero, mostrarEsqueleto, sinAnimaciones,
+} from '../config/ui.js';
 
-const usuario = exigirSesion();
+// Solo administrador y empleado entran al panel (un cliente o un cajero recibe aviso y vuelve al inicio)
+const usuario = exigirRol('administrador', 'empleado');
+if (!usuario) throw new Error('Acceso denegado');
 
-if (usuario && usuario.rol === 'cliente') {
-  window.location.href = 'Transporte.html';
-}
-
-const puedeUsarPanel = !!usuario && usuario.rol !== 'cliente';
-const esAdministrador = !!usuario && usuario.rol === 'administrador';
-const esEmpleado = !!usuario && usuario.rol === 'empleado';
-
-const sinAnimaciones = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esAdministrador = usuario.rol === 'administrador';
+const esEmpleado = usuario.rol === 'empleado';
 
 // ---------- Elementos de la página ----------
-const filtroTurno = document.getElementById('filtro-turno');
-const inputBuscar = document.getElementById('buscar-panel');
-const filtroEstado = document.getElementById('filtro-estado');
-const filtroAuditEmpleado = document.getElementById('filtro-audit-empleado');
-const filtroAuditFecha = document.getElementById('filtro-audit-fecha');
+const $ = (id) => document.getElementById(id);
+const filtroTurno = $('filtro-turno');
+const inputBuscar = $('buscar-panel');
+const filtroEstado = $('filtro-estado');
+const filtroAuditEmpleado = $('filtro-audit-empleado');
+const filtroAuditFecha = $('filtro-audit-fecha');
 
-// Selectores de tipo de servicio (crear y editar) con su costo estimado
-const selectCrearTipo = document.getElementById('pn-tipo');
-const costoCrear = document.getElementById('pn-costo');
-const selectEditarTipo = document.getElementById('pe-tipo');
-const costoEditar = document.getElementById('pe-costo');
-
-function mostrarCosto(select, destino) {
-  if (select && destino) destino.textContent = formatearSoles(costoEstimado(select.value));
-}
-
-if (selectCrearTipo) {
-  llenarSelectorServicio(selectCrearTipo);
-  mostrarCosto(selectCrearTipo, costoCrear);
-  selectCrearTipo.addEventListener('change', () => mostrarCosto(selectCrearTipo, costoCrear));
-}
-if (selectEditarTipo) {
-  llenarSelectorServicio(selectEditarTipo);
-  selectEditarTipo.addEventListener('change', () => mostrarCosto(selectEditarTipo, costoEditar));
-}
+const crear = { horas: $('pn-horas'), vehiculo: $('pn-vehiculo'), vip: $('pn-vip'), costo: $('pn-costo') };
+const editar = {
+  horas: $('pe-horas'), vehiculo: $('pe-vehiculo'), vip: $('pe-vip'), costo: $('pe-costo'),
+  estado: $('pe-estado'), avisoPago: $('pe-aviso-pago'),
+};
+let modalPagada = false;
 
 // ---------- Utilidades ----------
-function escaparHTML(texto) {
-  if (texto === null || texto === undefined) return '';
-  return String(texto)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function formatearFecha(valor) {
-  if (!valor) return '—';
-  return new Date(valor).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
-}
-
 function mostrarMensaje(elemento, texto, esError = false) {
   elemento.textContent = texto;
   elemento.classList.toggle('error', esError);
@@ -67,102 +38,33 @@ function mostrarSoloAdmin() {
   document.querySelectorAll('[data-solo-admin]').forEach((el) => {
     el.style.display = '';
   });
+  $('enlace-caja').hidden = false;
 }
 
-// Aviso emergente (usa la animación de la Semana 5 al entrar)
-function avisar(texto, tipo = 'exito') {
-  let contenedor = document.getElementById('avisos');
-  if (!contenedor) {
-    contenedor = document.createElement('div');
-    contenedor.id = 'avisos';
-    contenedor.className = 'avisos';
-    contenedor.setAttribute('role', 'status');
-    contenedor.setAttribute('aria-live', 'polite');
-    document.body.appendChild(contenedor);
-  }
+// Datos de tarifa de un grupo de campos (crear o editar)
+const leerTarifa = (grupo) => ({
+  horas: grupo.horas.value,
+  tipo_vehiculo: grupo.vehiculo.value,
+  zona_vip: grupo.vip.checked,
+});
 
-  const aviso = document.createElement('div');
-  aviso.className = `aviso aviso-${tipo}`;
-  aviso.innerHTML = `
-    <span class="aviso-icono" aria-hidden="true">${tipo === 'error' ? '!' : '✓'}</span>
-    <span class="aviso-texto"></span>
-    <span class="aviso-barra"></span>
-  `;
-  aviso.querySelector('.aviso-texto').textContent = texto;
-  contenedor.appendChild(aviso);
-
-  const quitar = () => {
-    aviso.classList.add('saliendo');
-    aviso.addEventListener('animationend', (evento) => {
-      if (evento.target === aviso) aviso.remove();
-    });
-    setTimeout(() => aviso.remove(), 600);
-  };
-  aviso.addEventListener('click', quitar);
-  setTimeout(quitar, 3800);
+function mostrarCostoCrear() {
+  crear.costo.textContent = formatearSoles(calcularMontoServicio(leerTarifa(crear)));
 }
 
-// Botón con círculo que gira mientras se ejecuta una acción
-async function conCarga(boton, accion) {
-  if (boton) {
-    boton.disabled = true;
-    boton.classList.add('cargando');
-  }
-  try {
-    return await accion();
-  } finally {
-    if (boton) {
-      boton.disabled = false;
-      boton.classList.remove('cargando');
-    }
-  }
+function mostrarCostoEditar() {
+  editar.costo.textContent = formatearSoles(calcularMontoServicio(leerTarifa(editar)));
 }
 
-// Número que cuenta hasta su valor
-function animarNumero(elemento, destino) {
-  if (!elemento) return;
-  const inicio = Number(elemento.dataset.valor || 0);
-  const esPrimera = elemento.dataset.valor === undefined;
-  if (!esPrimera && inicio === destino) return;
-  elemento.dataset.valor = destino;
-
-  if (sinAnimaciones) {
-    elemento.textContent = destino;
-    return;
-  }
-
-  if (!esPrimera) {
-    elemento.classList.remove('latido');
-    void elemento.offsetWidth;
-    elemento.classList.add('latido');
-    elemento.addEventListener('animationend', () => elemento.classList.remove('latido'), { once: true });
-  }
-
-  const duracion = 700;
-  const t0 = performance.now();
-  elemento._animacion = t0;
-
-  function paso(ahora) {
-    if (elemento._animacion !== t0) return;
-    const progreso = Math.min((ahora - t0) / duracion, 1);
-    const suave = 1 - Math.pow(1 - progreso, 3);
-    elemento.textContent = Math.round(inicio + (destino - inicio) * suave);
-    if (progreso < 1) requestAnimationFrame(paso);
-  }
-  requestAnimationFrame(paso);
-}
-
-// Filas grises con brillo mientras llegan los datos
-function mostrarEsqueleto(cuerpo, columnas, filas = 4) {
-  cuerpo.innerHTML = '';
-  for (let i = 0; i < filas; i++) {
-    const tr = document.createElement('tr');
-    tr.className = 'fila-esqueleto';
-    tr.setAttribute('aria-hidden', 'true');
-    tr.innerHTML = '<td><span class="barra-esqueleto"></span></td>'.repeat(columnas);
-    cuerpo.appendChild(tr);
-  }
-}
+[crear.horas, crear.vehiculo, crear.vip].forEach((campo) => {
+  campo.addEventListener('input', mostrarCostoCrear);
+  campo.addEventListener('change', mostrarCostoCrear);
+});
+[editar.horas, editar.vehiculo, editar.vip].forEach((campo) => {
+  campo.addEventListener('input', () => { if (!modalPagada) mostrarCostoEditar(); });
+  campo.addEventListener('change', () => { if (!modalPagada) mostrarCostoEditar(); });
+});
+mostrarCostoCrear();
 
 // Las secciones aparecen suavemente al hacer scroll
 function prepararRevelado() {
@@ -219,7 +121,7 @@ function textoRestante(minutos) {
 }
 
 function mostrarTurno(turno) {
-  const info = document.getElementById('info-turno');
+  const info = $('info-turno');
   const texto = textoTurno(turno);
   if (!info || !texto) return;
 
@@ -287,28 +189,50 @@ export async function listarDeHoy() {
   `;
 }
 
+// Una reserva de atención presencial no tiene cliente (usuario_id queda en NULL) y nace pendiente de pago
 export async function crearRegistro(datos) {
   await asegurarTurno();
   const codigo = 'COD-' + Date.now().toString().slice(-8);
+  const monto = calcularMontoServicio(datos);
   await sql`
     INSERT INTO reservas_estacionamiento
-      (codigo_seguimiento, nombre_pasajero, placa, fecha_hora_entrada, estado, notas, tipo_servicio, costo_estimado, gestionado_por, fecha_gestion)
+      (codigo_seguimiento, nombre_pasajero, placa, fecha_hora_entrada, estado, notas,
+       horas, tipo_vehiculo, zona_vip, monto_calculado, estado_pago, gestionado_por, fecha_gestion)
     VALUES
       (${codigo}, ${datos.nombre_pasajero}, ${datos.placa}, ${datos.fecha_hora_entrada}, 'registrado', ${datos.notas},
-       ${datos.tipo_servicio}, ${datos.costo_estimado}, ${usuario.id}, NOW());
+       ${Number(datos.horas)}, ${datos.tipo_vehiculo}, ${Boolean(datos.zona_vip)}, ${monto}, 'pendiente', ${usuario.id}, NOW());
   `;
   return codigo;
 }
 
-export async function actualizarComoPanel(id, datos) {
+// El panel nunca cambia estado_pago: los pagos solo nacen en la pasarela o en caja.
+// Si la reserva ya está pagada, no se toca la tarifa (horas, vehículo, VIP ni monto)
+export async function actualizarComoPanel(id, datos, pagada) {
   await asegurarTurno();
-  await sql`
+
+  if (pagada) {
+    await sql`
+      UPDATE reservas_estacionamiento
+      SET nombre_pasajero = ${datos.nombre_pasajero}, placa = ${datos.placa}, estado = ${datos.estado},
+          notas = ${datos.notas}, gestionado_por = ${usuario.id}, fecha_gestion = NOW()
+      WHERE id = ${id};
+    `;
+    return;
+  }
+
+  const monto = calcularMontoServicio(datos);
+  const filas = await sql`
     UPDATE reservas_estacionamiento
     SET nombre_pasajero = ${datos.nombre_pasajero}, placa = ${datos.placa}, estado = ${datos.estado},
-        notas = ${datos.notas}, tipo_servicio = ${datos.tipo_servicio}, costo_estimado = ${datos.costo_estimado},
+        notas = ${datos.notas}, horas = ${Number(datos.horas)}, tipo_vehiculo = ${datos.tipo_vehiculo},
+        zona_vip = ${Boolean(datos.zona_vip)}, monto_calculado = ${monto},
         gestionado_por = ${usuario.id}, fecha_gestion = NOW()
-    WHERE id = ${id};
+    WHERE id = ${id} AND estado_pago <> 'pagado'
+    RETURNING id;
   `;
+  if (filas.length === 0) {
+    throw new Error('La reserva se pagó mientras la editabas. Recarga la página.');
+  }
 }
 
 export async function marcarAtendido(id) {
@@ -324,7 +248,16 @@ export async function eliminarRegistro(id) {
   if (!esAdministrador) {
     throw new Error('Solo el administrador puede eliminar reservas.');
   }
-  await sql`DELETE FROM reservas_estacionamiento WHERE id = ${id};`;
+  try {
+    await sql`DELETE FROM reservas_estacionamiento WHERE id = ${id};`;
+    return { ok: true };
+  } catch (error) {
+    // 23503 = llave foránea: la reserva tiene pagos (aprobados o rechazados)
+    if (error.code === '23503') {
+      return { ok: false, mensaje: 'No se puede eliminar: tiene historial de pagos. Cámbiala a "cancelado".' };
+    }
+    throw error;
+  }
 }
 
 // ---------- Consultas: resumen y estadísticas ----------
@@ -356,6 +289,27 @@ export async function empleadoConMasGestiones() {
     LIMIT 1;
   `;
   return filas[0] || null;
+}
+
+// Lo cobrado hoy (hora de Lima) por cualquier canal
+export async function recaudadoHoy() {
+  const filas = await sql`
+    SELECT COALESCE(SUM(monto), 0) AS total
+    FROM pagos
+    WHERE estado = 'aprobado'
+      AND (fecha_pago AT TIME ZONE 'America/Lima')::date = (NOW() AT TIME ZONE 'America/Lima')::date;
+  `;
+  return Number(filas[0].total);
+}
+
+// Lo que todavía falta cobrar (sin contar las reservas canceladas)
+export async function porCobrar() {
+  const filas = await sql`
+    SELECT COALESCE(SUM(monto_calculado), 0) AS total, COUNT(*)::int AS cantidad
+    FROM reservas_estacionamiento
+    WHERE estado_pago = 'pendiente' AND estado <> 'cancelado';
+  `;
+  return { total: Number(filas[0].total), cantidad: filas[0].cantidad };
 }
 
 // ---------- Consultas: empleados ----------
@@ -404,13 +358,18 @@ function pintarFila(reserva) {
   const botonEliminar = esAdministrador
     ? '<button type="button" class="btn-fila btn-eliminar">Eliminar</button>'
     : '';
+  const estadia = `${Number(reserva.horas)} h · ${NOMBRES_VEHICULO[reserva.tipo_vehiculo] ?? reserva.tipo_vehiculo}${reserva.zona_vip ? ' · VIP' : ''}`;
+  const canalPago = reserva.canal_pago
+    ? `<small class="canal-pago">${reserva.canal_pago === 'pasarela' ? 'en línea' : 'ventanilla'}</small>`
+    : '';
 
   tr.innerHTML = `
     <td>${escaparHTML(reserva.codigo_seguimiento)}</td>
     <td>${escaparHTML(reserva.nombre_pasajero)}</td>
     <td>${escaparHTML(reserva.placa)}</td>
-    <td><span class="servicio-badge servicio-${reserva.tipo_servicio}">${etiquetaServicio(reserva.tipo_servicio)}</span></td>
-    <td>${formatearSoles(reserva.costo_estimado)}</td>
+    <td>${escaparHTML(estadia)}</td>
+    <td>${formatearSoles(Number(reserva.monto_calculado))}</td>
+    <td><span class="pago-badge pago-${reserva.estado_pago}">${reserva.estado_pago}</span>${canalPago}</td>
     <td>${formatearFecha(reserva.fecha_hora_entrada)}</td>
     <td><span class="estado-badge estado-${reserva.estado}">${reserva.estado}</span></td>
     <td class="celda-notas">${escaparHTML(reserva.notas) || '—'}</td>
@@ -426,7 +385,7 @@ function pintarFila(reserva) {
 function aplicarFiltros() {
   const termino = inputBuscar ? inputBuscar.value.trim().toLowerCase() : '';
   const estado = filtroEstado ? filtroEstado.value : '';
-  const cuerpo = document.getElementById('tabla-panel-body');
+  const cuerpo = $('tabla-panel-body');
   if (!cuerpo) return;
 
   const filas = cuerpo.querySelectorAll('tr[data-estado]');
@@ -454,7 +413,7 @@ function aplicarFiltros() {
     if (!vacia) {
       vacia = document.createElement('tr');
       vacia.className = 'fila-vacia';
-      vacia.innerHTML = '<td colspan="9">No hay reservas que coincidan con tu búsqueda.</td>';
+      vacia.innerHTML = '<td colspan="10">No hay reservas que coincidan con tu búsqueda.</td>';
       cuerpo.appendChild(vacia);
     }
   } else if (vacia) {
@@ -465,10 +424,10 @@ function aplicarFiltros() {
 let primeraCarga = true;
 
 async function cargarTabla(soloHoy = false, destacar = null) {
-  const cuerpoTabla = document.getElementById('tabla-panel-body');
+  const cuerpoTabla = $('tabla-panel-body');
   if (!cuerpoTabla) return;
 
-  if (!cuerpoTabla.dataset.cargado) mostrarEsqueleto(cuerpoTabla, 9);
+  if (!cuerpoTabla.dataset.cargado) mostrarEsqueleto(cuerpoTabla, 10);
 
   try {
     const reservas = soloHoy ? await listarDeHoy() : await listarTodos();
@@ -517,16 +476,16 @@ async function cargarContadores() {
     const filas = await contarDeHoyPorEstado();
     const totales = { registrado: 0, atendido: 0, cancelado: 0 };
     filas.forEach((f) => { totales[f.estado] = f.total; });
-    animarNumero(document.getElementById('cnt-registrado'), totales.registrado);
-    animarNumero(document.getElementById('cnt-atendido'), totales.atendido);
-    animarNumero(document.getElementById('cnt-cancelado'), totales.cancelado);
+    animarNumero($('cnt-registrado'), totales.registrado);
+    animarNumero($('cnt-atendido'), totales.atendido);
+    animarNumero($('cnt-cancelado'), totales.cancelado);
   } catch (error) {
     console.error(error);
   }
 }
 
 function actualizarBarraEstados(totales, total) {
-  const seccion = document.getElementById('seccion-estadisticas');
+  const seccion = $('seccion-estadisticas');
   if (!seccion) return;
 
   let barra = seccion.querySelector('.barra-estados');
@@ -559,14 +518,19 @@ async function cargarEstadisticas() {
     filas.forEach((f) => { totales[f.estado] = f.total; });
     const total = totales.registrado + totales.atendido + totales.cancelado;
 
-    animarNumero(document.getElementById('est-total'), total);
-    animarNumero(document.getElementById('est-registrado'), totales.registrado);
-    animarNumero(document.getElementById('est-atendido'), totales.atendido);
-    animarNumero(document.getElementById('est-cancelado'), totales.cancelado);
+    animarNumero($('est-total'), total);
+    animarNumero($('est-registrado'), totales.registrado);
+    animarNumero($('est-atendido'), totales.atendido);
+    animarNumero($('est-cancelado'), totales.cancelado);
     actualizarBarraEstados(totales, total);
 
     const top = await empleadoConMasGestiones();
-    document.getElementById('est-top-empleado').textContent = top ? `${top.nombre} (${top.total})` : '—';
+    $('est-top-empleado').textContent = top ? `${top.nombre} (${top.total})` : '—';
+
+    const [recaudado, pendiente] = await Promise.all([recaudadoHoy(), porCobrar()]);
+    animarNumero($('est-recaudado'), recaudado, formatearSoles);
+    animarNumero($('est-porcobrar'), pendiente.total, formatearSoles);
+    $('est-porcobrar-detalle').textContent = `Por cobrar (${pendiente.cantidad} reservas)`;
   } catch (error) {
     console.error(error);
   }
@@ -600,7 +564,11 @@ async function confirmarEliminar(id, fila) {
   if (!seguro) return;
 
   try {
-    await eliminarRegistro(id);
+    const resultado = await eliminarRegistro(id);
+    if (!resultado.ok) {
+      avisar(resultado.mensaje, 'error');
+      return;
+    }
     avisar('Reserva eliminada.');
     fila.classList.add('fila-saliendo');
     setTimeout(() => recargarTodo(), sinAnimaciones ? 0 : 450);
@@ -620,27 +588,25 @@ function recargarTodo(destacar = null) {
 }
 
 // ---------- Crear reserva ----------
-const formCrear = document.getElementById('form-crear-panel');
+const formCrear = $('form-crear-panel');
 if (formCrear) {
   formCrear.addEventListener('submit', async (evento) => {
     evento.preventDefault();
-    const tipo = selectCrearTipo.value;
     const datos = {
-      nombre_pasajero: document.getElementById('pn-nombre').value,
-      placa: document.getElementById('pn-placa').value,
-      fecha_hora_entrada: document.getElementById('pn-fecha').value,
-      notas: document.getElementById('pn-notas').value.trim() || null,
-      tipo_servicio: tipo,
-      costo_estimado: costoEstimado(tipo),
+      nombre_pasajero: $('pn-nombre').value,
+      placa: $('pn-placa').value,
+      fecha_hora_entrada: $('pn-fecha').value,
+      notas: $('pn-notas').value.trim() || null,
+      ...leerTarifa(crear),
     };
-    const confirmacionEl = document.getElementById('panel-confirmacion');
+    const confirmacionEl = $('panel-confirmacion');
     const boton = formCrear.querySelector('button[type="submit"]');
     try {
       const codigo = await conCarga(boton, () => crearRegistro(datos));
-      mostrarMensaje(confirmacionEl, `✓ Reserva registrada. Código: ${codigo}.`);
+      mostrarMensaje(confirmacionEl, `✓ Reserva registrada. Código: ${codigo}. Pendiente de pago en caja.`);
       avisar(`Reserva ${codigo} registrada.`);
       formCrear.reset();
-      mostrarCosto(selectCrearTipo, costoCrear);
+      mostrarCostoCrear();
       recargarTodo(codigo);
     } catch (error) {
       if (esFueraDeTurno(error)) return;
@@ -652,20 +618,33 @@ if (formCrear) {
 }
 
 // ---------- Editar reserva (modal) ----------
-const modal = document.getElementById('modal-editar');
-const formEditar = document.getElementById('form-editar-panel');
+const modal = $('modal-editar');
+const formEditar = $('form-editar-panel');
 
 function abrirModalEditar(reserva) {
-  document.getElementById('pe-id').value = reserva.id;
-  document.getElementById('pe-nombre').value = reserva.nombre_pasajero;
-  document.getElementById('pe-placa').value = reserva.placa;
-  document.getElementById('pe-estado').value = reserva.estado;
-  document.getElementById('pe-notas').value = reserva.notas || '';
-  selectEditarTipo.value = reserva.tipo_servicio || 'normal';
-  mostrarCosto(selectEditarTipo, costoEditar);
+  modalPagada = reserva.estado_pago === 'pagado';
+
+  $('pe-id').value = reserva.id;
+  $('pe-nombre').value = reserva.nombre_pasajero;
+  $('pe-placa').value = reserva.placa;
+  editar.estado.value = reserva.estado;
+  $('pe-notas').value = reserva.notas || '';
+
+  editar.horas.value = Number(reserva.horas);
+  editar.vehiculo.value = reserva.tipo_vehiculo;
+  editar.vip.checked = reserva.zona_vip;
+
+  // Una reserva pagada no puede cambiar su tarifa ni cancelarse desde aquí
+  [editar.horas, editar.vehiculo, editar.vip].forEach((campo) => { campo.disabled = modalPagada; });
+  editar.estado.querySelector('option[value="cancelado"]').disabled = modalPagada;
+  editar.avisoPago.hidden = !modalPagada;
+  editar.costo.textContent = modalPagada
+    ? formatearSoles(Number(reserva.monto_calculado))
+    : formatearSoles(calcularMontoServicio(leerTarifa(editar)));
+
   modal.classList.remove('cerrando');
   modal.classList.add('abierto');
-  setTimeout(() => document.getElementById('pe-nombre').focus(), 50);
+  setTimeout(() => $('pe-nombre').focus(), 50);
 }
 
 function cerrarModal() {
@@ -674,7 +653,7 @@ function cerrarModal() {
   setTimeout(() => modal.classList.remove('abierto', 'cerrando'), sinAnimaciones ? 0 : 180);
 }
 
-document.getElementById('btn-cancelar-editar').addEventListener('click', cerrarModal);
+$('btn-cancelar-editar').addEventListener('click', cerrarModal);
 modal.addEventListener('click', (evento) => {
   if (evento.target === modal) cerrarModal();
 });
@@ -684,26 +663,24 @@ document.addEventListener('keydown', (evento) => {
 
 formEditar.addEventListener('submit', async (evento) => {
   evento.preventDefault();
-  const id = document.getElementById('pe-id').value;
-  const tipo = selectEditarTipo.value;
+  const id = $('pe-id').value;
   const datos = {
-    nombre_pasajero: document.getElementById('pe-nombre').value,
-    placa: document.getElementById('pe-placa').value,
-    estado: document.getElementById('pe-estado').value,
-    notas: document.getElementById('pe-notas').value.trim() || null,
-    tipo_servicio: tipo,
-    costo_estimado: costoEstimado(tipo),
+    nombre_pasajero: $('pe-nombre').value,
+    placa: $('pe-placa').value,
+    estado: editar.estado.value,
+    notas: $('pe-notas').value.trim() || null,
+    ...leerTarifa(editar),
   };
   const boton = formEditar.querySelector('button[type="submit"]');
   try {
-    await conCarga(boton, () => actualizarComoPanel(id, datos));
+    await conCarga(boton, () => actualizarComoPanel(id, datos, modalPagada));
     cerrarModal();
     avisar('Cambios guardados.');
     recargarTodo();
   } catch (error) {
     if (esFueraDeTurno(error)) return;
     console.error(error);
-    avisar('No se pudieron guardar los cambios.', 'error');
+    avisar(error.message || 'No se pudieron guardar los cambios.', 'error');
   }
 });
 
@@ -723,13 +700,20 @@ function celdaCSV(valor) {
 async function exportarCSV() {
   try {
     const reservas = await listarTodos();
-    const encabezados = ['Código', 'Pasajero', 'Placa', 'Servicio', 'Costo estimado (S/)', 'Entrada', 'Estado', 'Notas', 'Registrado el'];
+    const encabezados = [
+      'Código', 'Pasajero', 'Placa', 'Horas', 'Vehículo', 'Zona VIP', 'Monto (S/)', 'Estado de pago',
+      'Canal de pago', 'Entrada', 'Estado', 'Notas', 'Registrado el',
+    ];
     const filas = reservas.map((r) => [
       r.codigo_seguimiento,
       r.nombre_pasajero,
       r.placa,
-      etiquetaServicio(r.tipo_servicio),
-      r.costo_estimado === null || r.costo_estimado === undefined ? '' : Number(r.costo_estimado).toFixed(2),
+      Number(r.horas),
+      NOMBRES_VEHICULO[r.tipo_vehiculo] ?? r.tipo_vehiculo,
+      r.zona_vip ? 'Sí' : 'No',
+      Number(r.monto_calculado).toFixed(2),
+      r.estado_pago,
+      r.canal_pago ?? '',
       formatearFecha(r.fecha_hora_entrada),
       r.estado,
       r.notas,
@@ -755,7 +739,7 @@ async function exportarCSV() {
   }
 }
 
-const botonExportar = document.getElementById('btn-exportar-csv');
+const botonExportar = $('btn-exportar-csv');
 if (botonExportar) {
   botonExportar.addEventListener('click', () => conCarga(botonExportar, exportarCSV));
 }
@@ -775,7 +759,7 @@ async function guardarHorario(id, inicio, fin, boton) {
 }
 
 async function cargarEmpleados(destacarId = null) {
-  const cuerpo = document.getElementById('tabla-empleados-body');
+  const cuerpo = $('tabla-empleados-body');
   if (!cuerpo) return;
 
   if (!cuerpo.dataset.cargado) mostrarEsqueleto(cuerpo, 5, 3);
@@ -852,13 +836,13 @@ async function cargarEmpleados(destacarId = null) {
   }
 }
 
-const formEmpleado = document.getElementById('form-crear-empleado');
+const formEmpleado = $('form-crear-empleado');
 if (formEmpleado) {
   formEmpleado.addEventListener('submit', async (evento) => {
     evento.preventDefault();
-    const inicio = document.getElementById('em-inicio').value || null;
-    const fin = document.getElementById('em-fin').value || null;
-    const mensajeEl = document.getElementById('empleado-confirmacion');
+    const inicio = $('em-inicio').value || null;
+    const fin = $('em-fin').value || null;
+    const mensajeEl = $('empleado-confirmacion');
 
     if ((inicio && !fin) || (!inicio && fin)) {
       mostrarMensaje(mensajeEl, 'Completa la entrada y la salida del turno, o deja ambas vacías.', true);
@@ -866,9 +850,9 @@ if (formEmpleado) {
     }
 
     const datos = {
-      nombre: document.getElementById('em-nombre').value,
-      correo: document.getElementById('em-correo').value,
-      contrasena: document.getElementById('em-contrasena').value,
+      nombre: $('em-nombre').value,
+      correo: $('em-correo').value,
+      contrasena: $('em-contrasena').value,
       hora_inicio: inicio,
       hora_fin: fin,
     };
@@ -909,7 +893,7 @@ function aplicarFiltrosAuditoria() {
 }
 
 async function cargarAuditoria() {
-  const cuerpo = document.getElementById('tabla-auditoria-body');
+  const cuerpo = $('tabla-auditoria-body');
   if (!cuerpo) return;
 
   if (!cuerpo.dataset.cargado) mostrarEsqueleto(cuerpo, 5);
@@ -955,7 +939,7 @@ async function cargarAuditoria() {
 if (filtroAuditEmpleado) filtroAuditEmpleado.addEventListener('change', aplicarFiltrosAuditoria);
 if (filtroAuditFecha) filtroAuditFecha.addEventListener('change', aplicarFiltrosAuditoria);
 
-const botonLimpiarAudit = document.getElementById('btn-limpiar-audit');
+const botonLimpiarAudit = $('btn-limpiar-audit');
 if (botonLimpiarAudit) {
   botonLimpiarAudit.addEventListener('click', () => {
     filtroAuditEmpleado.value = '';
@@ -966,8 +950,6 @@ if (botonLimpiarAudit) {
 
 // ---------- Arranque ----------
 async function iniciar() {
-  if (!puedeUsarPanel) return;
-
   // Un empleado fuera de su horario no llega a ver datos
   if (!(await verificarAcceso())) return;
 

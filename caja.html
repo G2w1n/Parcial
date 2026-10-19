@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caja — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Módulo de caja del Aeropuerto Internacional Qorikancha: cobro en garita, pagos en línea y cierre del día. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/caja.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="panel.html" id="enlace-panel" hidden>Panel</a>
+        <a href="caja.html" aria-current="page">Caja</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="caja">
+      <div class="wrap">
+
+        <div class="caja-cabecera">
+          <div>
+            <h1>Módulo de caja</h1>
+            <p class="section-intro">Atiende <strong id="nombre-cajero"></strong> · <span id="fecha-actual"></span></p>
+          </div>
+          <div class="caja-controles">
+            <label for="fecha-caja">Fecha de trabajo</label>
+            <input id="fecha-caja" type="date">
+            <button type="button" id="cerrar-sesion" class="btn btn-outline">Cerrar sesión</button>
+          </div>
+        </div>
+
+        <div class="tarjetas-caja">
+          <div class="tarjeta-kpi kpi-principal">
+            <span class="kpi-numero" id="kpi-total">S/ 0.00</span>
+            <span class="kpi-etiqueta">Recaudado en la fecha</span>
+          </div>
+          <div class="tarjeta-kpi">
+            <span class="kpi-numero" id="kpi-enlinea">S/ 0.00</span>
+            <span class="kpi-etiqueta">En línea</span>
+          </div>
+          <div class="tarjeta-kpi">
+            <span class="kpi-numero" id="kpi-ventanilla">S/ 0.00</span>
+            <span class="kpi-etiqueta">Ventanilla</span>
+          </div>
+          <div class="tarjeta-kpi">
+            <span class="kpi-numero" id="kpi-operaciones">0</span>
+            <span class="kpi-etiqueta">Operaciones aprobadas</span>
+          </div>
+          <div class="tarjeta-kpi kpi-alerta">
+            <span class="kpi-numero" id="kpi-porverificar">0</span>
+            <span class="kpi-etiqueta">Pagos por verificar</span>
+          </div>
+        </div>
+
+        <section class="bloque" aria-labelledby="t-salida">
+          <h2 id="t-salida">Control de salida (garita)</h2>
+          <p class="bloque-ayuda">Escribe la placa o el código de la reserva para confirmar si el pase de salida está habilitado.</p>
+          <form id="form-salida" class="form-linea" role="search">
+            <label for="criterio-salida" class="visually-hidden">Placa o código de la reserva</label>
+            <input id="criterio-salida" type="search" autocomplete="off" placeholder="Placa o código (ej. ABC-123)">
+            <button type="submit" class="btn">Consultar</button>
+          </form>
+          <div id="resultado-salida" class="resultado-salida" aria-live="polite"></div>
+        </section>
+
+        <section class="bloque" aria-labelledby="t-cobro">
+          <h2 id="t-cobro">Cobro presencial</h2>
+          <form id="form-buscar" class="form-linea" role="search">
+            <label for="criterio" class="visually-hidden">Código, placa, DNI o nombre</label>
+            <input id="criterio" name="criterio" type="search" autocomplete="off" placeholder="Código, placa, DNI o nombre">
+            <button type="submit" class="btn">Buscar</button>
+          </form>
+          <p id="ultimo-cobro" class="ultimo-cobro" role="status" hidden></p>
+          <div class="tabla-scroll">
+            <table id="tabla-pendientes">
+              <caption>Reservas pendientes de pago</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Código</th>
+                  <th scope="col">Placa</th>
+                  <th scope="col">Cliente</th>
+                  <th scope="col">DNI</th>
+                  <th scope="col">Monto</th>
+                  <th scope="col">Acción</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="bloque" aria-labelledby="t-linea">
+          <h2 id="t-linea">Pagos recibidos por la pasarela</h2>
+          <p id="aviso-nuevos" class="aviso-nuevos" role="status" aria-live="polite"></p>
+          <div class="barra-linea">
+            <label class="check-linea">
+              <input id="solo-por-verificar" type="checkbox"> Solo pendientes de verificar
+            </label>
+            <span class="actualizado">Se actualiza cada 15 s · última vez: <strong id="ultima-actualizacion">—</strong></span>
+          </div>
+          <div class="tabla-scroll">
+            <table id="tabla-en-linea">
+              <caption>Operaciones en línea</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Hora</th>
+                  <th scope="col">Operación</th>
+                  <th scope="col">Reserva</th>
+                  <th scope="col">Cliente</th>
+                  <th scope="col">Medio</th>
+                  <th scope="col">Monto</th>
+                  <th scope="col">Resultado</th>
+                  <th scope="col">Verificación</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="bloque" aria-labelledby="t-resumen">
+          <h2 id="t-resumen">Resumen del día (cierre de caja)</h2>
+          <div class="tabla-scroll">
+            <table id="tabla-resumen">
+              <caption class="visually-hidden">Cobros del día por canal y medio de pago</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Canal</th>
+                  <th scope="col">Medio</th>
+                  <th scope="col">Operaciones</th>
+                  <th scope="col">Total</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="total-dia">Total recaudado: <strong id="total-dia">S/ 0.00</strong></p>
+        </section>
+
+      </div>
+    </section>
+  </main>
+
+  <dialog id="dialogo-cobro" aria-labelledby="t-dialogo">
+    <form id="form-cobro">
+      <h2 id="t-dialogo">Registrar cobro</h2>
+      <p class="cobro-resumen">
+        Reserva <strong id="cobro-codigo"></strong><br>
+        Total a cobrar <strong id="cobro-total"></strong>
+      </p>
+
+      <label for="metodo-caja">Medio de pago</label>
+      <select id="metodo-caja" name="metodo">
+        <option value="efectivo">Efectivo</option>
+        <option value="pos">Tarjeta en POS</option>
+        <option value="andipay">Billetera AndiPay (QR)</option>
+        <option value="pagomovil">Billetera PagoMóvil (QR)</option>
+      </select>
+
+      <div id="campo-recibido">
+        <label for="monto-recibido">Monto recibido (S/)</label>
+        <input id="monto-recibido" name="monto_recibido" type="number" min="0" step="0.01" inputmode="decimal">
+        <div class="billetes" id="billetes">
+          <button type="button" data-valor="exacto">Exacto</button>
+          <button type="button" data-valor="10">S/ 10</button>
+          <button type="button" data-valor="20">S/ 20</button>
+          <button type="button" data-valor="50">S/ 50</button>
+          <button type="button" data-valor="100">S/ 100</button>
+          <button type="button" data-valor="200">S/ 200</button>
+        </div>
+        <p class="vuelto">Vuelto: <output id="vuelto" for="monto-recibido">S/ 0.00</output></p>
+      </div>
+
+      <div id="campo-referencia" hidden>
+        <label for="referencia">N.° de voucher u operación (6 a 12 dígitos)</label>
+        <input id="referencia" name="referencia" inputmode="numeric" maxlength="12">
+      </div>
+
+      <div class="dialogo-botones">
+        <button type="button" id="cancelar-cobro" class="btn btn-outline">Cancelar</button>
+        <button type="submit" class="btn btn-confirmar">Confirmar cobro</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/caja/caja.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+
+</body>
+</html>

@@ -1,228 +1,52 @@
-:root {
-  --color-primary: #163a5c;
-  --color-primary-dark: #0f2740;
-  --color-accent: #f2994a;
-  --color-bg: #f5f7fa;
-  --color-surface: #ffffff;
-  --color-line: #e1e6ea;
-  --color-ink: #16232e;
-  --color-ink-soft: #55636e;
-  --cancel: #d64545;
-  --radius: 10px;
-  --font-display: "Space Grotesk", sans-serif;
-  --font-body: "Inter", sans-serif;
-}
+/* ====== Semana 9: horas, VIP y monto ====== */
+.ayuda-campo { margin: 8px 0 0; font-size: 0.78rem; color: var(--color-ink-soft); align-self: center; }
+.nota-desglose { margin: -10px 0 16px; min-height: 1em; font-size: 0.78rem; color: var(--color-ink-soft); }
+.enlace-pagar { text-decoration: underline; font-weight: 700; }
+.confirmacion-estacionamiento.error { background: #fbe5e5; color: #b53030; }
 
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: var(--font-body);
-  background: var(--color-bg);
-  color: var(--color-ink);
-  line-height: 1.5;
-}
-a { color: inherit; }
-
-.wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-
-.site-header {
-  background: var(--color-primary-dark);
-  border-bottom: 1px solid rgba(255,255,255,0.12);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.site-header .wrap {
+.campo-vip { margin-bottom: 20px; }
+.opcion-check { display: block; cursor: pointer; position: relative; }
+.opcion-check input { position: absolute; opacity: 0; pointer-events: none; }
+.opcion-check-caja {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.logo {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: #fff;
-  text-decoration: none;
-}
-nav a {
-  margin-left: 20px;
-  text-decoration: none;
-  color: #cfe0ea;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-nav a:hover { color: var(--color-accent); }
-
-.nav-usuario { position: relative; display: inline-block; margin-left: 20px; }
-.nav-usuario-boton {
-  background: none; border: none; color: #cfe0ea; font-weight: 500;
-  font-family: var(--font-body); font-size: 1rem; cursor: pointer; padding: 0;
-  display: flex; align-items: center; gap: 4px; transition: color 0.2s ease;
-}
-.nav-usuario-boton:hover { color: var(--color-accent); }
-.nav-usuario-flecha { font-size: 0.7rem; }
-.nav-usuario-menu {
-  display: none; position: absolute; right: 0; top: calc(100% + 10px);
-  background: var(--color-surface); border: 1px solid var(--color-line);
-  border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-  min-width: 160px; overflow: hidden; z-index: 200;
-}
-.nav-usuario.abierto .nav-usuario-menu { display: block; }
-.nav-usuario-menu a { display: block; padding: 10px 16px; color: var(--color-ink); text-decoration: none; font-size: 0.9rem; }
-.nav-usuario-menu a:hover { background: var(--color-bg); }
-
-h1 { color: var(--color-ink); font-family: var(--font-display); font-size: 1.8rem; margin: 0 0 10px; }
-.section-intro { color: var(--color-ink-soft); margin: 0 0 24px; }
-
-.actualizar { padding: 40px 0 56px; }
-
-.formulario {
-  max-width: 640px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius);
-  padding: 28px;
-}
-.campo { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
-.campo-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-label { font-size: 0.9rem; font-weight: 500; color: var(--color-ink); }
-
-input[type="text"],
-input[type="datetime-local"] {
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  padding: 10px 12px;
-  border: 1px solid var(--color-line);
-  border-radius: 6px;
-  background: var(--color-bg);
-  color: var(--color-ink);
-  width: 100%;
-}
-input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(22,58,92,0.15); }
-input[required] { border-left: 3px solid var(--color-accent); }
-
-.btn {
-  display: inline-block;
-  background: var(--color-accent);
-  color: #fff;
-  padding: 12px 22px;
-  border-radius: var(--radius);
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: var(--font-body);
-  text-decoration: none;
-  text-align: center;
-}
-.btn:hover { opacity: 0.9; }
-
-.botones-actualizar {
-  display: flex;
   gap: 12px;
-}
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--color-line);
-  color: var(--color-ink);
-}
-.btn-outline:hover {
-  background: var(--color-bg);
-  opacity: 1;
-}
-
-.aviso-solo-lectura {
-  display: none;
-  max-width: 640px;
-  margin-bottom: 20px;
-  padding: 14px 18px;
-  background: #fdf1de;
-  color: #b5720c;
-  border-radius: var(--radius);
-  font-weight: 600;
-}
-.aviso-solo-lectura.visible { display: block; }
-
-.confirmacion-estacionamiento {
-  display: none;
-  max-width: 640px;
-  margin-top: 16px;
-  padding: 10px 14px;
-  background: #e3f6ea;
-  color: #1f8a4c;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-.confirmacion-estacionamiento.visible {
-  display: block;
-  animation: aparecer-confirmacion 0.4s ease forwards;
-}
-@keyframes aparecer-confirmacion {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.site-footer {
-  background: var(--color-primary-dark);
-  color: #fff;
-  padding: 32px 0;
-  margin-top: 40px;
-}
-.footer-grid { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-.footer-grid .logo { color: #fff; }
-address { font-style: normal; color: #cfe0ea; }
-address a { color: #fff; text-decoration: underline; }
-
-@media (max-width: 600px) {
-  .campo-grupo { grid-template-columns: 1fr; }
-  .botones-actualizar { flex-direction: column; }
-}
-
-/* ====== Tipo de servicio y costo ====== */
-.campo-servicio { border: 0; padding: 0; margin: 0 0 20px; min-width: 0; }
-.campo-servicio legend {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--color-ink);
-  padding: 0;
-  margin-bottom: 8px;
-}
-.opciones-servicio { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.opcion-servicio { position: relative; cursor: pointer; display: block; }
-.opcion-servicio input { position: absolute; opacity: 0; pointer-events: none; }
-.opcion-caja {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  height: 100%;
   padding: 14px 16px;
   border: 1.5px solid var(--color-line);
   border-radius: 10px;
   background: var(--color-bg);
   transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
-.opcion-servicio:hover .opcion-caja { border-color: #b9c5d0; }
-.opcion-servicio input:checked + .opcion-caja {
-  border-color: var(--color-primary);
+.opcion-check:hover .opcion-check-caja { border-color: #b9c5d0; }
+.check-marca {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 2px solid #b9c5d0;
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
-.opcion-servicio input[value="vip"]:checked + .opcion-caja {
+.check-marca::after {
+  content: "";
+  width: 10px;
+  height: 5px;
+  margin-top: -2px;
+  border-left: 2.5px solid #fff;
+  border-bottom: 2.5px solid #fff;
+  transform: rotate(-45deg) scale(0);
+  transition: transform 0.2s ease;
+}
+.opcion-check input:checked + .opcion-check-caja {
   border-color: #b5720c;
   background: #fffaf2;
   box-shadow: 0 0 0 3px rgba(242, 153, 74, 0.25);
 }
-.opcion-servicio input:focus-visible + .opcion-caja { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-.opcion-caja strong { font-family: var(--font-display); font-size: 0.95rem; color: var(--color-primary); }
-.opcion-precio { font-weight: 700; font-size: 1.05rem; }
-.opcion-desc { font-size: 0.75rem; color: var(--color-ink-soft); }
-
-.costo-linea { margin: 0 0 20px; font-size: 1rem; color: var(--color-ink-soft); }
-.costo-linea strong { color: var(--color-primary); font-size: 1.15rem; }
-
-@media (max-width: 600px) {
-  .opciones-servicio { grid-template-columns: 1fr; }
-}
+.opcion-check input:checked + .opcion-check-caja .check-marca { background: #b5720c; border-color: #b5720c; }
+.opcion-check input:checked + .opcion-check-caja .check-marca::after { transform: rotate(-45deg) scale(1); }
+.opcion-check input:focus-visible + .opcion-check-caja { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.opcion-check-texto { display: flex; flex-direction: column; font-size: 0.8rem; color: var(--color-ink-soft); }
+.opcion-check-texto strong { font-family: var(--font-display); font-size: 0.95rem; color: var(--color-primary); }

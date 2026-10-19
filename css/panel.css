@@ -564,3 +564,41 @@ address a { color: #fff; text-decoration: underline; }
   font-size: 1.05rem;
   color: var(--color-primary);
 }
+
+/* ====== Semana 9: pago, tarifa y recaudación ====== */
+.pago-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.pago-pendiente { background: #fdf1de; color: #b5720c; }
+.pago-pagado { background: #e3f6ea; color: #1f8a4c; }
+.pago-exonerado { background: #eef1f5; color: #3b4a5a; }
+.canal-pago { display: block; margin-top: 2px; font-size: 0.72rem; color: var(--color-ink-soft); }
+
+.resumen-pendiente .resumen-numero { color: #b5720c; }
+#est-recaudado, #est-porcobrar { font-size: 1.4rem; }
+
+.campo-check-simple {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.campo-check-simple input { width: auto; accent-color: var(--color-accent); }
+
+.aviso-pago {
+  margin: 0 0 18px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #fdf1de;
+  color: #b5720c;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.aviso-pago[hidden] { display: none; }
+input:disabled, select:disabled { opacity: 0.6; cursor: not-allowed; }
