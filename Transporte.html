@@ -86,7 +86,7 @@
 
           <div class="reserva-card" id="reserva-card">
             <h2>Reserva de estacionamiento</h2>
-            <p class="section-intro">Completa tus datos para reservar tu espacio con anticipación.</p>
+            <p class="section-intro">Cotiza tu estadía y reserva tu espacio. Después puedes pagar en línea o en la garita.</p>
 
             <form id="form-reserva-estacionamiento" class="formulario" action="#" method="post" novalidate>
               <div class="campo-flotante campo-entrada">
@@ -108,27 +108,49 @@
                 </div>
               </div>
 
+              <div class="campo-grupo">
+                <div class="campo-flotante campo-entrada">
+                  <input type="number" id="re-horas" name="horas" placeholder=" " required min="0.5" max="240" step="0.5" inputmode="decimal" aria-describedby="msg-horas ayuda-horas">
+                  <label for="re-horas">Horas de estacionamiento</label>
+                  <span class="mensaje-campo" id="msg-horas"></span>
+                </div>
+                <p class="ayuda-campo" id="ayuda-horas">Se cobra por hora o fracción: 3.5 h se cobra como 4 h.</p>
+              </div>
+
               <fieldset class="campo-servicio campo-entrada">
-                <legend>Tipo de servicio</legend>
+                <legend>Tipo de vehículo</legend>
                 <div class="opciones-servicio">
                   <label class="opcion-servicio">
-                    <input type="radio" name="tipo_servicio" value="normal" checked>
+                    <input type="radio" name="tipo_vehiculo" value="auto" checked>
                     <span class="opcion-caja">
-                      <strong data-etiqueta="normal">Taxi normal</strong>
-                      <span class="opcion-precio" data-precio="normal">—</span>
-                      <span class="opcion-desc">Servicio estándar</span>
+                      <strong>Auto</strong>
+                      <span class="opcion-precio"><span data-tarifa="hora">S/ 7.00</span> por hora</span>
+                      <span class="opcion-desc">Auto, camioneta o moto</span>
                     </span>
                   </label>
                   <label class="opcion-servicio">
-                    <input type="radio" name="tipo_servicio" value="vip">
+                    <input type="radio" name="tipo_vehiculo" value="bus_camion">
                     <span class="opcion-caja">
-                      <strong data-etiqueta="vip">Taxi VIP</strong>
-                      <span class="opcion-precio" data-precio="vip">—</span>
-                      <span class="opcion-desc">Vehículo ejecutivo, acceso preferente</span>
+                      <strong>Bus o camión</strong>
+                      <span class="opcion-precio"><span data-tarifa="bus">+50 %</span> sobre la tarifa</span>
+                      <span class="opcion-desc">Vehículos de gran tamaño</span>
                     </span>
                   </label>
                 </div>
               </fieldset>
+
+              <div class="campo-vip campo-entrada">
+                <label class="opcion-check">
+                  <input type="checkbox" id="re-vip" name="zona_vip">
+                  <span class="opcion-check-caja">
+                    <span class="check-marca" aria-hidden="true"></span>
+                    <span class="opcion-check-texto">
+                      <strong>Zona techada VIP</strong>
+                      <span>Protegida del sol y la lluvia · + <span data-tarifa="vip">S/ 15.00</span></span>
+                    </span>
+                  </span>
+                </label>
+              </div>
 
               <button type="submit" class="btn btn-reservar">
                 <span class="btn-texto">Reservar estacionamiento</span>
@@ -138,19 +160,21 @@
 
             <p id="reserva-confirmacion" class="confirmacion-estacionamiento"></p>
 
-            <div id="ticket-reserva" class="ticket-reserva" hidden>
+            <div id="ticket-reserva" class="ticket-reserva pendiente" hidden>
               <div class="ticket-principal">
-                <p class="ticket-etiqueta">Reserva confirmada</p>
+                <p class="ticket-etiqueta">Reserva registrada · pendiente de pago</p>
                 <p class="ticket-codigo" id="tk-codigo">COD-00000000</p>
                 <div class="ticket-datos">
                   <div><span>Pasajero</span><strong id="tk-nombre">—</strong></div>
                   <div><span>Placa</span><strong id="tk-placa">—</strong></div>
                   <div><span>Entrada</span><strong id="tk-fecha">—</strong></div>
-                  <div><span>Servicio</span><strong id="tk-servicio">—</strong></div>
-                  <div><span>Costo estimado</span><strong id="tk-costo">—</strong></div>
+                  <div><span>Estadía</span><strong id="tk-estadia">—</strong></div>
+                  <div><span>Total a pagar</span><strong id="tk-total">—</strong></div>
                 </div>
+                <p class="ticket-nota">Puedes pagar ahora en línea o después en la garita, presentando este código.</p>
               </div>
               <div class="ticket-talon">
+                <a href="pago.html" id="tk-pagar" class="btn btn-pagar">Pagar ahora</a>
                 <button type="button" id="btn-copiar" class="btn-copiar">Copiar código</button>
                 <a href="mis-reservas.html" id="tk-ver" class="ticket-link">Ver mis reservas</a>
                 <div class="ticket-barras" aria-hidden="true"></div>
@@ -164,9 +188,18 @@
               <div class="resumen-fila"><dt>Pasajero</dt><dd id="rv-nombre">—</dd></div>
               <div class="resumen-fila"><dt>Placa</dt><dd id="rv-placa">—</dd></div>
               <div class="resumen-fila"><dt>Entrada</dt><dd id="rv-fecha">—</dd></div>
-              <div class="resumen-fila"><dt>Servicio</dt><dd id="rv-servicio">—</dd></div>
-              <div class="resumen-fila resumen-total"><dt>Costo estimado</dt><dd id="rv-costo">—</dd></div>
+              <div class="resumen-fila"><dt>Horas</dt><dd id="rv-horas">—</dd></div>
+              <div class="resumen-fila"><dt>Vehículo</dt><dd id="rv-vehiculo">Auto</dd></div>
+              <div class="resumen-fila"><dt>Zona VIP</dt><dd id="rv-vip">No</dd></div>
             </dl>
+
+            <div class="cotizacion">
+              <h4>Cotización</h4>
+              <ul id="rv-desglose" class="desglose"></ul>
+              <p class="nota-desglose" id="rv-nota"></p>
+              <p class="total-cotizacion">Monto estimado <output id="monto-estimado" for="re-horas re-vip">S/ 0.00</output></p>
+            </div>
+
             <p class="resumen-listo" id="rv-listo">✓ Todo listo para reservar</p>
           </aside>
 
@@ -189,11 +222,12 @@
                 <tr>
                   <th scope="col">Código</th>
                   <th scope="col">Placa</th>
-                  <th scope="col">Servicio</th>
-                  <th scope="col">Costo estimado</th>
+                  <th scope="col">Vehículo</th>
+                  <th scope="col">Horas</th>
+                  <th scope="col">Monto</th>
+                  <th scope="col">Pago</th>
                   <th scope="col">Entrada</th>
                   <th scope="col">Estado</th>
-                  <th scope="col">Registrado el</th>
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>

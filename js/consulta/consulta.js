@@ -1,73 +1,100 @@
 import { sql } from '../config/neon-config.js';
-import { exigirSesion } from '../auth/auth.js';
-import { etiquetaServicio, formatearSoles } from '../config/tarifas.js';
+import { exigirRol } from '../auth/auth.js';
+import { formatearSoles, NOMBRES_VEHICULO } from '../registro/tarifario.js';
+import { formatearFecha } from '../config/ui.js';
 
-const usuario = exigirSesion();
+const usuario = exigirRol('cliente');
+if (!usuario) throw new Error('Acceso denegado');
+
+const SELECT_RESERVAS = `ignorado`; // (las consultas se escriben completas abajo: sql`` nunca se arma con texto)
 
 export async function consultarMisReservas() {
-  const filas = await sql`
-    SELECT codigo_seguimiento, placa, fecha_hora_entrada, estado, fecha_registro, tipo_servicio, costo_estimado
-    FROM reservas_estacionamiento
-    WHERE usuario_id = ${usuario.id}
-    ORDER BY fecha_registro DESC;
+  return await sql`
+    SELECT r.id, r.codigo_seguimiento, r.placa, r.horas, r.tipo_vehiculo, r.zona_vip,
+           r.monto_calculado, r.estado, r.estado_pago, r.fecha_hora_entrada, r.fecha_registro,
+           p.codigo_operacion
+    FROM reservas_estacionamiento r
+    LEFT JOIN pagos p ON p.id_registro = r.id AND p.estado = 'aprobado'
+    WHERE r.usuario_id = ${usuario.id}
+    ORDER BY r.fecha_registro DESC;
   `;
-  return filas;
 }
 
 export async function buscarReservaPorCodigo(codigo) {
   const filas = await sql`
-    SELECT codigo_seguimiento, placa, fecha_hora_entrada, estado, fecha_registro, tipo_servicio, costo_estimado
-    FROM reservas_estacionamiento
-    WHERE codigo_seguimiento = ${codigo} AND usuario_id = ${usuario.id};
+    SELECT r.codigo_seguimiento, r.placa, r.monto_calculado, r.estado, r.estado_pago
+    FROM reservas_estacionamiento r
+    WHERE r.codigo_seguimiento = ${codigo} AND r.usuario_id = ${usuario.id};
   `;
   return filas[0] || null;
 }
 
-function escaparHTML(texto) {
-  if (texto === null || texto === undefined) return '';
-  return String(texto)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+function celda(tr, contenido) {
+  const td = document.createElement('td');
+  if (contenido instanceof Node) td.append(contenido);
+  else td.textContent = contenido ?? '—'; // textContent: nunca se interpreta como HTML
+  tr.append(td);
+  return td;
 }
 
-function formatearFecha(valor) {
-  if (!valor) return '—';
-  const fecha = new Date(valor);
-  return fecha.toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
+function insignia(clase, texto) {
+  const span = document.createElement('span');
+  span.className = clase;
+  span.textContent = texto;
+  return span;
 }
 
-function pintarFila(reserva) {
+function enlace(href, clase, texto) {
+  const a = document.createElement('a');
+  a.href = href;
+  a.className = clase;
+  a.textContent = texto;
+  return a;
+}
+
+function pintarFila(r) {
   const tr = document.createElement('tr');
-  tr.dataset.codigo = reserva.codigo_seguimiento;
+  tr.dataset.codigo = r.codigo_seguimiento;
 
-  const accion = reserva.estado === 'registrado'
-    ? `<a href="actualizar.html?codigo=${encodeURIComponent(reserva.codigo_seguimiento)}" class="btn-editar-fila">Editar</a>`
-    : '—';
+  celda(tr, r.codigo_seguimiento);
+  celda(tr, r.placa);
+  celda(tr, `${NOMBRES_VEHICULO[r.tipo_vehiculo] ?? r.tipo_vehiculo}${r.zona_vip ? ' · VIP' : ''}`);
+  celda(tr, `${Number(r.horas)} h`);
+  celda(tr, formatearSoles(Number(r.monto_calculado)));
+  celda(tr, insignia(`pago-badge pago-${r.estado_pago}`, r.estado_pago));
+  celda(tr, formatearFecha(r.fecha_hora_entrada));
+  celda(tr, insignia(`estado-badge estado-${r.estado}`, r.estado));
 
-  tr.innerHTML = `
-    <td>${escaparHTML(reserva.codigo_seguimiento)}</td>
-    <td>${escaparHTML(reserva.placa)}</td>
-    <td><span class="servicio-badge servicio-${reserva.tipo_servicio}">${etiquetaServicio(reserva.tipo_servicio)}</span></td>
-    <td>${formatearSoles(reserva.costo_estimado)}</td>
-    <td>${formatearFecha(reserva.fecha_hora_entrada)}</td>
-    <td><span class="estado-badge estado-${reserva.estado}">${reserva.estado}</span></td>
-    <td>${formatearFecha(reserva.fecha_registro)}</td>
-    <td>${accion}</td>
-  `;
+  const acciones = document.createElement('td');
+  if (r.estado_pago === 'pendiente' && r.estado !== 'cancelado') {
+    acciones.append(enlace(`pago.html?id=${r.id}`, 'btn-pagar-fila', 'Pagar'));
+  }
+  if (r.estado_pago === 'pagado' && r.codigo_operacion) {
+    acciones.append(enlace(`comprobante.html?op=${encodeURIComponent(r.codigo_operacion)}`, 'btn-comprobante-fila', 'Comprobante'));
+  }
+  if (r.estado === 'registrado' && r.estado_pago !== 'pagado') {
+    acciones.append(enlace(`actualizar.html?codigo=${encodeURIComponent(r.codigo_seguimiento)}`, 'btn-editar-fila', 'Editar'));
+  }
+  if (!acciones.childNodes.length) acciones.textContent = r.estado_pago === 'exonerado' ? 'Exonerado' : '—';
+  tr.append(acciones);
+
   return tr;
 }
 
 // Esqueleto de carga mientras llegan los datos
 function mostrarEsqueleto(cuerpoTabla) {
-  cuerpoTabla.innerHTML = '';
+  cuerpoTabla.replaceChildren();
   for (let i = 0; i < 4; i++) {
     const tr = document.createElement('tr');
     tr.className = 'fila-esqueleto';
     tr.setAttribute('aria-hidden', 'true');
-    tr.innerHTML = '<td><span class="barra-esqueleto"></span></td>'.repeat(8);
+    for (let c = 0; c < 9; c++) {
+      const td = document.createElement('td');
+      const barra = document.createElement('span');
+      barra.className = 'barra-esqueleto';
+      td.append(barra);
+      tr.append(td);
+    }
     cuerpoTabla.appendChild(tr);
   }
 }
@@ -84,7 +111,7 @@ async function cargarMisReservas() {
 
   try {
     const reservas = await consultarMisReservas();
-    cuerpoTabla.innerHTML = '';
+    cuerpoTabla.replaceChildren();
 
     if (reservas.length === 0) {
       vacioEl.textContent = 'Aún no tienes reservas registradas.';
@@ -113,7 +140,7 @@ async function cargarMisReservas() {
     }
   } catch (error) {
     console.error(error);
-    cuerpoTabla.innerHTML = '';
+    cuerpoTabla.replaceChildren();
     vacioEl.textContent = 'Ocurrió un error al cargar tus reservas.';
     vacioEl.style.display = 'block';
   }
@@ -136,7 +163,9 @@ if (formBuscar) {
         resultadoEl.classList.add('no-encontrado');
         return;
       }
-      resultadoEl.textContent = `✓ Encontrada: placa ${reserva.placa}, ${etiquetaServicio(reserva.tipo_servicio)} (${formatearSoles(reserva.costo_estimado)}), estado "${reserva.estado}".`;
+      resultadoEl.textContent =
+        `✓ Encontrada: placa ${reserva.placa}, ${formatearSoles(Number(reserva.monto_calculado))}, ` +
+        `pago ${reserva.estado_pago}, estado "${reserva.estado}".`;
       resultadoEl.classList.add('encontrado');
     } catch (error) {
       console.error(error);

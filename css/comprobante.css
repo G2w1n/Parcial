@@ -1,0 +1,190 @@
+:root {
+  --color-primary: #163a5c;
+  --color-primary-dark: #0f2740;
+  --color-accent: #f2994a;
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-line: #e1e6ea;
+  --color-ink: #16232e;
+  --color-ink-soft: #55636e;
+  --radius: 10px;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+a { color: inherit; }
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+/* ====== Encabezado ====== */
+.site-header {
+  background: var(--color-primary-dark);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.site-header .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.logo { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; color: #fff; text-decoration: none; }
+nav a { margin-left: 20px; text-decoration: none; color: #cfe0ea; font-weight: 500; transition: color 0.2s ease; }
+nav a:hover { color: var(--color-accent); }
+
+.nav-usuario { position: relative; display: inline-block; margin-left: 20px; }
+.nav-usuario-boton {
+  background: none; border: none; color: #cfe0ea; font-weight: 500;
+  font-family: var(--font-body); font-size: 1rem; cursor: pointer; padding: 0;
+  display: flex; align-items: center; gap: 4px; transition: color 0.2s ease;
+}
+.nav-usuario-boton:hover { color: var(--color-accent); }
+.nav-usuario-flecha { font-size: 0.7rem; }
+.nav-usuario-menu {
+  display: none; position: absolute; right: 0; top: calc(100% + 10px);
+  background: var(--color-surface); border: 1px solid var(--color-line);
+  border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  min-width: 160px; overflow: hidden; z-index: 200;
+}
+.nav-usuario.abierto .nav-usuario-menu { display: block; }
+.nav-usuario-menu a { display: block; margin: 0; padding: 10px 16px; color: var(--color-ink); text-decoration: none; font-size: 0.9rem; }
+.nav-usuario-menu a:hover { background: var(--color-bg); }
+
+/* ====== Constancia ====== */
+.comprobante-seccion { padding: 40px 0 56px; }
+h1 { text-align: center; color: var(--color-ink); font-family: var(--font-display); font-size: 1.8rem; margin: 0 0 24px; }
+
+.constancia {
+  max-width: 560px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 14px 28px rgba(22, 58, 92, 0.14);
+  animation: aparecer-confirmacion 0.5s ease both;
+}
+@keyframes aparecer-confirmacion {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.constancia-cab {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--color-primary-dark);
+  color: #fff;
+  font-family: var(--font-display);
+}
+.constancia-cab span { font-size: 0.85rem; opacity: 0.85; }
+
+.pase {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  background: #e3f6ea;
+  color: #1f8a4c;
+  border-bottom: 1px dashed #b9dcc6;
+}
+.pase div { display: flex; flex-direction: column; }
+.pase small { font-weight: 500; opacity: 0.85; }
+.pase-icono {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #1f8a4c;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: aparecer-pase 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) 0.2s both;
+}
+@keyframes aparecer-pase {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+.constancia-cuerpo { padding: 20px 24px; }
+.constancia dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 18px; margin: 0 0 16px; }
+.constancia dt { color: var(--color-ink-soft); font-size: 0.85rem; }
+.constancia dd { margin: 0; font-size: 0.9rem; font-weight: 600; text-align: right; word-break: break-word; }
+
+.desglose-comp { list-style: none; margin: 0; padding: 12px 0 0; border-top: 1px dashed var(--color-line); }
+.desglose-comp li { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 0.85rem; }
+.desglose-comp li span:last-child { font-weight: 600; white-space: nowrap; }
+
+.total-comp {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 2px solid var(--color-primary);
+  font-weight: 600;
+}
+.total-comp strong { font-family: var(--font-display); font-size: 1.6rem; color: var(--color-primary); }
+
+.constancia-pie { padding: 14px 24px 20px; border-top: 2px dashed var(--color-line); text-align: center; }
+.pie-codigo { margin: 0 0 10px; font-family: var(--font-display); font-size: 1.05rem; letter-spacing: 0.08em; color: var(--color-primary); }
+.ticket-barras {
+  height: 30px;
+  border-radius: 3px;
+  opacity: 0.75;
+  background: repeating-linear-gradient(90deg, #16232e 0 2px, transparent 2px 4px, #16232e 4px 5px, transparent 5px 9px);
+}
+
+.acciones { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+.btn:hover { opacity: 0.9; }
+.btn:active { transform: scale(0.97); }
+.btn-outline { background: transparent; border: 1px solid var(--color-line); color: var(--color-ink); }
+
+@media (max-width: 560px) {
+  .constancia-cab { flex-direction: column; align-items: flex-start; gap: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constancia, .pase-icono { animation: none; }
+}
+
+/* ====== Impresión: solo se imprime la constancia ====== */
+@media print {
+  .site-header, .acciones, h1 { display: none; }
+  body { background: #fff; color: #000; }
+  .comprobante-seccion { padding: 0; }
+  .constancia { max-width: none; border: 1px solid #000; border-radius: 0; box-shadow: none; animation: none; }
+  .constancia-cab, .pase, .pase-icono, .ticket-barras {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

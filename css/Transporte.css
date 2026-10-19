@@ -678,3 +678,112 @@ address a { color: #fff; text-decoration: underline; }
 @media (max-width: 600px) {
   .opciones-servicio { grid-template-columns: 1fr; }
 }
+
+/* ====== Semana 9: horas, vehículo, VIP y cotización ====== */
+.ayuda-campo { margin: 8px 0 0; font-size: 0.78rem; color: var(--color-ink-soft); align-self: center; }
+
+.campo-vip { margin-bottom: 20px; }
+.reserva-card.en-vista .formulario > .campo-vip.campo-entrada { animation-delay: 0.42s; }
+.opcion-check { display: block; cursor: pointer; position: relative; }
+.opcion-check input { position: absolute; opacity: 0; pointer-events: none; }
+.opcion-check-caja {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--color-line);
+  border-radius: 10px;
+  background: var(--color-bg);
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.opcion-check:hover .opcion-check-caja { border-color: #b9c5d0; }
+.check-marca {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 2px solid #b9c5d0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.check-marca::after {
+  content: "";
+  width: 10px;
+  height: 5px;
+  margin-top: -2px;
+  border-left: 2.5px solid #fff;
+  border-bottom: 2.5px solid #fff;
+  transform: rotate(-45deg) scale(0);
+  transition: transform 0.2s ease;
+}
+.opcion-check input:checked + .opcion-check-caja {
+  border-color: #b5720c;
+  background: #fffaf2;
+  box-shadow: 0 0 0 3px rgba(242, 153, 74, 0.25);
+}
+.opcion-check input:checked + .opcion-check-caja .check-marca { background: #b5720c; border-color: #b5720c; }
+.opcion-check input:checked + .opcion-check-caja .check-marca::after { transform: rotate(-45deg) scale(1); }
+.opcion-check input:focus-visible + .opcion-check-caja { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.opcion-check-texto { display: flex; flex-direction: column; font-size: 0.8rem; color: var(--color-ink-soft); }
+.opcion-check-texto strong { font-family: var(--font-display); font-size: 0.95rem; color: var(--color-primary); }
+
+/* Cotización en vivo */
+.cotizacion { margin-top: 14px; padding-top: 14px; border-top: 1px dashed #c5ced6; }
+.cotizacion h4 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--color-ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.desglose { list-style: none; margin: 0; padding: 0; }
+.desglose li { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 0.85rem; }
+.desglose li span:last-child { font-weight: 600; white-space: nowrap; }
+.desglose-vacio { color: var(--color-ink-soft); }
+.nota-desglose { margin: 4px 0 0; min-height: 1em; font-size: 0.75rem; color: var(--color-ink-soft); }
+.total-cotizacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 2px solid var(--color-primary);
+  font-weight: 600;
+}
+.total-cotizacion output { font-family: var(--font-display); font-size: 1.5rem; color: var(--color-primary); }
+.total-cotizacion output.cambio { animation: flash-dato 0.5s ease; }
+
+/* Ticket pendiente de pago */
+.ticket-reserva.pendiente { border-left-color: var(--color-accent); }
+.ticket-nota { margin: 12px 0 0; font-size: 0.78rem; color: var(--color-ink-soft); }
+.btn-pagar { background: #1f8a4c; text-decoration: none; text-align: center; }
+
+/* Insignias y botones de pago en la tabla Mis reservas */
+.pago-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.pago-pendiente { background: #fdf1de; color: #b5720c; }
+.pago-pagado { background: #e3f6ea; color: #1f8a4c; }
+.pago-exonerado { background: #eef1f5; color: #3b4a5a; }
+.btn-pagar-fila,
+.btn-comprobante-fila {
+  display: inline-block;
+  padding: 5px 12px;
+  margin-right: 6px;
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.btn-pagar-fila { background: #1f8a4c; }
+.btn-comprobante-fila { background: #1c5fa8; }
+.btn-pagar-fila:hover, .btn-comprobante-fila:hover { opacity: 0.88; }

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagar estacionamiento — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Paga tu reserva de estacionamiento del Aeropuerto Internacional Qorikancha con tarjeta o billetera electrónica. Simulación académica ficticia.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/pago.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="Transporte.html">Reservar</a>
+        <a href="mis-reservas.html">Mis reservas</a>
+        <a href="pago.html" aria-current="page">Pagar</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="pago">
+      <div class="wrap">
+        <h1>Pago en línea</h1>
+        <p class="section-intro">Paga tu estacionamiento con tarjeta o billetera y habilita tu pase de salida sin detenerte en la garita.</p>
+        <p class="aviso-simulacion">Simulación académica: los datos son ficticios y no se realiza ningún cobro real.</p>
+
+        <div class="pago-layout">
+
+          <div class="pago-principal">
+            <div id="panel-pago">
+
+              <fieldset class="metodos">
+                <legend>Método de pago</legend>
+                <div class="metodos-opciones">
+                  <label class="metodo-opcion">
+                    <input type="radio" name="metodo" value="tarjeta" checked>
+                    <span class="metodo-caja">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg>
+                      Tarjeta de débito o crédito
+                    </span>
+                  </label>
+                  <label class="metodo-opcion">
+                    <input type="radio" name="metodo" value="billetera">
+                    <span class="metodo-caja">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>
+                      Billetera electrónica
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <form id="form-tarjeta" class="form-pago" novalidate>
+                <div id="vista-tarjeta" class="tarjeta-vista" data-marca="" aria-hidden="true">
+                  <span class="vista-chip"></span>
+                  <span class="vista-numero" id="vista-numero">•••• •••• •••• ••••</span>
+                  <span class="vista-pie">
+                    <span id="vista-titular">NOMBRE DEL TITULAR</span>
+                    <span id="vista-venc">MM/AA</span>
+                    <span class="vista-marca" id="vista-marca"></span>
+                  </span>
+                </div>
+
+                <div class="campo-pago">
+                  <label for="numero">Número de tarjeta</label>
+                  <div class="campo-con-marca">
+                    <input id="numero" name="numero" inputmode="numeric" autocomplete="cc-number" maxlength="23" required aria-describedby="error-numero">
+                    <span id="marca-detectada" class="marca-detectada"></span>
+                  </div>
+                  <span id="error-numero" class="error"></span>
+                </div>
+
+                <div class="fila-campos">
+                  <div class="campo-pago">
+                    <label for="vencimiento">Vencimiento (MM/AA)</label>
+                    <input id="vencimiento" name="vencimiento" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA" required aria-describedby="error-vencimiento">
+                    <span id="error-vencimiento" class="error"></span>
+                  </div>
+                  <div class="campo-pago">
+                    <label for="cvv">CVV</label>
+                    <input id="cvv" name="cvv" type="password" inputmode="numeric" autocomplete="cc-csc" maxlength="4" required aria-describedby="error-cvv">
+                    <span id="error-cvv" class="error"></span>
+                  </div>
+                </div>
+
+                <div class="campo-pago">
+                  <label for="titular">Nombre del titular</label>
+                  <input id="titular" name="titular" autocomplete="cc-name" required aria-describedby="error-titular">
+                  <span id="error-titular" class="error"></span>
+                </div>
+
+                <button type="submit" class="btn btn-pagar-form">Pagar con tarjeta</button>
+              </form>
+
+              <form id="form-billetera" class="form-pago" novalidate hidden>
+                <div class="campo-pago">
+                  <label for="proveedor">Billetera</label>
+                  <select id="proveedor" name="proveedor">
+                    <option value="andipay">AndiPay</option>
+                    <option value="pagomovil">PagoMóvil</option>
+                  </select>
+                </div>
+
+                <div class="campo-pago">
+                  <label for="celular">Celular afiliado</label>
+                  <input id="celular" name="celular" inputmode="numeric" autocomplete="tel-national" maxlength="9" required aria-describedby="error-celular">
+                  <span id="error-celular" class="error"></span>
+                </div>
+
+                <div class="campo-pago">
+                  <label for="codigo">Código de aprobación (6 dígitos que muestra tu billetera)</label>
+                  <input id="codigo" name="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required aria-describedby="error-codigo">
+                  <span id="error-codigo" class="error"></span>
+                </div>
+
+                <button type="submit" class="btn btn-pagar-form">Pagar con billetera</button>
+              </form>
+
+            </div>
+
+            <p id="mensaje-pago" class="mensaje" role="status" aria-live="polite"></p>
+          </div>
+
+          <aside class="resumen-pago">
+            <h2>Resumen</h2>
+            <label for="registro">Reserva a pagar</label>
+            <select id="registro" name="registro"></select>
+            <ul id="resumen-detalle" class="desglose"></ul>
+            <p class="total-pago">Total a pagar <strong id="resumen-monto">—</strong></p>
+          </aside>
+
+        </div>
+
+        <details class="datos-prueba">
+          <summary>Datos de prueba (solo para la demostración)</summary>
+
+          <div class="grupo-prueba" id="datos-prueba">
+            <h3>Tarjetas</h3>
+            <div class="botones-prueba">
+              <button type="button" class="btn-prueba" data-tipo="tarjeta" data-numero="4111111111111111" data-venc="12/29" data-cvv="123" data-titular="ANA TORRES QUISPE">1 · Visa débito (aprobada)</button>
+              <button type="button" class="btn-prueba" data-tipo="tarjeta" data-numero="4000000000000002" data-venc="08/28" data-cvv="456" data-titular="LUIS PEREZ ROJAS">2 · Visa (saldo insuficiente)</button>
+              <button type="button" class="btn-prueba" data-tipo="tarjeta" data-numero="5555555555554444" data-venc="05/30" data-cvv="789" data-titular="MARIA HUAMAN SOTO">3 · Mastercard crédito (aprobada)</button>
+              <button type="button" class="btn-prueba" data-tipo="tarjeta" data-numero="5105105105105100" data-venc="03/27" data-cvv="321" data-titular="JORGE LIMA CRUZ">4 · Mastercard (bloqueada)</button>
+              <button type="button" class="btn-prueba" data-tipo="tarjeta" data-numero="378282246310005" data-venc="11/28" data-cvv="1234" data-titular="MARIA HUAMAN SOTO">5 · American Express (aprobada)</button>
+              <button type="button" class="btn-prueba" data-tipo="tarjeta" data-numero="4242424242424242" data-venc="01/25" data-cvv="111" data-titular="ROSA CCENCHO VEGA">6 · Vencida (la frena JavaScript)</button>
+              <button type="button" class="btn-prueba" data-tipo="tarjeta" data-numero="4111111111111112" data-venc="12/29" data-cvv="123" data-titular="ANA TORRES QUISPE">7 · Número inválido (la frena JavaScript)</button>
+              <button type="button" class="btn-prueba" data-tipo="tarjeta" data-numero="4111111111111111" data-venc="12/29" data-cvv="999" data-titular="ANA TORRES QUISPE">8 · CVV incorrecto</button>
+            </div>
+
+            <h3>Billeteras</h3>
+            <div class="botones-prueba">
+              <button type="button" class="btn-prueba" data-tipo="billetera" data-proveedor="andipay" data-celular="987654321" data-codigo="123456">9 · AndiPay (aprobada)</button>
+              <button type="button" class="btn-prueba" data-tipo="billetera" data-proveedor="pagomovil" data-celular="912345678" data-codigo="654321">10 · PagoMóvil (saldo insuficiente)</button>
+              <button type="button" class="btn-prueba" data-tipo="billetera" data-proveedor="andipay" data-celular="999888777" data-codigo="000000">11 · AndiPay (código incorrecto)</button>
+            </div>
+          </div>
+        </details>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/pago/pago.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+
+</body>
+</html>

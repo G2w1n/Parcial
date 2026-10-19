@@ -1,4 +1,4 @@
-import { registrarUsuario, iniciarSesion, textoTurno } from './auth.js';
+import { registrarUsuario, iniciarSesion, textoTurno, rutaInicioSegunRol } from './auth.js';
 
 const formIniciar = document.getElementById('form-iniciar-sesion');
 const formCrear = document.getElementById('form-crear-cuenta');
@@ -17,7 +17,7 @@ function ocultarError(idError) {
 }
 
 function redirigirSegunRol(usuario) {
-  window.location.href = usuario.rol === 'cliente' ? 'Transporte.html' : 'panel.html';
+  window.location.href = rutaInicioSegunRol(usuario.rol);
 }
 
 // Mensaje cuando el sistema cerró la sesión por turno terminado o cuenta desactivada

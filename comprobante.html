@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Constancia de pago — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Constancia de pago e información del pase de salida del estacionamiento del Aeropuerto Internacional Qorikancha. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/comprobante.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="Transporte.html">Reservar</a>
+        <a href="mis-reservas.html">Mis reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="comprobante-seccion">
+      <div class="wrap">
+        <h1>Constancia de pago</h1>
+        <div id="comprobante" aria-live="polite">Cargando comprobante...</div>
+
+        <div class="acciones">
+          <button type="button" id="imprimir" class="btn">Imprimir</button>
+          <a href="mis-reservas.html" id="volver" class="btn btn-outline">Volver</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/comprobante/comprobante.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+
+</body>
+</html>

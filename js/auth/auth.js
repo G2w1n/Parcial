@@ -1,4 +1,8 @@
+// js/auth/auth.js
 import { sql } from '../config/neon-config.js';
+import { rutaInicioSegunRol } from './roles.js';
+
+export { rutaInicioSegunRol };
 
 export async function registrarUsuario(nombre, correo, contrasena) {
   await sql`INSERT INTO usuarios (nombre, correo, contrasena) VALUES (${nombre}, ${correo}, ${contrasena})`;
@@ -73,4 +77,21 @@ export function exigirSesion() {
     return null;
   }
   return JSON.parse(usuarioActivo);
+}
+
+// Control por rol: si el perfil no corresponde, avisa una sola vez y vuelve al inicio
+let accesoDenegado = false;
+
+export function exigirRol(...rolesPermitidos) {
+  const usuario = exigirSesion();
+  if (!usuario) return null;
+  if (!rolesPermitidos.includes(usuario.rol)) {
+    if (!accesoDenegado) {
+      accesoDenegado = true;
+      alert('Tu perfil no tiene acceso a esta página.');
+      window.location.href = 'index.html';
+    }
+    return null;
+  }
+  return usuario;
 }

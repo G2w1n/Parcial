@@ -1,53 +1,57 @@
-// js/nav-sesion.js
-// Cuando hay sesión activa, convierte el link "Iniciar sesión" en un menú
-// desplegable con el nombre del usuario y la opción "Cerrar sesión".
-// También decide a dónde lleva el link "Reservas" según si hay sesión o no.
-const enlaceReservas = document.getElementById('nav-reservas');
-const usuarioGuardado = sessionStorage.getItem('usuario');
+// js/auth/nav-sesion.js
+import { rutaInicioSegunRol } from './roles.js';
 
-if (enlaceReservas) {
-  enlaceReservas.href = usuarioGuardado ? 'Transporte.html' : 'login.html';
+const ETIQUETA_INICIO = { cliente: 'Reservas', administrador: 'Panel', empleado: 'Panel', cajero: 'Caja' };
+
+let usuarioGuardado = null;
+try {
+  usuarioGuardado = JSON.parse(sessionStorage.getItem('usuario'));
+} catch {
+  usuarioGuardado = null;
 }
 
+// "Reservas" lleva a cada perfil a su página de inicio
+const enlaceReservas = document.getElementById('nav-reservas');
+if (enlaceReservas) {
+  enlaceReservas.href = usuarioGuardado ? rutaInicioSegunRol(usuarioGuardado.rol) : 'login.html';
+  if (usuarioGuardado) enlaceReservas.textContent = ETIQUETA_INICIO[usuarioGuardado.rol] ?? 'Reservas';
+}
+
+// "Iniciar sesión" se vuelve un menú con el nombre y la opción "Cerrar sesión"
 const enlaceSesion = document.getElementById('nav-sesion');
+if (enlaceSesion && usuarioGuardado) {
+  const contenedor = document.createElement('div');
+  contenedor.className = 'nav-usuario';
 
-if (enlaceSesion) {
-  const usuarioActivo = sessionStorage.getItem('usuario');
+  const boton = document.createElement('button');
+  boton.type = 'button';
+  boton.className = 'nav-usuario-boton';
+  const flecha = document.createElement('span');
+  flecha.className = 'nav-usuario-flecha';
+  flecha.textContent = '▾';
+  boton.append(document.createTextNode(`${usuarioGuardado.nombre} `), flecha);
 
-  if (usuarioActivo) {
-    const usuario = JSON.parse(usuarioActivo);
+  const menu = document.createElement('div');
+  menu.className = 'nav-usuario-menu';
+  const cerrar = document.createElement('a');
+  cerrar.href = '#';
+  cerrar.textContent = 'Cerrar sesión';
+  menu.append(cerrar);
 
-    const contenedor = document.createElement('div');
-    contenedor.className = 'nav-usuario';
-    contenedor.innerHTML = `
-      <button type="button" class="nav-usuario-boton" id="nav-usuario-boton">
-        ${usuario.nombre} <span class="nav-usuario-flecha">▾</span>
-      </button>
-      <div class="nav-usuario-menu" id="nav-usuario-menu">
-        <a href="#" id="nav-cerrar-sesion">Cerrar sesión</a>
-      </div>
-    `;
+  contenedor.append(boton, menu);
+  enlaceSesion.replaceWith(contenedor);
 
-    enlaceSesion.replaceWith(contenedor);
+  boton.addEventListener('click', (evento) => {
+    evento.stopPropagation();
+    contenedor.classList.toggle('abierto');
+  });
 
-    const boton = document.getElementById('nav-usuario-boton');
-    const menu = document.getElementById('nav-usuario-menu');
-    const enlaceCerrarSesion = document.getElementById('nav-cerrar-sesion');
+  cerrar.addEventListener('click', (evento) => {
+    evento.preventDefault();
+    sessionStorage.removeItem('usuario');
+    window.location.href = 'index.html';
+  });
 
-    boton.addEventListener('click', (evento) => {
-      evento.stopPropagation();
-      contenedor.classList.toggle('abierto');
-    });
-
-    enlaceCerrarSesion.addEventListener('click', (evento) => {
-      evento.preventDefault();
-      sessionStorage.removeItem('usuario');
-      window.location.href = 'index.html';
-    });
-
-    // Cierra el menú si se hace clic en cualquier otro lado de la página
-    document.addEventListener('click', () => {
-      contenedor.classList.remove('abierto');
-    });
-  }
+  // Cierra el menú si se hace clic en cualquier otro lado de la página
+  document.addEventListener('click', () => contenedor.classList.remove('abierto'));
 }
