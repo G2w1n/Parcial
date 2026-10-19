@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
   <title>Actualizar reserva — Aeropuerto Internacional Qorikancha</title>
   <meta name="description" content="Actualiza tu reserva de estacionamiento en el Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/actualizar.css">
 </head>
 <body>
@@ -28,50 +31,78 @@
     <section class="actualizar">
       <div class="wrap">
         <h1>Actualizar reserva</h1>
-        <p class="section-intro">Edita los datos de tu reserva mientras siga en estado "registrado".</p>
+        <p class="section-intro">Puedes cambiar los datos mientras la reserva siga registrada y no esté pagada. El monto se recalcula al instante.</p>
 
-        <div id="solo-lectura-aviso" class="aviso-solo-lectura"></div>
+        <div id="solo-lectura-aviso" class="aviso-solo-lectura" role="status"></div>
 
-        <form id="form-actualizar" class="formulario" action="#" method="post">
+        <form id="form-actualizar" class="formulario tarjeta-editar" action="#" method="post" novalidate hidden>
+          <p class="codigo-editar">Reserva <strong id="ac-codigo">—</strong></p>
+
           <div class="campo">
             <label for="ac-nombre">Nombre completo</label>
-            <input type="text" id="ac-nombre" name="nombre_pasajero" required minlength="3">
+            <input type="text" id="ac-nombre" name="nombre_pasajero" required minlength="3" autocomplete="name" aria-describedby="msg-ac-nombre">
+            <small class="msg-campo" id="msg-ac-nombre"></small>
           </div>
 
           <div class="campo-grupo">
             <div class="campo">
               <label for="ac-placa">Placa del vehículo</label>
-              <input type="text" id="ac-placa" name="placa" required pattern="[A-Za-z0-9-]{6,10}">
+              <input type="text" id="ac-placa" name="placa" required pattern="[A-Za-z0-9-]{6,10}" aria-describedby="msg-ac-placa">
+              <small class="msg-campo" id="msg-ac-placa"></small>
             </div>
             <div class="campo">
               <label for="ac-fecha">Fecha y hora de entrada</label>
-              <input type="datetime-local" id="ac-fecha" name="fecha_hora_entrada" required>
+              <input type="datetime-local" id="ac-fecha" name="fecha_hora_entrada" required aria-describedby="msg-ac-fecha">
+              <small class="msg-campo" id="msg-ac-fecha"></small>
             </div>
           </div>
 
+          <div class="campo">
+            <label for="ac-horas">Horas de estacionamiento</label>
+            <input type="number" id="ac-horas" name="horas" required min="0.5" max="240" step="0.5" inputmode="decimal" aria-describedby="msg-ac-horas">
+            <small class="msg-campo" id="msg-ac-horas"></small>
+          </div>
+
           <fieldset class="campo-servicio">
-            <legend>Tipo de servicio</legend>
+            <legend>Tipo de vehículo</legend>
             <div class="opciones-servicio">
               <label class="opcion-servicio">
-                <input type="radio" name="tipo_servicio" value="normal" checked>
+                <input type="radio" name="tipo_vehiculo" value="auto" checked>
                 <span class="opcion-caja">
-                  <strong data-etiqueta="normal">Taxi normal</strong>
-                  <span class="opcion-precio" data-precio="normal">—</span>
-                  <span class="opcion-desc">Servicio estándar</span>
+                  <strong>Auto</strong>
+                  <span class="opcion-precio"><span data-tarifa="hora">S/ 7.00</span> por hora</span>
+                  <span class="opcion-desc">Auto, camioneta o moto</span>
                 </span>
               </label>
               <label class="opcion-servicio">
-                <input type="radio" name="tipo_servicio" value="vip">
+                <input type="radio" name="tipo_vehiculo" value="bus_camion">
                 <span class="opcion-caja">
-                  <strong data-etiqueta="vip">Taxi VIP</strong>
-                  <span class="opcion-precio" data-precio="vip">—</span>
-                  <span class="opcion-desc">Vehículo ejecutivo, acceso preferente</span>
+                  <strong>Bus o camión</strong>
+                  <span class="opcion-precio"><span data-tarifa="bus">+50 %</span> sobre la tarifa</span>
+                  <span class="opcion-desc">Vehículos de gran tamaño</span>
                 </span>
               </label>
             </div>
           </fieldset>
 
-          <p class="costo-linea">Costo estimado: <strong id="ac-costo">—</strong></p>
+          <div class="campo-vip">
+            <label class="opcion-check">
+              <input type="checkbox" id="ac-vip" name="zona_vip">
+              <span class="opcion-check-caja">
+                <span class="check-marca" aria-hidden="true"></span>
+                <span class="opcion-check-texto">
+                  <strong>Zona techada VIP</strong>
+                  <span>Protegida del sol y la lluvia · + <span data-tarifa="vip">S/ 15.00</span></span>
+                </span>
+              </span>
+            </label>
+          </div>
+
+          <div class="cotizacion-editar" aria-live="polite">
+            <ul id="ac-desglose" class="desglose"></ul>
+            <p id="ac-nota" class="nota-desglose"></p>
+            <p class="total-cotizacion">Nuevo monto <output id="ac-monto">S/ 0.00</output></p>
+          </div>
 
           <div class="botones-actualizar">
             <a href="mis-reservas.html" class="btn btn-outline">Cancelar</a>

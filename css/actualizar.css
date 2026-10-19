@@ -1,8 +1,170 @@
-/* ====== Semana 9: horas, VIP y monto ====== */
-.ayuda-campo { margin: 8px 0 0; font-size: 0.78rem; color: var(--color-ink-soft); align-self: center; }
-.nota-desglose { margin: -10px 0 16px; min-height: 1em; font-size: 0.78rem; color: var(--color-ink-soft); }
-.enlace-pagar { text-decoration: underline; font-weight: 700; }
-.confirmacion-estacionamiento.error { background: #fbe5e5; color: #b53030; }
+/* css/actualizar.css — página "Editar reserva" (los estilos comunes están en base.css) */
+
+.actualizar { padding: 44px 0 56px; }
+.actualizar .wrap { max-width: 720px; }
+.actualizar h1 { font-family: var(--font-display); font-size: 2rem; margin: 0 0 6px; color: var(--color-primary); }
+.section-intro { color: var(--color-ink-soft); margin: 0 0 24px; }
+
+/* Tarjeta del formulario */
+.tarjeta-editar {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(15, 39, 64, 0.06);
+}
+.codigo-editar { margin: 0 0 20px; font-size: 0.9rem; color: var(--color-ink-soft); }
+.codigo-editar strong { font-family: var(--font-display); color: var(--color-primary); letter-spacing: 0.03em; }
+
+.campo { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
+.campo-grupo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.campo label { font-size: 0.9rem; font-weight: 500; }
+.campo input {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--color-ink);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.campo input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.12); }
+.campo input[aria-invalid="true"] { border-color: #b53030; }
+.msg-campo { min-height: 1em; font-size: 0.78rem; color: #b53030; }
+
+/* Tipo de vehículo */
+.campo-servicio { border: 0; padding: 0; margin: 0 0 20px; min-width: 0; }
+.campo-servicio legend { font-size: 0.9rem; font-weight: 500; padding: 0; margin-bottom: 8px; }
+.opciones-servicio { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.opcion-servicio { position: relative; cursor: pointer; display: block; }
+.opcion-servicio input { position: absolute; opacity: 0; pointer-events: none; }
+.opcion-caja {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--color-line);
+  border-radius: 10px;
+  background: var(--color-bg);
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.opcion-servicio:hover .opcion-caja { border-color: #b9c5d0; }
+.opcion-servicio input:checked + .opcion-caja {
+  border-color: var(--color-primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.12);
+}
+.opcion-servicio input:focus-visible + .opcion-caja { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.opcion-caja strong { font-family: var(--font-display); font-size: 0.95rem; color: var(--color-primary); }
+.opcion-precio { font-weight: 700; font-size: 1rem; }
+.opcion-desc { font-size: 0.75rem; color: var(--color-ink-soft); }
+
+/* Cotización */
+.cotizacion-editar { margin: 4px 0 24px; padding: 16px; background: var(--color-bg); border-radius: 10px; }
+.desglose { list-style: none; margin: 0; padding: 0; }
+.desglose li { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 0.85rem; }
+.desglose li span:last-child { font-weight: 600; white-space: nowrap; }
+.nota-desglose { margin: 4px 0 0; min-height: 1em; font-size: 0.75rem; color: var(--color-ink-soft); }
+.total-cotizacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 8px 0 0;
+  padding-top: 10px;
+  border-top: 2px solid var(--color-primary);
+  font-weight: 600;
+}
+.total-cotizacion output { font-family: var(--font-display); font-size: 1.5rem; color: var(--color-primary); }
+
+/* Botones */
+.botones-actualizar { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+.btn {
+  position: relative;
+  display: inline-block;
+  background: var(--color-accent);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-accent);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+.btn:hover { opacity: 0.9; }
+.btn:active { transform: scale(0.97); }
+.btn-outline { background: transparent; border-color: var(--color-line); color: var(--color-ink); }
+.btn.cargando { cursor: wait; opacity: 0.85; padding-left: 44px; }
+.btn.cargando::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* Mensajes */
+.aviso-solo-lectura {
+  display: none;
+  padding: 16px 18px;
+  border-radius: 10px;
+  background: #fff6e8;
+  border: 1px solid #f3d3a6;
+  color: #7a4a0c;
+}
+.aviso-solo-lectura.visible { display: block; }
+.confirmacion-estacionamiento {
+  display: none;
+  margin-top: 16px;
+  padding: 10px 14px;
+  background: #e3f6ea;
+  color: #1f8a4c;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.confirmacion-estacionamiento.visible { display: block; animation: aparecer-confirmacion 0.4s ease forwards; }
+@keyframes aparecer-confirmacion {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Avisos emergentes (los crea ui.js) */
+.avisos { position: fixed; top: 84px; right: 20px; z-index: 500; display: flex; flex-direction: column; gap: 10px; }
+.aviso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--color-surface);
+  border-left: 4px solid #1f8a4c;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  font-size: 0.9rem;
+  cursor: pointer;
+  animation: aparecer-confirmacion 0.3s ease;
+}
+.aviso-error { border-left-color: #b53030; }
+.aviso.saliendo { opacity: 0; transition: opacity 0.3s ease; }
+
+@media (max-width: 600px) {
+  .tarjeta-editar { padding: 20px 16px; }
+  .campo-grupo, .opciones-servicio { grid-template-columns: 1fr; }
+  .botones-actualizar .btn { flex: 1; text-align: center; }
+}
+
+/* Casilla de zona VIP */
 
 .campo-vip { margin-bottom: 20px; }
 .opcion-check { display: block; cursor: pointer; position: relative; }
@@ -50,3 +212,4 @@
 .opcion-check input:focus-visible + .opcion-check-caja { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 .opcion-check-texto { display: flex; flex-direction: column; font-size: 0.8rem; color: var(--color-ink-soft); }
 .opcion-check-texto strong { font-family: var(--font-display); font-size: 0.95rem; color: var(--color-primary); }
+.confirmacion-estacionamiento.error { background: #fbe5e5; color: #b53030; }
