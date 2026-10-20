@@ -71,6 +71,9 @@ function pintarFila(r) {
   if (r.estado_pago === 'pagado' && r.codigo_operacion) {
     acciones.append(enlace(`comprobante.html?op=${encodeURIComponent(r.codigo_operacion)}`, 'btn-comprobante-fila', 'Comprobante'));
   }
+  if (r.estado === 'registrado' && r.estado_pago === 'pagado') {
+    acciones.append(enlace(`ampliar.html?codigo=${encodeURIComponent(r.codigo_seguimiento)}`, 'btn-ampliar-fila', 'Ampliar'));
+  }
   if (r.estado === 'registrado' && r.estado_pago !== 'pagado') {
     acciones.append(enlace(`actualizar.html?codigo=${encodeURIComponent(r.codigo_seguimiento)}`, 'btn-editar-fila', 'Editar'));
   }
