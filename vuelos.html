@@ -6,7 +6,7 @@
   <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
   <meta name="theme-color" content="#0f2740">
   <title>Horarios de vuelo — Aeropuerto Internacional Qorikancha</title>
-  <meta name="description" content="Horarios de salidas y llegadas del Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <meta name="description" content="Tablero en vivo de llegadas y salidas del Aeropuerto Internacional Qorikancha, Cusco: busca tu vuelo y síguelo con cuenta regresiva. Caso académico ficticio.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
@@ -45,49 +45,58 @@
           </svg>
         </div>
 
-        <p class="aerolineas-label">Aerolíneas que operan en Qorikancha</p>
-        <ul class="aerolineas">
-          <li>LATAM</li>
-          <li>Sky Airline</li>
-          <li>JetSmart</li>
-          <li>Avianca</li>
-          <li>Star Perú</li>
-        </ul>
+        <p class="section-intro">Salidas y llegadas del Aeropuerto Qorikancha (código CUZ) en tiempo real. Marca la estrella ☆ de tu vuelo para seguirlo: verás la cuenta regresiva y te avisaremos si cambia su estado o su puerta.</p>
 
-        <p class="section-intro">Horarios referenciales de salidas y llegadas del Aeropuerto Qorikancha (código CUZ). Los tiempos pueden variar según la aerolínea.</p>
+        <!-- Vuelos que sigue el pasajero (se guardan en este navegador) -->
+        <section id="mis-vuelos" class="mis-vuelos" aria-labelledby="t-mis-vuelos" hidden>
+          <h2 id="t-mis-vuelos">Mis vuelos</h2>
+          <div id="lista-mis-vuelos" class="lista-mis-vuelos"></div>
+        </section>
 
-        <ul class="leyenda-estados">
-          <li><span class="estado-badge estado-a-tiempo">A tiempo</span></li>
-          <li><span class="estado-badge estado-embarcando">Embarcando</span></li>
-          <li><span class="estado-badge estado-demorado">Demorado</span></li>
-          <li><span class="estado-badge estado-cancelado">Cancelado</span></li>
-        </ul>
+        <!-- Tablero de llegadas y salidas -->
+        <section id="tablero" class="tablero" aria-labelledby="t-tablero">
+          <div class="tablero-cabecera">
+            <div>
+              <h2 id="t-tablero" class="tablero-titulo">Tablero de vuelos</h2>
+              <p class="tablero-reloj">Hora de Cusco <time id="reloj" aria-live="off">--:--:--</time></p>
+            </div>
+            <div class="tablero-pestanas" role="tablist" aria-label="Tipo de vuelo">
+              <button type="button" role="tab" id="tab-salida" aria-selected="true" aria-controls="cuerpo-tablero" data-tipo="salida">Salidas</button>
+              <button type="button" role="tab" id="tab-llegada" aria-selected="false" aria-controls="cuerpo-tablero" data-tipo="llegada">Llegadas</button>
+            </div>
+          </div>
 
-        <div class="tabla-scroll">
-          <table>
-            <caption class="visually-hidden">Horarios de vuelo del Aeropuerto Qorikancha</caption>
-            <thead>
-              <tr>
-                <th scope="col">Vuelo</th>
-                <th scope="col">Aerolínea</th>
-                <th scope="col">Tipo</th>
-                <th scope="col">Origen / Destino</th>
-                <th scope="col">Hora</th>
-                <th scope="col">Puerta</th>
-                <th scope="col">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="vuelo-proximo"><td>QK 214</td><td>LATAM</td><td>Salida</td><td>Lima (LIM)</td><td>08:45</td><td>3</td><td><span class="estado-badge estado-a-tiempo">A tiempo</span></td></tr>
-              <tr><td>QK 108</td><td>LATAM</td><td>Llegada</td><td>Lima (LIM)</td><td>09:20</td><td>1</td><td><span class="estado-badge estado-a-tiempo">A tiempo</span></td></tr>
-              <tr><td>QK 331</td><td>Sky Airline</td><td>Salida</td><td>Arequipa (AQP)</td><td>10:05</td><td>2</td><td><span class="estado-badge estado-embarcando">Embarcando</span></td></tr>
-              <tr><td>QK 450</td><td>JetSmart</td><td>Llegada</td><td>Puerto Maldonado (PEM)</td><td>11:15</td><td>1</td><td><span class="estado-badge estado-demorado">Demorado</span></td></tr>
-              <tr><td>QK 217</td><td>Avianca</td><td>Salida</td><td>Lima (LIM)</td><td>13:30</td><td>3</td><td><span class="estado-badge estado-a-tiempo">A tiempo</span></td></tr>
-              <tr><td>QK 522</td><td>Star Perú</td><td>Llegada</td><td>Arequipa (AQP)</td><td>15:00</td><td>2</td><td><span class="estado-badge estado-a-tiempo">A tiempo</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="nota">Los horarios se actualizan cada 15 minutos. Ante cambios de última hora, consulta directamente con tu aerolínea.</p>
+          <form id="form-buscar-vuelo" class="buscador-vuelos" role="search" action="#">
+            <label class="visually-hidden" for="buscar-vuelo">Buscar vuelo</label>
+            <input type="search" id="buscar-vuelo" placeholder="Buscar por vuelo, aerolínea o ciudad (ej. LA 2021, Bogotá)" autocomplete="off">
+            <label class="visually-hidden" for="filtro-aerolinea">Aerolínea</label>
+            <select id="filtro-aerolinea">
+              <option value="">Todas las aerolíneas</option>
+            </select>
+          </form>
+
+          <div class="tablero-scroll">
+            <table class="tabla-tablero">
+              <caption class="visually-hidden">Tablero de vuelos del Aeropuerto Qorikancha</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Hora</th>
+                  <th scope="col">Vuelo</th>
+                  <th scope="col" id="th-ciudad">Destino</th>
+                  <th scope="col">Puerta</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col"><span class="visually-hidden">Seguir</span></th>
+                </tr>
+              </thead>
+              <tbody id="cuerpo-tablero" role="tabpanel" aria-labelledby="tab-salida"></tbody>
+            </table>
+          </div>
+          <p id="tablero-vacio" class="tablero-vacio" hidden>No hay vuelos que coincidan con tu búsqueda.</p>
+          <p class="nota">Información referencial que se actualiza cada 30 segundos. Ante cambios de última hora, consulta con tu aerolínea.</p>
+        </section>
+
+        <p class="aerolineas-label">Aerolíneas que operan en Qorikancha · <a href="aerolineas.html">ver mostradores y contactos</a></p>
+        <ul class="aerolineas" id="chips-aerolineas"></ul>
 
         <h2 class="titulo-faq">Preguntas frecuentes</h2>
         <div class="faq">
@@ -124,6 +133,7 @@
       </address>
     </div>
   </footer>
+  <script type="module" src="js/vuelos/tablero.js"></script>
   <script type="module" src="js/auth/nav-sesion.js"></script>
 
 </body>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <title>Aerolíneas — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Aerolíneas que operan en el Aeropuerto Internacional Qorikancha, Cusco: mostradores, teléfonos, destinos y próximos vuelos. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/aerolineas.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Horarios de vuelo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="index.html#como-funciona">Cómo funciona</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="aerolineas-pagina">
+      <div class="wrap">
+        <p class="miga"><a href="vuelos.html">Horarios de vuelo</a> / Aerolíneas</p>
+        <h1>Aerolíneas</h1>
+        <p class="section-intro">Estas son las aerolíneas que operan en el Aeropuerto Qorikancha. Encuentra su mostrador en el nivel 1 de la terminal, sus datos de contacto y su próximo vuelo.</p>
+
+        <div id="lista-aerolineas" class="lista-aerolineas"></div>
+
+        <aside class="consejo">
+          <strong>¿Primera vez en la terminal?</strong>
+          Los mostradores abren 3 horas antes del primer vuelo de cada aerolínea y cierran 45 minutos antes de cada salida.
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/vuelos/aerolineas.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+
+</body>
+</html>
