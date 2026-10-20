@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <meta name="robots" content="noindex">
+  <title>Garita de salida — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Control de salida del estacionamiento con lector de código QR.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/garita.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+  <div id="menu-admin" data-pagina="garita"></div>
+
+  <main class="adm-pagina">
+    <div class="wrap">
+      <div class="adm-cabecera">
+        <div>
+          <h1>Garita de salida</h1>
+          <p class="adm-intro">Escanea el QR del comprobante o escribe la placa. Turno de <strong id="nombre-turno"></strong> · salidas registradas: <strong id="contador-salidas">0</strong></p>
+        </div>
+      </div>
+      <div class="garita-grid">
+        <section class="adm-bloque" aria-labelledby="t-lector">
+          <h2 id="t-lector">Lector de QR</h2>
+          <div id="camara" class="camara">
+            <video id="video" playsinline muted aria-label="Vista de la cámara"></video>
+            <div class="marco" aria-hidden="true"></div>
+            <p class="camara-apagada">La cámara está apagada</p>
+          </div>
+          <button type="button" id="btn-camara" class="adm-btn adm-btn-acento btn-ancho">Encender cámara</button>
+          <form id="form-manual" class="form-linea" role="search">
+            <label class="visually-hidden" for="criterio">Placa o código</label>
+            <input id="criterio" placeholder="Placa o código (ej. ABC-123)" autocomplete="off">
+            <button type="submit" class="adm-btn">Consultar</button>
+          </form>
+        </section>
+        <section aria-labelledby="t-resultado">
+          <h2 id="t-resultado" class="visually-hidden">Resultado</h2>
+          <div id="resultado" class="resultado-garita" aria-live="polite">
+            <p class="resultado-vacio">Escanea un comprobante para ver si el vehículo puede salir.</p>
+          </div>
+          <section class="adm-bloque" aria-labelledby="t-historial">
+            <h2 id="t-historial">Últimas salidas de este turno</h2>
+            <ul id="historial" class="historial"></ul>
+          </section>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script src="js/vendor/jsQR-1.4.0.js"></script>
+  <script type="module" src="js/garita/garita.js"></script>
+  <script type="module" src="js/panel/menu-admin.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>

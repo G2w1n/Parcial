@@ -4,7 +4,9 @@ import { formatearSoles, redondear, NOMBRES_VEHICULO } from '../registro/tarifar
 import { avisar, animarNumero, mostrarEsqueleto, sinAnimaciones } from '../config/ui.js';
 import {
   buscarPendientes, cobrarPresencial, listarPagosEnLinea, verificarPago, resumenDelDia, consultarSalida,
+  placasBloqueadas, registrarSalida, ampliacionesDelDia, descuentosDelDia,
 } from './caja-datos.js';
+import { registrar } from '../config/bitacora.js';
 
 const usuario = exigirRol('cajero', 'administrador');
 if (!usuario) throw new Error('Acceso denegado');
@@ -87,6 +89,7 @@ function describirMedio(p) {
 /* ============================== Cobro presencial ============================== */
 async function pintarPendientes(criterio = '') {
   pendientesCache = await buscarPendientes(criterio);
+  const bloqueadas = await placasBloqueadas(pendientesCache.map((r) => r.placa));
   tablaPendientes.replaceChildren();
   if (pendientesCache.length === 0) return filaVacia(tablaPendientes, 6, 'Sin reservas pendientes de pago.');
 
@@ -94,7 +97,16 @@ async function pintarPendientes(criterio = '') {
     const tr = document.createElement('tr');
     tr.className = 'fila-entrada';
     celda(tr, r.codigo_seguimiento);
-    celda(tr, r.placa);
+    const bloqueo = bloqueadas[r.placa?.toUpperCase()];
+    const tdPlaca = celda(tr, r.placa);
+    if (bloqueo) {
+      tr.classList.add('fila-bloqueada');
+      const chip = document.createElement('span');
+      chip.className = 'chip-bloqueo';
+      chip.textContent = '⛔ Lista negra';
+      chip.title = `${bloqueo.motivo} · deuda ${formatearSoles(Number(bloqueo.deuda))}`;
+      tdPlaca.append(' ', chip);
+    }
     celda(tr, r.cliente ?? 'Atención presencial');
     celda(tr, r.dni);
     celda(tr, formatearSoles(Number(r.monto_calculado)));
@@ -209,6 +221,7 @@ formCobro.addEventListener('submit', async (e) => {
       idCajero: usuario.id,
     });
     dialogo.close();
+    registrar(usuario, 'Cobro presencial', `${codigo} · ${registroEnCobro.codigo_seguimiento} · ${formatearSoles(Number(registroEnCobro.monto_calculado))} · ${datos.metodo}`);
     mostrarUltimoCobro(codigo, vuelto);
     avisar('Cobro registrado. Pase de salida habilitado.');
     registroEnCobro = null;
@@ -231,7 +244,7 @@ function dato(lista, etiqueta, valor) {
   lista.append(dt, dd);
 }
 
-function tarjetaSalida(r) {
+function tarjetaSalida(r, bloqueo) {
   const cancelada = r.estado === 'cancelado';
   const habilitado = !cancelada && (r.estado_pago === 'pagado' || r.estado_pago === 'exonerado');
   const clase = cancelada ? 'salida-cancelado' : habilitado ? 'salida-habilitado' : 'salida-pendiente';
@@ -246,6 +259,13 @@ function tarjetaSalida(r) {
       ? '✓ Pase de salida HABILITADO'
       : `Pendiente de pago: cobrar ${formatearSoles(Number(r.monto_calculado))}`;
   tarjeta.append(titulo);
+  if (bloqueo) {
+    tarjeta.classList.add('salida-bloqueada');
+    const alerta = document.createElement('p');
+    alerta.className = 'alerta-bloqueo';
+    alerta.textContent = `⛔ Placa en lista negra: ${bloqueo.motivo} (deuda ${formatearSoles(Number(bloqueo.deuda))}). Avisa al administrador antes de dejarlo salir.`;
+    tarjeta.append(alerta);
+  }
 
   const lista = document.createElement('dl');
   dato(lista, 'Reserva', r.codigo_seguimiento);
@@ -263,6 +283,10 @@ function tarjetaSalida(r) {
   if (!habilitado && !cancelada) {
     salidaCache.set(r.id, r);
     tarjeta.append(boton('Cobrar ahora', 'cobrar-salida', r.id, 'btn btn-confirmar'));
+  }
+  if (habilitado && r.estado === 'registrado' && !bloqueo) {
+    salidaCache.set(r.id, r);
+    tarjeta.append(boton('Registrar salida', 'registrar-salida', r.id, 'btn btn-confirmar'));
   }
   if (r.codigo_operacion) {
     const enlace = document.createElement('a');
@@ -289,7 +313,8 @@ async function pintarSalida(criterio) {
     resultadoSalida.append(vacio);
     return;
   }
-  filas.forEach((r) => resultadoSalida.append(tarjetaSalida(r)));
+  const bloqueadas = await placasBloqueadas(filas.map((r) => r.placa));
+  filas.forEach((r) => resultadoSalida.append(tarjetaSalida(r, bloqueadas[r.placa?.toUpperCase()])));
 }
 
 $('#form-salida').addEventListener('submit', async (e) => {
@@ -304,7 +329,28 @@ $('#form-salida').addEventListener('submit', async (e) => {
   }
 });
 
-resultadoSalida.addEventListener('click', (e) => {
+resultadoSalida.addEventListener('click', async (e) => {
+  const salida = e.target.closest('button[data-accion="registrar-salida"]');
+  if (salida) {
+    const registro = salidaCache.get(Number(salida.dataset.id));
+    if (!registro) return;
+    salida.disabled = true;
+    try {
+      const ok = await registrarSalida(registro.id, usuario.id);
+      if (ok) {
+        registrar(usuario, 'Salida registrada', `${registro.codigo_seguimiento} · ${registro.placa}`);
+        avisar(`Salida registrada: ${registro.placa}.`);
+      } else {
+        avisar('Esa reserva ya tenía la salida registrada o no está pagada.', 'error');
+      }
+      await pintarSalida(ultimoCriterioSalida);
+    } catch (error) {
+      console.error(error);
+      avisar('No se pudo registrar la salida.', 'error');
+      salida.disabled = false;
+    }
+    return;
+  }
   const b = e.target.closest('button[data-accion="cobrar-salida"]');
   if (!b) return;
   const registro = salidaCache.get(Number(b.dataset.id));
@@ -355,6 +401,7 @@ tablaEnLinea.addEventListener('click', async (e) => {
   b.disabled = true;
   try {
     const verificado = await verificarPago(Number(b.dataset.id), usuario.id);
+    if (verificado) registrar(usuario, 'Pago en línea verificado', `Pago #${b.dataset.id}`);
     avisar(verificado ? 'Pago verificado.' : 'Ese pago ya estaba verificado.', verificado ? 'exito' : 'error');
     await pintarPagosEnLinea();
   } catch (error) {
@@ -366,7 +413,11 @@ tablaEnLinea.addEventListener('click', async (e) => {
 
 /* ============================== Resumen del día ============================== */
 async function pintarResumen() {
-  const filas = await resumenDelDia(inputFecha.value);
+  const [cobros, ampliaciones, descuentos] = await Promise.all([
+    resumenDelDia(inputFecha.value), ampliacionesDelDia(inputFecha.value), descuentosDelDia(inputFecha.value),
+  ]);
+  // Las ampliaciones de estadía se pagan en línea: se suman como un canal más
+  const filas = [...cobros, ...ampliaciones.map((a) => ({ ...a, canal: 'ampliacion' }))];
   tablaResumen.replaceChildren();
   if (filas.length === 0) filaVacia(tablaResumen, 4, 'Sin cobros aprobados en esta fecha.');
 
@@ -379,11 +430,11 @@ async function pintarResumen() {
     const importe = Number(f.total);
     total += importe;
     operaciones += f.operaciones;
-    if (f.canal === 'pasarela') enLinea += importe;
-    else ventanilla += importe;
+    if (f.canal === 'caja') ventanilla += importe;
+    else enLinea += importe;
 
     const tr = document.createElement('tr');
-    celda(tr, f.canal === 'pasarela' ? 'En línea' : 'Ventanilla');
+    celda(tr, { pasarela: 'En línea', ampliacion: 'Ampliación (en línea)' }[f.canal] ?? 'Ventanilla');
     celda(tr, NOMBRES_METODO[f.metodo] ?? f.metodo);
     celda(tr, String(f.operaciones));
     celda(tr, formatearSoles(importe));
@@ -391,6 +442,9 @@ async function pintarResumen() {
   }
 
   $('#total-dia').textContent = formatearSoles(redondear(total));
+  $('#descuentos-dia').textContent = descuentos.cupones
+    ? `Incluye ${formatearSoles(descuentos.total)} descontados con ${descuentos.cupones} cupón(es).`
+    : '';
   animarNumero($('#kpi-total'), redondear(total), formatearSoles);
   animarNumero($('#kpi-enlinea'), redondear(enLinea), formatearSoles);
   animarNumero($('#kpi-ventanilla'), redondear(ventanilla), formatearSoles);

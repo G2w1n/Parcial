@@ -126,3 +126,7 @@ h1 { text-align: center; color: var(--color-ink); font-family: var(--font-displa
 }
 /* Fase 4: ampliaciones de estadía */
 .titulo-ampliaciones { margin: 14px 0 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-ink-soft); }
+
+/* Fase 5: QR del pase de salida */
+.qr-pase { width: 132px; height: 132px; margin: 8px auto 0; }
+.qr-pase svg { width: 100%; height: 100%; display: block; }

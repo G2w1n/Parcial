@@ -54,6 +54,19 @@ function crear(etiqueta, clase, texto) {
   return el;
 }
 
+// QR del pase de salida: lo lee la garita con la cámara (qrcode-generator se carga como script clásico)
+function codigoQR(texto) {
+  if (typeof window.qrcode !== 'function') return crear('div', 'ticket-barras');
+  const qr = window.qrcode(0, 'M');
+  qr.addData(texto);
+  qr.make();
+  const contenedor = crear('div', 'qr-pase');
+  contenedor.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+  contenedor.setAttribute('role', 'img');
+  contenedor.setAttribute('aria-label', 'Código QR del pase de salida');
+  return contenedor;
+}
+
 function agregarDato(lista, etiqueta, valor) {
   lista.append(crear('dt', '', etiqueta), crear('dd', '', valor ?? '—'));
 }
@@ -72,7 +85,7 @@ if (!pago || (usuario.rol === 'cliente' && pago.id_usuario !== usuario.id)) {
   const textoPase = crear('div', '');
   textoPase.append(
     crear('strong', '', 'Pase de salida habilitado'),
-    crear('small', '', 'Presenta el código de operación en la garita'),
+    crear('small', '', 'Muestra este código QR en la garita'),
   );
   pase.append(crear('span', 'pase-icono', '✓'), textoPase);
 
@@ -130,7 +143,7 @@ if (!pago || (usuario.rol === 'cliente' && pago.id_usuario !== usuario.id)) {
   }
 
   const pie = crear('footer', 'constancia-pie');
-  pie.append(crear('p', 'pie-codigo', pago.codigo_operacion), crear('div', 'ticket-barras'));
+  pie.append(crear('p', 'pie-codigo', pago.codigo_operacion), codigoQR(`QORIKANCHA-PASE|${pago.codigo_seguimiento}|${pago.codigo_operacion}`));
 
   constancia.append(cabecera, pase, cuerpo, pie);
   contenedor.replaceChildren(constancia);
