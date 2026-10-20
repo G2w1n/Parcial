@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <title>Estacionamiento — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Espacios libres en el estacionamiento del Aeropuerto Internacional Qorikancha, tarifas por hora, nocturna, por día y de fin de semana, y calculadora de costo. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/estacionamiento.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Vuelos</a>
+        <a href="pasajero.html">Pasajeros</a>
+        <a href="turismo.html">Turismo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="portada-est">
+      <div class="wrap portada-grid">
+        <div>
+          <p class="kicker">A 50 metros del terminal</p>
+          <h1>Estacionamiento</h1>
+          <p class="lede">Reserva en línea, paga antes de llegar y sal sin hacer cola. Abierto las 24 horas, con vigilancia y zona techada VIP.</p>
+          <div class="cta">
+            <a href="Transporte.html" class="btn">Reservar estacionamiento</a>
+            <a href="mis-reservas.html" class="btn btn-borde">Mis reservas</a>
+          </div>
+        </div>
+        <div class="resumen-libres" aria-live="polite">
+          <p class="resumen-titulo">Espacios libres ahora</p>
+          <div id="contadores" class="contadores"></div>
+          <p class="actualizado">Actualizado a las <time id="hora-actualizacion">--:--</time></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mapa de espacios -->
+    <section class="bloque" aria-labelledby="t-mapa">
+      <div class="wrap">
+        <div class="cabecera-mapa">
+          <div>
+            <h2 id="t-mapa">Mapa de espacios</h2>
+            <p class="section-intro">Incluye las reservas en línea que están activas ahora y los vehículos que llegaron sin reserva (simulado). Se actualiza cada minuto.</p>
+          </div>
+          <ul class="leyenda">
+            <li><span class="muestra libre"></span> Libre</li>
+            <li><span class="muestra ocupado"></span> Ocupado</li>
+          </ul>
+        </div>
+        <div id="mapa" class="mapa-playa"></div>
+        <p id="aviso-mapa" class="nota" hidden></p>
+      </div>
+    </section>
+
+    <!-- Tarifas -->
+    <section class="bloque bloque-alterno" aria-labelledby="t-tarifas">
+      <div class="wrap">
+        <h2 id="t-tarifas">Tarifas</h2>
+        <p class="section-intro">Siempre se aplica la tarifa que más te conviene.</p>
+        <div id="tarifas" class="tarifas"></div>
+      </div>
+    </section>
+
+    <!-- Calculadora -->
+    <section class="bloque" aria-labelledby="t-calc">
+      <div class="wrap calc-grid">
+        <div>
+          <h2 id="t-calc">¿Cuánto pagaré?</h2>
+          <p class="section-intro">Elige cuándo llegas y cuántas horas te quedas.</p>
+          <form id="form-calc" class="calc" novalidate>
+            <div class="fila">
+              <div class="campo">
+                <label for="calc-entrada">Entrada</label>
+                <input type="datetime-local" id="calc-entrada" name="fecha_hora_entrada">
+              </div>
+              <div class="campo">
+                <label for="calc-horas">Horas</label>
+                <input type="number" id="calc-horas" name="horas" min="1" max="240" step="1" value="6" inputmode="numeric">
+              </div>
+            </div>
+            <div class="fila">
+              <div class="campo">
+                <label for="calc-vehiculo">Vehículo</label>
+                <select id="calc-vehiculo" name="tipo_vehiculo">
+                  <option value="auto">Auto, camioneta o moto</option>
+                  <option value="bus_camion">Bus o camión</option>
+                </select>
+              </div>
+              <label class="check"><input type="checkbox" name="zona_vip" id="calc-vip"> Zona techada VIP</label>
+            </div>
+          </form>
+        </div>
+        <div class="calc-resultado" aria-live="polite">
+          <ul id="calc-desglose" class="desglose"></ul>
+          <p class="calc-total">Total <strong id="calc-total">S/ 0.00</strong></p>
+          <a href="Transporte.html" class="btn">Reservar con este precio</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/estacionamiento/estacionamiento.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>

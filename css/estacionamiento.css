@@ -1,0 +1,120 @@
+/* css/estacionamiento.css — Estacionamiento (los estilos comunes están en base.css) */
+
+h1, h2, h3 { font-family: var(--font-display); color: var(--color-ink); }
+h2 { font-size: 1.6rem; margin: 0 0 6px; }
+.section-intro { color: var(--color-ink-soft); margin: 0 0 20px; max-width: 640px; }
+.nota { color: var(--color-ink-soft); font-size: 0.82rem; margin-top: 12px; }
+.bloque { padding: 48px 0; }
+.bloque-alterno { background: var(--color-surface); border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); }
+
+.btn {
+  display: inline-block;
+  padding: 12px 22px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+}
+.btn:hover { opacity: 0.9; }
+.btn-borde { background: transparent; border-color: rgba(255,255,255,0.35); }
+
+/* Portada */
+.portada-est { background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)); color: #fff; padding: 48px 0; }
+.portada-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: center; }
+.portada-est .kicker { margin: 0 0 6px; color: var(--color-accent); font-weight: 600; font-size: 0.9rem; }
+.portada-est h1 { color: #fff; font-size: clamp(2rem, 5vw, 2.8rem); margin: 0 0 10px; }
+.portada-est .lede { color: #cfe0ea; margin: 0 0 22px; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.resumen-libres { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16); border-radius: 16px; padding: 20px; }
+.resumen-titulo { margin: 0 0 12px; font-weight: 700; }
+.contadores { display: grid; gap: 10px; }
+.contador { display: grid; grid-template-columns: 56px 1fr; grid-template-rows: auto auto; column-gap: 12px; align-items: center; }
+.contador strong { grid-row: 1 / 3; font-family: var(--font-display); font-size: 2rem; color: #6ee7a0; text-align: right; }
+.contador.casi-lleno strong { color: #ff9b9b; }
+.contador span { font-size: 0.85rem; color: #cfe0ea; }
+.contador-barra { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.15); position: relative; overflow: hidden; }
+.contador-barra::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--lleno); background: var(--color-accent); border-radius: inherit; transition: width 0.6s ease; }
+.actualizado { margin: 12px 0 0; font-size: 0.75rem; color: #9fb4c8; }
+
+/* Mapa */
+.cabecera-mapa { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.leyenda { list-style: none; margin: 0; padding: 0; display: flex; gap: 16px; font-size: 0.85rem; color: var(--color-ink-soft); }
+.leyenda li { display: flex; align-items: center; gap: 6px; }
+.muestra { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid #1f8a4c; background: #e3f6ea; }
+.muestra.ocupado { background: #c9d3dc; border-color: #c9d3dc; }
+
+.mapa-playa {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #3b4a5a;
+  background-image: repeating-linear-gradient(90deg, transparent 0 60px, rgba(255,255,255,0.04) 60px 62px);
+}
+.zona h3 { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; color: #fff; font-size: 1rem; margin: 0 0 10px; }
+.zona-libres { font-family: var(--font-body); font-size: 0.8rem; color: #cfe0ea; font-weight: 500; }
+.espacios { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 6px; }
+.espacio {
+  display: grid;
+  place-items: center;
+  height: 54px;
+  border-radius: 6px;
+  border: 2px solid #6ee7a0;
+  background: rgba(110, 231, 160, 0.12);
+  color: #d9fbe7;
+  font: 700 0.7rem var(--font-body);
+  transition: background-color 0.3s ease;
+}
+.espacio.ocupado { border-color: #8796a5; background: #5a6978; color: #c9d3dc; }
+.espacio.ocupado::before { content: "🚗"; font-size: 1.05rem; }
+.espacio.ocupado { font-size: 0; }
+.zona-vip .espacio:not(.ocupado) { border-color: #f5c542; background: rgba(245, 197, 66, 0.14); color: #fff3c4; }
+.zona-bus .espacios { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); }
+.zona-bus .espacio { height: 64px; }
+.zona-bus .espacio.ocupado::before { content: "🚌"; }
+
+/* Tarifas */
+.tarifas { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.tarifa { background: var(--color-bg); border: 1px solid var(--color-line); border-radius: 12px; padding: 18px; }
+.tarifa h3 { margin: 0; font-size: 0.95rem; color: var(--color-ink-soft); }
+.tarifa-precio { margin: 4px 0; font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--color-primary); }
+.tarifa-detalle { margin: 0; font-size: 0.85rem; color: var(--color-ink-soft); }
+
+/* Calculadora */
+.calc-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; align-items: start; }
+.fila { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; }
+.campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; min-width: 0; }
+.campo label { font-size: 0.85rem; font-weight: 600; }
+.calc input, .calc select {
+  font: 0.95rem var(--font-body);
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: #fff;
+  min-width: 0;
+}
+.check { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; margin-bottom: 24px; cursor: pointer; }
+.calc-resultado { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 14px; padding: 20px; box-shadow: 0 10px 30px rgba(15, 39, 64, 0.06); }
+.desglose { list-style: none; margin: 0; padding: 0; }
+.desglose li { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; font-size: 0.88rem; }
+.desglose li span:last-child { font-weight: 600; white-space: nowrap; }
+.calc-total { display: flex; justify-content: space-between; align-items: baseline; margin: 10px 0 16px; padding-top: 10px; border-top: 2px solid var(--color-primary); font-weight: 600; }
+.calc-total strong { font-family: var(--font-display); font-size: 1.7rem; color: var(--color-primary); }
+.calc-resultado .btn { width: 100%; }
+
+@media (max-width: 860px) {
+  .portada-grid, .calc-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .fila { grid-template-columns: 1fr; }
+  .mapa-playa { padding: 14px 10px; }
+  .espacios { grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 4px; }
+  .espacio { height: 46px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contador-barra::after, .espacio { transition: none; }
+}
