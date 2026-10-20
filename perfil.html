@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <title>Mi perfil — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Tus datos y tu contraseña. Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <script>try{var d=document.documentElement;if(localStorage.getItem("qorikancha.tema")==="oscuro")d.dataset.tema="oscuro";if(localStorage.getItem("qorikancha.accesible")==="1")d.dataset.accesible=""}catch(e){}</script>
+  <link rel="stylesheet" href="css/perfil.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Vuelos</a>
+        <a href="pasajero.html">Pasajeros</a>
+        <a href="turismo.html">Turismo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="perfil">
+    <div class="wrap">
+      <div class="perfil-cabecera">
+        <span id="pf-iniciales" class="avatar" aria-hidden="true">?</span>
+        <div>
+          <h1>Mi perfil</h1>
+          <p class="rol">Cuenta de <strong id="pf-rol">—</strong></p>
+        </div>
+      </div>
+
+      <div class="perfil-grid">
+        <form id="form-datos" class="tarjeta-perfil" novalidate>
+          <h2>Mis datos</h2>
+          <div class="campo">
+            <label for="pf-nombre">Nombre completo</label>
+            <input id="pf-nombre" autocomplete="name" required minlength="3">
+          </div>
+          <div class="campo">
+            <label for="pf-correo">Correo</label>
+            <input id="pf-correo" type="email" readonly aria-describedby="pf-correo-ayuda">
+            <small id="pf-correo-ayuda">El correo es tu usuario y no se puede cambiar.</small>
+          </div>
+          <div class="campo">
+            <label for="pf-dni">DNI (opcional)</label>
+            <input id="pf-dni" inputmode="numeric" maxlength="8" placeholder="8 dígitos">
+            <small>Con tu DNI la caja encuentra tus reservas más rápido.</small>
+          </div>
+          <button type="submit" class="btn">Guardar datos</button>
+        </form>
+
+        <form id="form-clave" class="tarjeta-perfil" novalidate>
+          <h2>Cambiar contraseña</h2>
+          <div class="campo">
+            <label for="pf-actual">Contraseña actual</label>
+            <div class="con-boton"><input id="pf-actual" type="password" autocomplete="current-password" required><button type="button" class="ver-clave" data-campo="pf-actual">Ver</button></div>
+          </div>
+          <div class="campo">
+            <label for="pf-nueva">Nueva contraseña</label>
+            <div class="con-boton"><input id="pf-nueva" type="password" autocomplete="new-password" minlength="6" required><button type="button" class="ver-clave" data-campo="pf-nueva">Ver</button></div>
+            <small>Mínimo 6 caracteres. Se guarda encriptada: nadie puede verla, ni el administrador.</small>
+          </div>
+          <div class="campo">
+            <label for="pf-repetir">Repite la nueva contraseña</label>
+            <input id="pf-repetir" type="password" autocomplete="new-password" required>
+          </div>
+          <p id="pf-error" class="error" role="alert"></p>
+          <button type="submit" class="btn">Cambiar contraseña</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+        <p><a href="reclamos.html" class="libro-footer">📖 Libro de reclamaciones</a></p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+
+  <script type="module" src="js/perfil/perfil.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>

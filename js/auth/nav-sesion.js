@@ -37,6 +37,16 @@ if (enlaceSesion && usuarioGuardado) {
   const cerrar = document.createElement('a');
   cerrar.href = '#';
   cerrar.textContent = 'Cerrar sesión';
+  const perfil = document.createElement('a');
+  perfil.href = 'perfil.html';
+  perfil.textContent = 'Mi perfil';
+  menu.append(perfil);
+  if (['empleado', 'cajero', 'seguridad'].includes(usuarioGuardado.rol)) {
+    const turno = document.createElement('a');
+    turno.href = 'mi-turno.html';
+    turno.textContent = 'Mi turno';
+    menu.append(turno);
+  }
   menu.append(cerrar);
 
   contenedor.append(boton, menu);

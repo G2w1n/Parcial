@@ -102,6 +102,17 @@ tbody tr:last-child td { border-bottom: none; }
   font-weight: 600;
 }
 .btn-ampliar-fila:hover { background: #fff6e8; }
+.btn-cancelar-fila {
+  margin-left: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid #f1b9b9;
+  background: var(--color-surface);
+  color: #b53030;
+  font: 600 0.8rem var(--font-body);
+  cursor: pointer;
+}
+.btn-cancelar-fila:hover { background: #fbe5e5; }
 
 .reservas-vacio {
   display: none;

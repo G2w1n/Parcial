@@ -1,7 +1,7 @@
 import { sql } from '../config/neon-config.js';
 import { exigirRol } from '../auth/auth.js';
 import { formatearSoles, NOMBRES_VEHICULO } from '../registro/tarifario.js';
-import { formatearFecha } from '../config/ui.js';
+import { formatearFecha, avisar } from '../config/ui.js';
 
 const usuario = exigirRol('cliente');
 if (!usuario) throw new Error('Acceso denegado');
@@ -76,6 +76,12 @@ function pintarFila(r) {
   }
   if (r.estado === 'registrado' && r.estado_pago !== 'pagado') {
     acciones.append(enlace(`actualizar.html?codigo=${encodeURIComponent(r.codigo_seguimiento)}`, 'btn-editar-fila', 'Editar'));
+    const cancelar = document.createElement('button');
+    cancelar.type = 'button';
+    cancelar.className = 'btn-cancelar-fila';
+    cancelar.dataset.codigo = r.codigo_seguimiento;
+    cancelar.textContent = 'Cancelar';
+    acciones.append(cancelar);
   }
   if (!acciones.childNodes.length) acciones.textContent = r.estado_pago === 'exonerado' ? 'Exonerado' : '—';
   tr.append(acciones);
@@ -176,5 +182,32 @@ if (formBuscar) {
     }
   });
 }
+
+// El cliente puede cancelar una reserva que todavía no pagó (las pagadas se devuelven en caja)
+export async function cancelarReserva(codigo) {
+  const filas = await sql`
+    UPDATE reservas_estacionamiento SET estado = 'cancelado'
+    WHERE codigo_seguimiento = ${codigo} AND usuario_id = ${usuario.id}
+      AND estado = 'registrado' AND estado_pago = 'pendiente'
+    RETURNING id;
+  `;
+  return filas.length === 1;
+}
+
+document.getElementById('tabla-reservas-body')?.addEventListener('click', async (e) => {
+  const boton = e.target.closest('.btn-cancelar-fila');
+  if (!boton) return;
+  if (!confirm(`¿Cancelar la reserva ${boton.dataset.codigo}? Esta acción no se puede deshacer.`)) return;
+  boton.disabled = true;
+  try {
+    const ok = await cancelarReserva(boton.dataset.codigo);
+    avisar(ok ? 'Reserva cancelada.' : 'Esa reserva ya no se puede cancelar (fue pagada o atendida).', ok ? 'exito' : 'error');
+    cargarMisReservas();
+  } catch (error) {
+    console.error(error);
+    avisar('No se pudo cancelar la reserva.', 'error');
+    boton.disabled = false;
+  }
+});
 
 cargarMisReservas();
