@@ -35,7 +35,15 @@
       <div class="wrap">
 
         <h1>Tiendas y restaurantes</h1>
-        <p class="section-intro">Zona comercial del Aeropuerto Qorikancha con opciones de comida rápida y cafeterías.</p>
+        <p class="section-intro">Zona comercial del Aeropuerto Qorikancha con opciones de comida rápida y cafeterías. Haz tu pedido en línea y recógelo listo antes de embarcar.</p>
+
+        <section id="mis-pedidos" class="mis-pedidos" aria-labelledby="t-mis-pedidos" hidden>
+          <div class="mis-pedidos-cabecera">
+            <h2 id="t-mis-pedidos">Mis pedidos</h2>
+            <button type="button" id="actualizar-pedidos" class="btn-texto">Actualizar estado</button>
+          </div>
+          <ul id="lista-pedidos" class="lista-pedidos"></ul>
+        </section>
 
         <div class="rest-grid">
 
@@ -47,7 +55,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
               Sala de embarque
             </p>
-            <a href="#" class="btn-ver">Ver establecimiento</a>
+            <div class="rest-acciones">
+              <button type="button" class="btn-ver btn-pedir" data-restaurante="Pizza Hut">Pedir para recoger</button>
+              <a href="terminal.html?lugar=pizza-hut" class="btn-ubicar">Ver en el mapa</a>
+            </div>
           </article>
 
           <article class="rest-card">
@@ -58,7 +69,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
               Zona pública
             </p>
-            <a href="#" class="btn-ver">Ver establecimiento</a>
+            <div class="rest-acciones">
+              <button type="button" class="btn-ver btn-pedir" data-restaurante="Bembos">Pedir para recoger</button>
+              <a href="terminal.html?lugar=bembos" class="btn-ubicar">Ver en el mapa</a>
+            </div>
           </article>
 
           <article class="rest-card">
@@ -69,7 +83,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
               Hall de salidas
             </p>
-            <a href="#" class="btn-ver">Ver establecimiento</a>
+            <div class="rest-acciones">
+              <button type="button" class="btn-ver btn-pedir" data-restaurante="Burger King">Pedir para recoger</button>
+              <a href="terminal.html?lugar=burger-king" class="btn-ubicar">Ver en el mapa</a>
+            </div>
           </article>
 
           <article class="rest-card">
@@ -80,7 +97,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
               Hall de llegadas
             </p>
-            <a href="#" class="btn-ver">Ver establecimiento</a>
+            <div class="rest-acciones">
+              <button type="button" class="btn-ver btn-pedir" data-restaurante="KFC">Pedir para recoger</button>
+              <a href="terminal.html?lugar=kfc" class="btn-ubicar">Ver en el mapa</a>
+            </div>
           </article>
 
           <article class="rest-card">
@@ -91,7 +111,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
               Nivel 1
             </p>
-            <a href="#" class="btn-ver">Ver establecimiento</a>
+            <div class="rest-acciones">
+              <button type="button" class="btn-ver btn-pedir" data-restaurante="Popeyes">Pedir para recoger</button>
+              <a href="terminal.html?lugar=popeyes" class="btn-ubicar">Ver en el mapa</a>
+            </div>
           </article>
 
           <article class="rest-card">
@@ -102,7 +125,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
               Sala de embarque
             </p>
-            <a href="#" class="btn-ver">Ver establecimiento</a>
+            <div class="rest-acciones">
+              <button type="button" class="btn-ver btn-pedir" data-restaurante="Starbucks">Pedir para recoger</button>
+              <a href="terminal.html?lugar=starbucks" class="btn-ubicar">Ver en el mapa</a>
+            </div>
           </article>
 
           <article class="rest-card">
@@ -113,13 +139,48 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
               Zona pública
             </p>
-            <a href="#" class="btn-ver">Ver establecimiento</a>
+            <div class="rest-acciones">
+              <button type="button" class="btn-ver btn-pedir" data-restaurante="Taco Bell">Pedir para recoger</button>
+              <a href="terminal.html?lugar=taco-bell" class="btn-ubicar">Ver en el mapa</a>
+            </div>
           </article>
 
         </div>
       </div>
     </section>
   </main>
+
+  <!-- Pedido para recoger -->
+  <dialog id="dialogo-pedido" class="dialogo-pedido" aria-labelledby="t-pedido">
+    <form id="form-pedido" novalidate>
+      <div class="pedido-cabecera">
+        <h2 id="t-pedido">Pedido</h2>
+        <button type="button" id="cerrar-pedido" class="cerrar" aria-label="Cerrar">×</button>
+      </div>
+      <p id="pedido-ubicacion" class="pedido-ubicacion"></p>
+      <ul id="menu" class="menu"></ul>
+      <div class="pedido-datos">
+        <div class="campo">
+          <label for="pd-nombre">Nombre</label>
+          <input id="pd-nombre" name="nombre" autocomplete="given-name" required>
+        </div>
+        <div class="campo">
+          <label for="pd-celular">Celular</label>
+          <input id="pd-celular" name="celular" inputmode="numeric" maxlength="9" autocomplete="tel" required>
+        </div>
+        <div class="campo">
+          <label for="pd-hora">Hora de recojo</label>
+          <select id="pd-hora" name="hora_recojo" required></select>
+        </div>
+      </div>
+      <p id="pd-error" class="pd-error" role="alert"></p>
+      <div class="pedido-pie">
+        <p class="pedido-total">Total <strong id="pd-total">S/ 0.00</strong></p>
+        <button type="submit" id="pd-enviar" class="btn-ver">Hacer pedido</button>
+      </div>
+      <p class="pd-nota">Pagas al recoger, con tarjeta, efectivo o Yape.</p>
+    </form>
+  </dialog>
 
   <footer class="site-footer">
     <div class="wrap footer-grid">
@@ -133,6 +194,7 @@
       </address>
     </div>
   </footer>
+  <script type="module" src="js/servicios/pedidos.js"></script>
   <script type="module" src="js/auth/nav-sesion.js"></script>
   <script type="module" src="js/config/idioma.js"></script>
 
