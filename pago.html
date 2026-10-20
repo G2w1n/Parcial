@@ -135,6 +135,14 @@
             <label for="registro">Reserva a pagar</label>
             <select id="registro" name="registro"></select>
             <ul id="resumen-detalle" class="desglose"></ul>
+            <form id="form-cupon" class="form-cupon" novalidate>
+              <label for="cupon">¿Tienes un cupón?</label>
+              <div class="cupon-fila">
+                <input id="cupon" name="cupon" maxlength="20" autocomplete="off" placeholder="Ej. BIENVENIDO10">
+                <button type="submit" id="btn-cupon" class="btn-cupon">Aplicar</button>
+              </div>
+              <p id="mensaje-cupon" class="mensaje-cupon" role="status" aria-live="polite"></p>
+            </form>
             <p class="total-pago">Total a pagar <strong id="resumen-monto">—</strong></p>
           </aside>
 
