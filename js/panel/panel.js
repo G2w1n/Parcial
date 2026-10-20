@@ -1,5 +1,7 @@
 import { sql } from '../config/neon-config.js';
 import { exigirRol, consultarTurno, textoTurno, tipoTurno, expulsar } from '../auth/auth.js';
+import { cargarConfiguracion } from '../config/configuracion.js';
+import { registrar } from '../config/bitacora.js';
 import { calcularMontoServicio, formatearSoles, NOMBRES_VEHICULO } from '../registro/tarifario.js';
 import {
   escaparHTML, formatearFecha, avisar, conCarga, animarNumero, mostrarEsqueleto, sinAnimaciones,
@@ -8,6 +10,9 @@ import {
 // Solo administrador y empleado entran al panel (un cliente o un cajero recibe aviso y vuelve al inicio)
 const usuario = exigirRol('administrador', 'empleado');
 if (!usuario) throw new Error('Acceso denegado');
+
+// Tarifas vigentes que configura el administrador
+await cargarConfiguracion();
 
 const esAdministrador = usuario.rol === 'administrador';
 const esEmpleado = usuario.rol === 'empleado';
@@ -204,6 +209,7 @@ export async function crearRegistro(datos) {
       (${codigo}, ${datos.nombre_pasajero}, ${datos.placa}, ${datos.fecha_hora_entrada}, 'registrado', ${datos.notas},
        ${Number(datos.horas)}, ${datos.tipo_vehiculo}, ${Boolean(datos.zona_vip)}, ${monto}, 'pendiente', ${usuario.id}, NOW());
   `;
+  registrar(usuario, 'Reserva creada', `${codigo} · ${datos.placa} · S/ ${monto.toFixed(2)}`);
   return codigo;
 }
 
@@ -219,6 +225,7 @@ export async function actualizarComoPanel(id, datos, pagada) {
           notas = ${datos.notas}, gestionado_por = ${usuario.id}, fecha_gestion = NOW()
       WHERE id = ${id};
     `;
+    registrar(usuario, 'Reserva editada', `#${id} · ${datos.placa} · ${datos.estado}`);
     return;
   }
 
@@ -235,6 +242,7 @@ export async function actualizarComoPanel(id, datos, pagada) {
   if (filas.length === 0) {
     throw new Error('La reserva se pagó mientras la editabas. Recarga la página.');
   }
+  registrar(usuario, 'Reserva editada', `#${id} · ${datos.placa} · ${datos.estado} · S/ ${monto.toFixed(2)}`);
 }
 
 export async function marcarAtendido(id) {
@@ -244,6 +252,7 @@ export async function marcarAtendido(id) {
     SET estado = 'atendido', gestionado_por = ${usuario.id}, fecha_gestion = NOW()
     WHERE id = ${id};
   `;
+  registrar(usuario, 'Reserva atendida', `#${id}`);
 }
 
 export async function eliminarRegistro(id) {
@@ -252,6 +261,7 @@ export async function eliminarRegistro(id) {
   }
   try {
     await sql`DELETE FROM reservas_estacionamiento WHERE id = ${id};`;
+    registrar(usuario, 'Reserva eliminada', `#${id}`);
     return { ok: true };
   } catch (error) {
     // 23503 = llave foránea: la reserva tiene pagos (aprobados o rechazados)
@@ -327,14 +337,17 @@ export async function crearEmpleado(datos) {
     INSERT INTO usuarios (nombre, correo, contrasena, rol, hora_inicio, hora_fin)
     VALUES (${datos.nombre}, ${datos.correo}, ${datos.contrasena}, 'empleado', ${datos.hora_inicio}, ${datos.hora_fin});
   `;
+  registrar(usuario, 'Empleado creado', `${datos.nombre} (${datos.correo})`);
 }
 
 export async function cambiarEstadoEmpleado(id, activo) {
   await sql`UPDATE usuarios SET activo = ${activo} WHERE id = ${id} AND rol = 'empleado';`;
+  registrar(usuario, activo ? 'Empleado activado' : 'Empleado desactivado', `#${id}`);
 }
 
 export async function cambiarHorarioEmpleado(id, inicio, fin) {
   await sql`UPDATE usuarios SET hora_inicio = ${inicio}, hora_fin = ${fin} WHERE id = ${id} AND rol = 'empleado';`;
+  registrar(usuario, 'Horario de empleado', `#${id}: ${inicio ?? 'libre'} a ${fin ?? 'libre'}`);
 }
 
 // ---------- Consultas: auditoría ----------
@@ -688,6 +701,9 @@ formEditar.addEventListener('submit', async (evento) => {
 
 // ---------- Filtros de la tabla ----------
 if (inputBuscar) inputBuscar.addEventListener('input', aplicarFiltros);
+// La búsqueda global del menú del personal llega con ?buscar=COD-...
+const buscarUrl = new URLSearchParams(location.search).get('buscar');
+if (inputBuscar && buscarUrl) inputBuscar.value = buscarUrl;
 if (filtroEstado) filtroEstado.addEventListener('change', aplicarFiltros);
 if (filtroTurno) {
   filtroTurno.addEventListener('change', () => cargarTabla(filtroTurno.checked));
