@@ -10,7 +10,10 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 
 ### Para el público
 - **Inicio** con información del aeropuerto, servicios y requisitos.
-- **Horarios de vuelo** con estado de cada vuelo (a tiempo, embarcando, demorado, cancelado).
+- **Tablero de vuelos en vivo** estilo aeropuerto, con letras que giran, pestañas de salidas y llegadas, y estados que cambian con la hora de Cusco (programado, a tiempo, embarcando, puerta cerrada, demorado, cancelado).
+- **Buscador de vuelos** por número, aerolínea o ciudad, y filtro por aerolínea.
+- **Seguir mi vuelo**: con la estrella ☆ el vuelo pasa a "Mis vuelos", con cuenta regresiva y avisos si cambia su estado, su hora o su puerta. Se guarda en el navegador.
+- **Aerolíneas**: mostrador, teléfono, destinos y próximo vuelo de cada una.
 - **Servicios**: tiendas y restaurantes, objetos perdidos, taxis, buses y alquiler de autos.
 
 ### Cliente
@@ -32,6 +35,8 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 - **Gestión de empleados** con horarios de turno (diurno o nocturno, hora de Perú).
 - **Auditoría**: quién gestionó cada reserva y cuándo.
 
+![Tablero de vuelos](docs/capturas/vuelos.webp)
+
 ![Editar reserva](docs/capturas/editar-reserva.webp)
 
 ## Tecnologías
@@ -47,7 +52,8 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 
 ```
 ├── index.html               Inicio
-├── vuelos.html              Horarios de vuelo
+├── vuelos.html              Tablero de vuelos en vivo
+├── aerolineas.html          Aerolíneas
 ├── Servicios.html, Objetos.html, tienda_restaurante.html
 ├── taxis.html, buses.html, alquiler.html
 ├── login.html               Iniciar sesión / crear cuenta
@@ -71,7 +77,8 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 │   ├── pago/                Validaciones y pasarela
 │   ├── comprobante/         Constancia de pago
 │   ├── caja/                Módulo de caja
-│   └── panel/               Panel de gestión
+│   ├── panel/               Panel de gestión
+│   └── vuelos/              Vuelos simulados, tablero y aerolíneas
 ├── imagenes/
 └── docs/capturas/
 ```
@@ -101,6 +108,12 @@ La cadena de conexión está en `js/config/neon-config.js`. Para usar tu propia 
 | `cajero` | Caja | Asignado en la tabla `usuarios` |
 | `empleado` | Panel (solo dentro de su turno) | Creado por el administrador desde el panel |
 | `administrador` | Panel (con acceso a caja) | Asignado en la tabla `usuarios` |
+
+## Vuelos simulados
+
+Los vuelos no se guardan en la base de datos. Están en `js/vuelos/datos-vuelos.js` como un itinerario diario, y su estado se calcula con la hora de Cusco. Las demoras, cancelaciones y cambios de puerta se eligen al azar, pero son siempre los mismos para un mismo día, así el tablero se ve en vivo a cualquier hora. Para agregar o cambiar un vuelo, se edita el arreglo `ITINERARIO`.
+
+Enlaces directos: `vuelos.html?aerolinea=LA`, `vuelos.html?vuelo=LA2021` y `vuelos.html?tipo=llegada`.
 
 ## Datos de prueba para pagos
 
