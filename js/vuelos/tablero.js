@@ -2,6 +2,7 @@
 // Tablero de llegadas y salidas, buscador y "Mis vuelos" (seguimiento con cuenta regresiva y avisos)
 import { AEROLINEAS, obtenerVuelos, filtrarVuelos, ahoraEnLima } from './datos-vuelos.js';
 import { avisar, sinAnimaciones } from '../config/ui.js';
+import { cargarCambios } from './cambios.js';
 
 const $ = (id) => document.getElementById(id);
 const cuerpo = $('cuerpo-tablero');
@@ -194,6 +195,7 @@ function actualizarFila(tr, v) {
 
   celdas.puerta.classList.toggle('puerta-cambiada', v.puertaCambiada);
   celdas.estado.className = `est-${v.estado.clave}`;
+  celdas.estado.title = v.nota ?? '';
 
   const seguido = Boolean(seguidos[v.id]);
   tr.classList.toggle('seguido', seguido);
@@ -277,6 +279,7 @@ function pintarMisVuelos(cambiados = new Set()) {
     cuenta.dataset.cuenta = v.id;
 
     tarjeta.append(quitar, cabecera, ruta, datos, cuenta);
+    if (v.nota) tarjeta.append(etiqueta('tv-nota', `📢 ${v.nota}`));
     return tarjeta;
   }));
   actualizarCuentas();
@@ -370,7 +373,8 @@ function actualizarReloj() {
   relojEl.textContent = `${dos(Math.floor(s / 3600))}:${dos(Math.floor((s % 3600) / 60))}:${dos(s % 60)}`;
 }
 
-function refrescar() {
+async function refrescar() {
+  await cargarCambios();
   vuelos = obtenerVuelos();
   const cambiados = revisarCambios();
   pintarTablero();
@@ -381,6 +385,8 @@ elegirTipo(tipoActual);
 revisarCambios();
 pintarMisVuelos();
 actualizarReloj();
+// Los cambios manuales del personal (demoras, cancelaciones, puertas) llegan de la base de datos
+refrescar();
 
 setInterval(() => {
   actualizarReloj();
