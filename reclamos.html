@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <title>Libro de reclamaciones — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Libro de reclamaciones virtual del Aeropuerto Internacional Qorikancha: registra un reclamo, queja o sugerencia y consulta su estado. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <script>try{var d=document.documentElement;if(localStorage.getItem("qorikancha.tema")==="oscuro")d.dataset.tema="oscuro";if(localStorage.getItem("qorikancha.accesible")==="1")d.dataset.accesible=""}catch(e){}</script>
+  <link rel="stylesheet" href="css/reclamos.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Vuelos</a>
+        <a href="pasajero.html">Pasajeros</a>
+        <a href="turismo.html">Turismo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="reclamos">
+    <div class="wrap">
+      <div class="libro-cabecera">
+        <span class="libro-icono" aria-hidden="true">📖</span>
+        <div>
+          <h1>Libro de reclamaciones</h1>
+          <p class="section-intro">Aeropuerto Internacional Qorikancha · Av. de la Aviación s/n, Cusco. Respondemos en un máximo de 15 días hábiles al correo que indiques.</p>
+        </div>
+      </div>
+
+      <div class="reclamos-grid">
+        <form id="form-reclamo" class="tarjeta-reclamo" novalidate>
+          <h2>Registra tu caso</h2>
+          <fieldset class="tipos">
+            <legend>Tipo</legend>
+            <label><input type="radio" name="tipo" value="reclamo" checked> <strong>Reclamo</strong> <small>Disconformidad con un servicio que pagaste</small></label>
+            <label><input type="radio" name="tipo" value="queja"> <strong>Queja</strong> <small>Malestar por la atención recibida</small></label>
+            <label><input type="radio" name="tipo" value="sugerencia"> <strong>Sugerencia</strong> <small>Una idea para mejorar</small></label>
+          </fieldset>
+          <div class="fila">
+            <div class="campo"><label for="rc-nombre">Nombre completo</label><input id="rc-nombre" name="nombre" autocomplete="name" maxlength="80" required></div>
+            <div class="campo"><label for="rc-documento">DNI o pasaporte (opcional)</label><input id="rc-documento" name="documento" maxlength="12"></div>
+          </div>
+          <div class="campo"><label for="rc-correo">Correo para la respuesta</label><input id="rc-correo" name="correo" type="email" autocomplete="email" maxlength="120" required></div>
+          <div class="campo"><label for="rc-detalle">¿Qué pasó?</label><textarea id="rc-detalle" name="detalle" rows="5" maxlength="1000" placeholder="Fecha, lugar, número de vuelo o de reserva y lo que ocurrió" required></textarea></div>
+          <div class="campo"><label for="rc-pedido">¿Qué solución esperas? (opcional)</label><textarea id="rc-pedido" name="pedido" rows="2" maxlength="300"></textarea></div>
+          <label class="acepto"><input type="checkbox" name="acepto" value="si"> Declaro que los datos son verdaderos.</label>
+          <p id="rc-error" class="error" role="alert"></p>
+          <button type="submit" class="btn">Enviar</button>
+          <div id="rc-confirmacion" class="confirmacion" role="status" hidden></div>
+        </form>
+
+        <aside class="tarjeta-reclamo consulta">
+          <h2>Consulta tu caso</h2>
+          <form id="form-consulta" class="fila-consulta" role="search">
+            <label class="visually-hidden" for="consulta-codigo">Código</label>
+            <input id="consulta-codigo" placeholder="LR-2026-ABC12" autocomplete="off">
+            <button type="submit" class="btn btn-borde">Consultar</button>
+          </form>
+          <div id="consulta-resultado" class="consulta-resultado" aria-live="polite"></div>
+          <p class="nota">También puedes pedir el libro físico en el módulo de información, nivel 1.</p>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+        <p><a href="reclamos.html" class="libro-footer">📖 Libro de reclamaciones</a></p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+
+  <script type="module" src="js/reclamos/reclamos.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>
