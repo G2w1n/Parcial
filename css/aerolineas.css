@@ -1,0 +1,99 @@
+/* css/aerolineas.css — página de aerolíneas (los estilos comunes están en base.css) */
+
+.aerolineas-pagina { padding: 36px 0 56px; }
+.miga { font-size: 0.85rem; color: var(--color-ink-soft); margin: 0 0 8px; }
+.miga a { color: var(--color-primary); }
+.aerolineas-pagina h1 { font-family: var(--font-display); font-size: 2rem; color: var(--color-primary); margin: 0 0 6px; }
+.section-intro { color: var(--color-ink-soft); margin: 0 0 28px; max-width: 680px; }
+
+.lista-aerolineas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+.tarjeta-aerolinea {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-top: 5px solid var(--color-aerolinea);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 8px 22px rgba(22, 58, 92, 0.07);
+  scroll-margin-top: 90px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.tarjeta-aerolinea:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(22, 58, 92, 0.12); }
+.tarjeta-aerolinea.destacada { box-shadow: 0 0 0 3px var(--color-aerolinea), 0 14px 30px rgba(22, 58, 92, 0.12); }
+
+.ta-cabecera { display: flex; align-items: center; gap: 14px; }
+.logo-aerolinea {
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--color-aerolinea);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+}
+.ta-cabecera h2 { font-family: var(--font-display); font-size: 1.15rem; margin: 0; color: var(--color-ink); }
+.ta-frecuencia { margin: 2px 0 0; font-size: 0.8rem; color: var(--color-ink-soft); }
+.ta-descripcion { margin: 0; font-size: 0.9rem; color: var(--color-ink-soft); }
+
+.ta-datos { margin: 0; display: grid; gap: 8px; }
+.ta-datos div { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 8px; border-bottom: 1px dashed var(--color-line); }
+.ta-datos dt { font-size: 0.8rem; color: var(--color-ink-soft); }
+.ta-datos dd { margin: 0; font-size: 0.85rem; font-weight: 600; text-align: right; }
+.ta-datos a { color: var(--color-primary); }
+
+.ta-destinos { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.ta-destinos li {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+}
+
+.ta-acciones { display: flex; gap: 10px; margin-top: auto; flex-wrap: wrap; }
+.btn-ta {
+  flex: 1;
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+.btn-ta:hover { opacity: 0.88; }
+.btn-ta-borde { background: transparent; color: var(--color-primary); border-color: var(--color-line); }
+
+.consejo {
+  margin-top: 28px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: #fff6e8;
+  border: 1px solid #f3d3a6;
+  color: #7a4a0c;
+  font-size: 0.9rem;
+}
+.consejo strong { display: block; margin-bottom: 4px; }
+
+@media (max-width: 400px) {
+  .lista-aerolineas { grid-template-columns: 1fr; }
+  .tarjeta-aerolinea { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-aerolinea { transition: none; }
+}
