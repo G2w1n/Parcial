@@ -1,0 +1,241 @@
+/* css/checkin.css — Check-in en línea (los estilos comunes están en base.css) */
+
+.checkin { padding: 36px 0 56px; }
+.checkin .wrap { max-width: 860px; }
+.miga { font-size: 0.85rem; color: var(--color-ink-soft); margin: 0 0 8px; }
+.miga a { color: var(--color-primary); }
+.checkin h1 { font-family: var(--font-display); font-size: 2rem; color: var(--color-primary); margin: 0 0 6px; }
+.checkin h2 { font-family: var(--font-display); font-size: 1.25rem; margin: 0 0 4px; }
+.section-intro { color: var(--color-ink-soft); margin: 0 0 24px; }
+
+/* Pasos */
+.pasos-checkin { list-style: none; margin: 0 0 20px; padding: 0; display: flex; gap: 8px; }
+.pasos-checkin li {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  color: var(--color-ink-soft);
+  font-size: 0.88rem;
+}
+.pasos-checkin li span {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--color-line);
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.pasos-checkin li.activo { border-color: var(--color-primary); color: var(--color-ink); }
+.pasos-checkin li.activo span { background: var(--color-primary); color: #fff; }
+.pasos-checkin li.hecho span { background: #1f8a4c; color: #fff; }
+
+/* Tarjeta de formulario */
+.tarjeta-checkin {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(15, 39, 64, 0.06);
+}
+.campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.campo label { font-size: 0.9rem; font-weight: 600; }
+.fila-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.tarjeta-checkin input,
+.tarjeta-checkin select {
+  font: 0.95rem var(--font-body);
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--color-ink);
+  min-width: 0;
+}
+.tarjeta-checkin input:focus, .tarjeta-checkin select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.12);
+}
+.tarjeta-checkin [aria-invalid="true"] { border-color: #b53030; }
+#ck-reserva { text-transform: uppercase; letter-spacing: 0.1em; }
+.doc { display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+.msg { min-height: 1em; font-size: 0.78rem; color: #b53030; }
+.ayuda { margin: 0 0 16px; font-size: 0.8rem; color: var(--color-ink-soft); }
+
+.acciones { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.btn {
+  display: inline-block;
+  padding: 11px 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+  font: 600 0.92rem var(--font-body);
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.btn:hover { opacity: 0.9; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-borde { background: transparent; border-color: var(--color-line); color: var(--color-ink); }
+
+/* Mapa de asientos */
+.asiento-cabecera { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.resumen-vuelo { margin: 0; color: var(--color-ink-soft); font-size: 0.9rem; }
+.leyenda-asientos { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.78rem; color: var(--color-ink-soft); }
+.leyenda-asientos li { display: flex; align-items: center; gap: 6px; }
+.muestra { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--color-line); background: #fff; }
+.muestra.ocupado { background: #d7dde3; border-color: #d7dde3; }
+.muestra.salida { border-color: #1f8a4c; }
+.muestra.elegido { background: var(--color-accent); border-color: var(--color-accent); }
+
+.avion {
+  max-width: 380px;
+  margin: 0 auto 16px;
+  padding: 0 18px 22px;
+  border: 2px solid var(--color-line);
+  border-radius: 140px 140px 28px 28px;
+  background: var(--color-bg);
+  max-height: 520px;
+  overflow-y: auto;
+}
+.nariz { text-align: center; padding: 44px 0 14px; font-size: 0.72rem; color: var(--color-ink-soft); text-transform: uppercase; letter-spacing: 0.1em; }
+.mapa-asientos { display: grid; gap: 6px; }
+.fila-asientos { display: grid; grid-template-columns: repeat(3, 1fr) 28px repeat(3, 1fr); gap: 6px; align-items: center; }
+.fila-letras span { text-align: center; font-size: 0.72rem; font-weight: 700; color: var(--color-ink-soft); }
+.fila-salida { padding: 6px 0; border-top: 2px dashed #1f8a4c; border-bottom: 2px dashed #1f8a4c; }
+.pasillo { text-align: center; font-size: 0.72rem; color: var(--color-ink-soft); }
+.asiento {
+  aspect-ratio: 1;
+  min-height: 34px;
+  border-radius: 8px 8px 5px 5px;
+  border: 1.5px solid #b9c5d0;
+  background: #fff;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.15s ease;
+}
+.asiento:hover:not(:disabled) { border-color: var(--color-primary); transform: translateY(-1px); }
+.asiento:disabled { background: #d7dde3; border-color: #d7dde3; cursor: not-allowed; }
+.fila-salida .asiento:not(:disabled) { border-color: #1f8a4c; }
+.asiento.elegido { background: var(--color-accent); border-color: var(--color-accent); }
+.asiento-elegido { text-align: center; margin: 0 0 16px; }
+
+/* Tarjetas guardadas */
+.mis-pases { margin-bottom: 22px; }
+.lista-pases { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.mini-pase {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-line);
+  border-left: 5px solid var(--color-aerolinea);
+  background: var(--color-surface);
+  font: 0.82rem var(--font-body);
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+.mini-pase strong { font-family: var(--font-display); color: var(--color-ink); font-size: 1rem; }
+
+/* Tarjeta de embarque */
+.pase {
+  display: grid;
+  grid-template-columns: 1fr 210px;
+  grid-template-rows: auto 1fr;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(15, 39, 64, 0.16);
+  border: 1px solid var(--color-line);
+  animation: entrar-pase 0.5s ease both;
+}
+@keyframes entrar-pase {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+.pase-cabecera {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 22px;
+  background: var(--color-aerolinea);
+  color: #fff;
+  font-family: var(--font-display);
+}
+.pase-cabecera span { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.9; }
+.pase-cuerpo { padding: 20px 22px; }
+.pase-ruta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.pase-ruta div { display: flex; flex-direction: column; font-size: 0.82rem; color: var(--color-ink-soft); }
+.pase-iata { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; color: var(--color-ink); line-height: 1; }
+.pase-ruta div:last-child { text-align: right; }
+.pase-avion { font-size: 1.5rem; color: var(--color-aerolinea); }
+.pase-datos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 16px; }
+.pase-dato { display: flex; flex-direction: column; }
+.pase-dato.ancho { grid-column: 1 / -1; }
+.pase-dato span { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-ink-soft); }
+.pase-dato strong { font-family: var(--font-display); font-size: 1.05rem; color: var(--color-ink); word-break: break-word; }
+.pase-dato.resaltado strong { color: var(--color-aerolinea); font-size: 1.35rem; }
+.pase-talon {
+  border-left: 2px dashed var(--color-line);
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  position: relative;
+}
+.pase-talon::before, .pase-talon::after { /* muescas del talón */
+  content: "";
+  position: absolute;
+  left: -11px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+}
+.pase-talon::before { top: -10px; }
+.pase-talon::after { bottom: -10px; }
+.qr { width: 160px; height: 160px; }
+.qr svg { width: 100%; height: 100%; display: block; }
+.pase-nota { margin: 0; font-size: 0.72rem; color: var(--color-ink-soft); }
+.pase-doc { margin: 0; font-size: 0.75rem; font-weight: 600; }
+.acciones-pase { justify-content: center; margin-top: 20px; }
+
+@media (max-width: 640px) {
+  .fila-2 { grid-template-columns: 1fr; }
+  .pasos-checkin b { display: none; }
+  .pasos-checkin li { justify-content: center; }
+  .pase { grid-template-columns: 1fr; }
+  .pase-talon { border-left: 0; border-top: 2px dashed var(--color-line); }
+  .pase-talon::before, .pase-talon::after { display: none; }
+  .pase-datos { grid-template-columns: repeat(2, 1fr); }
+  .tarjeta-checkin { padding: 18px 16px; }
+  .acciones .btn { flex: 1 1 auto; }
+}
+
+/* Al imprimir solo sale la tarjeta de embarque */
+@media print {
+  .site-header, .site-footer, .miga, h1, .section-intro, .pasos-checkin, .mis-pases, .acciones-pase, .avisos { display: none !important; }
+  body { background: #fff; }
+  .checkin { padding: 0; }
+  .pase { box-shadow: none; animation: none; }
+  .pase-cabecera { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pase { animation: none; }
+  .asiento { transition: none; }
+}

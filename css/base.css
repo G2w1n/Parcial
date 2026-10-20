@@ -117,6 +117,20 @@ nav a:hover { color: var(--color-accent); }
 }
 .nav-usuario-menu a:hover { background: var(--color-bg); }
 
+/* Selector de idioma (lo agrega idioma.js al final del menú) */
+.selector-idioma { margin-left: 20px; display: inline-block; }
+.selector-idioma select {
+  font: 600 0.8rem var(--font-body);
+  color: #cfe0ea;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.selector-idioma select option { color: var(--color-ink); }
+nav a[aria-current="page"] { color: #fff; box-shadow: inset 0 -2px 0 var(--color-accent); }
+
 /* Pie de página */
 .site-footer {
   background: var(--color-primary-dark);
@@ -216,6 +230,7 @@ button:focus-visible {
     gap: 6px 16px;
   }
   .site-header nav a,
-  .site-header .nav-usuario { margin-left: 0; }
+  .site-header .nav-usuario,
+  .selector-idioma { margin-left: 0; }
   .footer-grid { flex-direction: column; text-align: center; align-items: center; }
 }

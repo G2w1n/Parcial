@@ -14,6 +14,10 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 - **Buscador de vuelos** por número, aerolínea o ciudad, y filtro por aerolínea.
 - **Seguir mi vuelo**: con la estrella ☆ el vuelo pasa a "Mis vuelos", con cuenta regresiva y avisos si cambia su estado, su hora o su puerta. Se guarda en el navegador.
 - **Aerolíneas**: mostrador, teléfono, destinos y próximo vuelo de cada una.
+- **Check-in en línea**: datos del pasajero, mapa de asientos y **tarjeta de embarque con código QR**, imprimible y guardada en el navegador.
+- **Guía del pasajero**: pasos para tu primer vuelo, **calculadora de equipaje** por aerolínea, buscador de **objetos permitidos y prohibidos**, preguntas frecuentes con buscador y qué hacer si se pierde tu maleta.
+- **Descubre Cusco**: **clima en vivo** (Open-Meteo), consejos contra el **soroche**, altura de cada destino, **tours** con filtro y **conversor de monedas** con tasas del día.
+- **Idiomas**: selector de español, inglés y quechua en el menú. Las páginas de pasajeros, check-in y turismo están traducidas completas; en el resto se traducen el menú y el pie de página. El quechua es una traducción parcial.
 - **Servicios**: tiendas y restaurantes, objetos perdidos, taxis, buses y alquiler de autos.
 
 ### Cliente
@@ -47,6 +51,9 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 | Base de datos | [Neon](https://neon.tech) (PostgreSQL serverless) |
 | Conexión | `@neondatabase/serverless`, cargado desde CDN (esm.sh) |
 | Tipografías | Space Grotesk e Inter (Google Fonts) |
+| Clima | [Open-Meteo](https://open-meteo.com) (gratis, sin clave) |
+| Tipo de cambio | [ExchangeRate-API](https://www.exchangerate-api.com) (open.er-api.com, gratis, sin clave) |
+| Código QR | qrcode-generator 1.4.4 (MIT), incluido en `js/vendor/` |
 
 ## Estructura del proyecto
 
@@ -54,6 +61,9 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 ├── index.html               Inicio
 ├── vuelos.html              Tablero de vuelos en vivo
 ├── aerolineas.html          Aerolíneas
+├── checkin.html             Check-in en línea
+├── pasajero.html            Guía del pasajero
+├── turismo.html             Descubre Cusco
 ├── Servicios.html, Objetos.html, tienda_restaurante.html
 ├── taxis.html, buses.html, alquiler.html
 ├── login.html               Iniciar sesión / crear cuenta
@@ -69,7 +79,7 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 │   ├── base.css             Estilos comunes: colores, encabezado, menú y pie de página
 │   └── <página>.css         Estilos propios de cada página
 ├── js/
-│   ├── config/              Conexión a Neon y utilidades de interfaz
+│   ├── config/              Conexión a Neon, utilidades de interfaz e idiomas
 │   ├── auth/                Login, sesión y roles
 │   ├── registro/            Reserva y reglas de tarifa (tarifario.js)
 │   ├── consulta/            Mis reservas
@@ -78,7 +88,10 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 │   ├── comprobante/         Constancia de pago
 │   ├── caja/                Módulo de caja
 │   ├── panel/               Panel de gestión
-│   └── vuelos/              Vuelos simulados, tablero y aerolíneas
+│   ├── vuelos/              Vuelos simulados, tablero y aerolíneas
+│   ├── pasajero/            Check-in, equipaje y objetos permitidos
+│   ├── turismo/             Clima, tours y monedas
+│   └── vendor/              qrcode-generator 1.4.4 (MIT, Kazuhiko Arase)
 ├── imagenes/
 └── docs/capturas/
 ```
@@ -114,6 +127,10 @@ La cadena de conexión está en `js/config/neon-config.js`. Para usar tu propia 
 Los vuelos no se guardan en la base de datos. Están en `js/vuelos/datos-vuelos.js` como un itinerario diario, y su estado se calcula con la hora de Cusco. Las demoras, cancelaciones y cambios de puerta se eligen al azar, pero son siempre los mismos para un mismo día, así el tablero se ve en vivo a cualquier hora. Para agregar o cambiar un vuelo, se edita el arreglo `ITINERARIO`.
 
 Enlaces directos: `vuelos.html?aerolinea=LA`, `vuelos.html?vuelo=LA2021` y `vuelos.html?tipo=llegada`.
+
+## Idiomas
+
+`js/config/idioma.js` agrega el selector al menú y recuerda el idioma elegido. Los textos marcados con `data-i18n` se traducen con el diccionario de `js/config/traducciones.js`; para traducir otro texto, se agrega la frase en español con su versión `en` (y `qu` si se tiene). Lo que no tiene traducción se muestra en español.
 
 ## Datos de prueba para pagos
 

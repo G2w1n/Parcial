@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <title>Check-in en línea — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Haz tu check-in en línea, elige tu asiento y obtén tu tarjeta de embarque con código QR. Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/checkin.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Vuelos</a>
+        <a href="pasajero.html">Pasajeros</a>
+        <a href="turismo.html">Turismo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="checkin">
+    <div class="wrap">
+      <p class="miga"><a href="pasajero.html" data-i18n>Guía del pasajero</a> / <span data-i18n>Check-in</span></p>
+      <h1 data-i18n>Check-in en línea</h1>
+      <p class="section-intro" data-i18n>Disponible hasta 45 minutos antes de la salida. Al terminar tendrás tu tarjeta de embarque con código QR.</p>
+
+      <section id="mis-pases" class="mis-pases" aria-labelledby="t-mis-pases" hidden>
+        <h2 id="t-mis-pases" data-i18n>Tus tarjetas de embarque</h2>
+        <div id="lista-pases" class="lista-pases"></div>
+      </section>
+
+      <ol class="pasos-checkin" aria-label="Pasos del check-in">
+        <li id="paso-1" class="activo" aria-current="step"><span>1</span> <b data-i18n>Tus datos</b></li>
+        <li id="paso-2"><span>2</span> <b data-i18n>Asiento</b></li>
+        <li id="paso-3"><span>3</span> <b data-i18n>Tarjeta de embarque</b></li>
+      </ol>
+
+      <!-- Paso 1: datos del pasajero -->
+      <form id="form-checkin" class="tarjeta-checkin" novalidate>
+        <div class="campo">
+          <label for="ck-vuelo" data-i18n>Vuelo</label>
+          <select id="ck-vuelo" name="vuelo" required></select>
+          <small class="msg" id="msg-vuelo"></small>
+        </div>
+        <div class="fila-2">
+          <div class="campo">
+            <label for="ck-nombres" data-i18n>Nombres</label>
+            <input id="ck-nombres" name="nombres" autocomplete="given-name" required>
+            <small class="msg" id="msg-nombres"></small>
+          </div>
+          <div class="campo">
+            <label for="ck-apellidos" data-i18n>Apellidos</label>
+            <input id="ck-apellidos" name="apellidos" autocomplete="family-name" required>
+            <small class="msg" id="msg-apellidos"></small>
+          </div>
+        </div>
+        <div class="fila-2">
+          <div class="campo">
+            <label for="ck-tipo-doc" data-i18n>Documento</label>
+            <div class="doc">
+              <select id="ck-tipo-doc" name="tipoDoc" aria-label="Tipo de documento">
+                <option value="DNI">DNI</option>
+                <option value="PAS" data-i18n>Pasaporte</option>
+                <option value="CE" data-i18n>Carné de extranjería</option>
+              </select>
+              <input id="ck-documento" name="documento" inputmode="numeric" aria-label="Número de documento" required>
+            </div>
+            <small class="msg" id="msg-documento"></small>
+          </div>
+          <div class="campo">
+            <label for="ck-reserva" data-i18n>Código de reserva</label>
+            <input id="ck-reserva" name="reserva" maxlength="6" placeholder="Ej. K7Q2XZ" autocomplete="off" required>
+            <small class="msg" id="msg-reserva"></small>
+          </div>
+        </div>
+        <p class="ayuda" data-i18n>El código de reserva tiene 6 letras o números y está en el correo de tu aerolínea.</p>
+        <div class="acciones">
+          <button type="button" id="ck-ejemplo" class="btn btn-borde" data-i18n>Llenar con datos de prueba</button>
+          <button type="submit" class="btn" data-i18n>Continuar</button>
+        </div>
+      </form>
+
+      <!-- Paso 2: elegir asiento -->
+      <section id="seccion-asiento" class="tarjeta-checkin" hidden aria-labelledby="t-asiento">
+        <div class="asiento-cabecera">
+          <div>
+            <h2 id="t-asiento" data-i18n>Elige tu asiento</h2>
+            <p id="resumen-vuelo" class="resumen-vuelo"></p>
+          </div>
+          <ul class="leyenda-asientos">
+            <li><span class="muestra libre"></span> <span data-i18n>Libre</span></li>
+            <li><span class="muestra ocupado"></span> <span data-i18n>Ocupado</span></li>
+            <li><span class="muestra salida"></span> <span data-i18n>Salida de emergencia</span></li>
+            <li><span class="muestra elegido"></span> <span data-i18n>Tu asiento</span></li>
+          </ul>
+        </div>
+
+        <div class="avion">
+          <div class="nariz" aria-hidden="true"><span data-i18n>Cabina de mando</span></div>
+          <div id="mapa-asientos" class="mapa-asientos" role="grid" aria-label="Mapa de asientos"></div>
+        </div>
+
+        <p class="asiento-elegido" aria-live="polite"><span data-i18n>Asiento elegido:</span> <strong id="asiento-elegido">—</strong></p>
+        <div class="acciones">
+          <button type="button" id="volver-datos" class="btn btn-borde" data-i18n>Volver</button>
+          <button type="button" id="asiento-azar" class="btn btn-borde" data-i18n>Asignar al azar</button>
+          <button type="button" id="confirmar-asiento" class="btn" disabled data-i18n>Confirmar check-in</button>
+        </div>
+      </section>
+
+      <!-- Paso 3: tarjeta de embarque -->
+      <section id="seccion-pase" hidden aria-labelledby="t-pase">
+        <h2 id="t-pase" class="visually-hidden" data-i18n>Tarjeta de embarque</h2>
+        <div id="pase" class="pase"></div>
+        <div class="acciones acciones-pase">
+          <button type="button" id="imprimir-pase" class="btn" data-i18n>Imprimir o guardar en PDF</button>
+          <a id="seguir-vuelo" class="btn btn-borde" href="vuelos.html" data-i18n>Seguir este vuelo</a>
+          <button type="button" id="nuevo-checkin" class="btn btn-borde" data-i18n>Hacer otro check-in</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script src="js/vendor/qrcode-generator-1.4.4.js"></script>
+  <script type="module" src="js/pasajero/checkin.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>
