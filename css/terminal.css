@@ -1,0 +1,153 @@
+/* css/terminal.css — Mapa del terminal (los estilos comunes están en base.css) */
+
+.terminal { padding: 36px 0 56px; }
+.miga { font-size: 0.85rem; color: var(--color-ink-soft); margin: 0 0 8px; }
+.miga a { color: var(--color-primary); }
+.terminal h1 { font-family: var(--font-display); font-size: 2rem; color: var(--color-primary); margin: 0 0 6px; }
+.terminal h2 { font-family: var(--font-display); font-size: 1.3rem; margin: 0 0 6px; }
+.section-intro { color: var(--color-ink-soft); margin: 0 0 22px; }
+
+/* Espera en seguridad */
+.espera {
+  --color-espera: #1f8a4c;
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 24px;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-left: 6px solid var(--color-espera);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 28px;
+}
+.espera[data-nivel="media"] { --color-espera: #d99121; }
+.espera[data-nivel="alta"] { --color-espera: #c0392b; }
+.espera h2 { font-size: 1rem; color: var(--color-ink-soft); }
+.espera-minutos { margin: 0; display: flex; align-items: baseline; gap: 8px; }
+.espera-minutos strong { font-family: var(--font-display); font-size: 3rem; line-height: 1; color: var(--color-espera); }
+.espera-texto { margin: 6px 0 0; font-size: 0.9rem; }
+.espera-sub { margin: 0 0 8px; font-size: 0.8rem; color: var(--color-ink-soft); }
+.grafico { display: grid; grid-template-columns: repeat(16, 1fr); gap: 4px; height: 110px; align-items: end; }
+.barra-hora { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
+.barra-hora .barra { width: 100%; height: var(--alto); min-height: 4px; border-radius: 4px 4px 0 0; background: #b9c5d0; }
+.barra-hora.actual .barra { background: var(--color-espera); }
+.barra-hora .hora { font-size: 0.68rem; color: var(--color-ink-soft); height: 1em; }
+
+/* Mapa */
+.controles { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; }
+.niveles { display: flex; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 999px; padding: 4px; }
+.niveles button {
+  border: 0;
+  background: transparent;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font: 600 0.9rem var(--font-body);
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+.niveles button[aria-selected="true"] { background: var(--color-primary); color: #fff; }
+#buscar-lugar {
+  flex: 1 1 260px;
+  font: 0.95rem var(--font-body);
+  padding: 10px 14px;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: #fff;
+}
+#buscar-lugar:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.12); }
+.categorias { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chip {
+  --color-categoria: var(--color-primary);
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font: 500 0.82rem var(--font-body);
+  cursor: pointer;
+}
+.chip.activo { background: var(--color-categoria); border-color: var(--color-categoria); color: #fff; }
+
+.mapa-cuerpo { display: grid; grid-template-columns: 1fr 300px; gap: 18px; align-items: start; }
+.plano-contenedor { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 14px; padding: 12px; }
+.nombre-nivel { margin: 0 0 6px 4px; font-weight: 700; font-size: 0.9rem; color: var(--color-primary); }
+.plano { width: 100%; height: auto; display: block; }
+.plano .zona { stroke: rgba(22, 58, 92, 0.12); stroke-width: 2; }
+.plano .zona-nombre { font: 600 15px var(--font-body); fill: #55636e; }
+.plano .lugar { cursor: pointer; transition: opacity 0.2s ease; outline: none; }
+.plano .lugar-fondo { fill: #fff; stroke-width: 3; transform-box: fill-box; transform-origin: center; transition: transform 0.15s ease; }
+.plano .lugar-icono { font-size: 22px; pointer-events: none; }
+.plano .lugar-icono.numero { font: 700 22px var(--font-display); fill: var(--color-primary); }
+.plano .lugar:hover .lugar-fondo,
+.plano .lugar:focus-visible .lugar-fondo { transform: scale(1.18); }
+.plano .lugar:focus-visible .lugar-fondo { stroke: var(--color-accent); stroke-width: 5; }
+.plano .lugar.apagado { opacity: 0.18; pointer-events: none; }
+.plano .lugar.resaltado .lugar-fondo { animation: latido 1.4s ease-in-out infinite; }
+.plano .lugar.elegido .lugar-fondo { fill: #fff3dc; stroke: var(--color-accent); stroke-width: 5; transform: scale(1.2); }
+@keyframes latido { 50% { transform: scale(1.22); } }
+
+.detalle { position: sticky; top: 84px; }
+.detalle-vacio { margin: 0; padding: 18px; border: 2px dashed var(--color-line); border-radius: 14px; color: var(--color-ink-soft); text-align: center; }
+.detalle-tarjeta {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-top: 5px solid var(--color-categoria);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 10px 26px rgba(15, 39, 64, 0.08);
+  animation: aparecer-confirmacion 0.25s ease;
+}
+.detalle-icono { font-size: 2rem; }
+.detalle-categoria { display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-categoria); margin-top: 6px; }
+.detalle-tarjeta h3 { font-family: var(--font-display); margin: 2px 0 8px; font-size: 1.15rem; }
+.detalle-tarjeta p { margin: 0 0 8px; font-size: 0.9rem; color: var(--color-ink-soft); }
+.detalle-horario { font-weight: 600; color: var(--color-ink) !important; }
+.detalle-enlace { font-weight: 600; color: var(--color-primary); }
+
+.resultados { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.resultados button {
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font: 0.85rem var(--font-body);
+  cursor: pointer;
+  text-align: left;
+}
+.resultados button.elegido { border-color: var(--color-accent); background: #fff6e8; }
+.sin-resultados { color: var(--color-ink-soft); font-size: 0.9rem; }
+
+/* Cómo llegar */
+.como-llegar { margin-top: 40px; }
+.llegar-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+.mapa-google { width: 100%; min-height: 320px; border: 0; border-radius: 14px; background: var(--color-line); }
+.opciones-llegar { display: grid; gap: 10px; }
+.opcion-llegar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+.opcion-llegar:hover { border-color: var(--color-accent); transform: translateX(3px); }
+.opcion-llegar > span { font-size: 1.8rem; }
+.opcion-llegar strong { display: block; }
+.opcion-llegar small { color: var(--color-ink-soft); }
+
+@media (max-width: 900px) {
+  .mapa-cuerpo, .llegar-grid, .espera { grid-template-columns: 1fr; }
+  .detalle { position: static; }
+}
+@media (max-width: 520px) {
+  .plano .zona-nombre { font-size: 22px; }
+  .plano .lugar-fondo { r: 26; }
+  .grafico { height: 80px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plano .lugar.resaltado .lugar-fondo { animation: none; }
+  .plano .lugar-fondo, .opcion-llegar { transition: none; }
+}
