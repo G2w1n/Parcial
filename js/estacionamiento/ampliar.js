@@ -3,6 +3,7 @@
 // y se cobra solo la diferencia (pasarela.js vuelve a calcularla contra la base de datos)
 import { sql } from '../config/neon-config.js';
 import { exigirRol } from '../auth/auth.js';
+import { cargarConfiguracion } from '../config/configuracion.js';
 import { calcularMontoServicio, desglosarMonto, formatearSoles, redondear } from '../registro/tarifario.js';
 import {
   formatearNumeroTarjeta, formatearVencimiento, validarFormularioTarjeta, validarCelular, validarCodigoAprobacion,
@@ -12,6 +13,9 @@ import { avisar, conCarga, lanzarConfeti } from '../config/ui.js';
 
 const usuario = exigirRol('cliente');
 if (!usuario) throw new Error('Acceso denegado');
+
+// Tarifas vigentes que configura el administrador (si no hay, se usan las de tarifario.js)
+await cargarConfiguracion();
 
 const $ = (id) => document.getElementById(id);
 const codigo = new URLSearchParams(location.search).get('codigo');

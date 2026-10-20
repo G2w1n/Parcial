@@ -6,6 +6,7 @@ import {
   DESCUENTO_FIN_DE_SEMANA, RECARGO_BUS_CAMION, ADICIONAL_ZONA_VIP,
 } from '../registro/tarifario.js';
 import { ahoraEnLima } from '../vuelos/datos-vuelos.js';
+import { cargarConfiguracion } from '../config/configuracion.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -77,7 +78,7 @@ async function pintarMapa() {
   }
 
   const contadores = [];
-  const bloques = ZONAS.map((zona) => {
+  const bloques = ZONAS.filter((zona) => zona.espacios > 0).map((zona) => {
     const ocupados = Math.min(zona.espacios, ocupacionSimulada(zona, momento) + (reales[zona.clave] ?? 0));
     const libres = zona.espacios - ocupados;
     const marcados = espaciosOcupados(zona, ocupados, momento);
@@ -148,6 +149,10 @@ function entradaPorDefecto() {
 formCalc.addEventListener('input', calcular);
 formCalc.addEventListener('change', calcular);
 formCalc.addEventListener('submit', (e) => e.preventDefault());
+
+// Tarifas y capacidad que configura el administrador
+const config = await cargarConfiguracion();
+ZONAS.forEach((zona) => { zona.espacios = Number(config.capacidad[zona.clave]) || 0; });
 
 $('calc-entrada').value = entradaPorDefecto();
 pintarTarifas();

@@ -15,6 +15,7 @@ export const TRADUCCIONES = {
   'Cerrar sesión': { en: 'Sign out', qu: 'Lluqsiy' },
   'Panel': { en: 'Dashboard' },
   'Caja': { en: 'Cashier' },
+  'Garita': { en: 'Exit gate' },
   'Mis reservas': { en: 'My bookings' },
   'Reservar': { en: 'Book' },
   'Reservar estacionamiento': { en: 'Book parking' },

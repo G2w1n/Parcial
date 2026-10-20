@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <meta name="robots" content="noindex">
+  <title>Estadísticas — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Gráficos de reservas, ingresos y uso del estacionamiento.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+  <div id="menu-admin" data-pagina="estadisticas"></div>
+
+  <main class="adm-pagina">
+    <div class="wrap">
+      <div class="adm-cabecera">
+        <div>
+          <h1>Estadísticas</h1>
+          <p class="adm-intro">Reservas, ingresos y uso del estacionamiento. Pasa el mouse sobre las barras para ver cada valor.</p>
+        </div>
+        <div class="adm-campo">
+          <label for="periodo">Periodo</label>
+          <select id="periodo">
+            <option value="7">Últimos 7 días</option>
+            <option value="14" selected>Últimos 14 días</option>
+            <option value="30">Últimos 30 días</option>
+          </select>
+        </div>
+      </div>
+      <p id="error" class="adm-aviso-tabla" hidden>No se pudieron cargar las estadísticas. Revisa la conexión.</p>
+      <div id="kpis" class="adm-kpis"></div>
+      <div class="adm-grid-2">
+        <section class="adm-bloque grafico" aria-labelledby="t-g1"><h2 id="t-g1">Ingresos por día</h2><div id="g-ingresos" class="grafico-cuerpo"></div></section>
+        <section class="adm-bloque grafico" aria-labelledby="t-g2"><h2 id="t-g2">Reservas por día de entrada</h2><div id="g-reservas" class="grafico-cuerpo"></div></section>
+        <section class="adm-bloque grafico" aria-labelledby="t-g3"><h2 id="t-g3">Horas pico de llegada</h2><div id="g-horas" class="grafico-cuerpo"></div></section>
+        <section class="adm-bloque grafico" aria-labelledby="t-g4"><h2 id="t-g4">Recaudado por medio de pago</h2><div id="g-medios" class="grafico-cuerpo"></div></section>
+        <section class="adm-bloque grafico" aria-labelledby="t-g5"><h2 id="t-g5">Reservas por estado</h2><div id="g-estados" class="grafico-cuerpo"></div></section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/panel/estadisticas.js"></script>
+  <script type="module" src="js/panel/menu-admin.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>

@@ -2,16 +2,38 @@
 // Regla de negocio del caso 21 (estacionamiento): funciones PURAS, sin DOM ni base de datos.
 // Prueba en la consola: calcularMontoServicio({ horas: '3.5', tipo_vehiculo: 'auto', zona_vip: 'on' })  ->  43
 
-export const TARIFA_POR_HORA = 7.00;     // S/ por hora o fracción
-export const RECARGO_BUS_CAMION = 0.5;   // +50 % si es bus o camión
-export const ADICIONAL_ZONA_VIP = 15.00; // S/ fijos por zona techada VIP
-export const HORAS_MAXIMAS = 240;        // 10 días
+// Valores por defecto. El administrador puede cambiarlos desde el panel (tabla "configuracion"):
+// cada página llama a cargarConfiguracion() (js/config/configuracion.js) antes de calcular.
+// Se exportan con "let" para que los módulos que los importan vean siempre el valor vigente.
+export let TARIFA_POR_HORA = 7.00;     // S/ por hora o fracción
+export let RECARGO_BUS_CAMION = 0.5;   // +50 % si es bus o camión
+export let ADICIONAL_ZONA_VIP = 15.00; // S/ fijos por zona techada VIP
+export const HORAS_MAXIMAS = 240;      // 10 días
 
 // Tarifas especiales (fase 4)
-export const TARIFA_DIA_COMPLETO = 60.00;       // S/ por cada 24 h; también es el tope de un mismo día
-export const TARIFA_NOCTURNA = 20.00;           // S/ fijos si entra entre las 22:00 y las 05:59 y se queda hasta 8 h
-export const HORAS_NOCTURNA = 8;
-export const DESCUENTO_FIN_DE_SEMANA = 0.10;    // -10 % si entra sábado o domingo
+export let TARIFA_DIA_COMPLETO = 60.00;       // S/ por cada 24 h; también es el tope de un mismo día
+export let TARIFA_NOCTURNA = 20.00;           // S/ fijos si entra entre las 22:00 y las 05:59 y se queda hasta HORAS_NOCTURNA
+export let HORAS_NOCTURNA = 8;
+export let DESCUENTO_FIN_DE_SEMANA = 0.10;    // -10 % si entra sábado o domingo
+
+export function tarifasVigentes() {
+  return {
+    porHora: TARIFA_POR_HORA, diaCompleto: TARIFA_DIA_COMPLETO, nocturna: TARIFA_NOCTURNA, horasNocturna: HORAS_NOCTURNA,
+    descuentoFinDeSemana: DESCUENTO_FIN_DE_SEMANA, recargoBusCamion: RECARGO_BUS_CAMION, adicionalVip: ADICIONAL_ZONA_VIP,
+  };
+}
+
+// Aplica las tarifas guardadas por el administrador; ignora los valores que no son números válidos
+export function aplicarTarifas(t = {}) {
+  const num = (valor, actual, min = 0) => (Number.isFinite(Number(valor)) && Number(valor) >= min ? Number(valor) : actual);
+  TARIFA_POR_HORA = num(t.porHora, TARIFA_POR_HORA, 0.1);
+  TARIFA_DIA_COMPLETO = num(t.diaCompleto, TARIFA_DIA_COMPLETO, 0.1);
+  TARIFA_NOCTURNA = num(t.nocturna, TARIFA_NOCTURNA, 0.1);
+  HORAS_NOCTURNA = num(t.horasNocturna, HORAS_NOCTURNA, 1);
+  DESCUENTO_FIN_DE_SEMANA = Math.min(num(t.descuentoFinDeSemana, DESCUENTO_FIN_DE_SEMANA), 0.9);
+  RECARGO_BUS_CAMION = num(t.recargoBusCamion, RECARGO_BUS_CAMION);
+  ADICIONAL_ZONA_VIP = num(t.adicionalVip, ADICIONAL_ZONA_VIP);
+}
 
 export function redondear(valor) {
   return Math.round((valor + Number.EPSILON) * 100) / 100;

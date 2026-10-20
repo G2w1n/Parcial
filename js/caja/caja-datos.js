@@ -138,3 +138,55 @@ export async function consultarSalida(criterio) {
     LIMIT 5;
   `;
 }
+// ---------- Fase 5 ----------
+// Placas bloqueadas (lista negra). Si la tabla aún no existe, no hay placas bloqueadas
+export async function placasBloqueadas(placas) {
+  const lista = [...new Set(placas.filter(Boolean).map((p) => p.toUpperCase()))];
+  if (lista.length === 0) return {};
+  try {
+    const filas = await sql`SELECT placa, motivo, deuda FROM lista_negra WHERE activo AND placa = ANY(${lista});`;
+    return Object.fromEntries(filas.map((f) => [f.placa, f]));
+  } catch (error) {
+    if (error.code !== '42P01') console.error(error);
+    return {};
+  }
+}
+
+// La garita marca la reserva como "atendido" cuando el vehículo sale (solo si está pagada)
+export async function registrarSalida(idRegistro, idUsuario) {
+  const filas = await sql`
+    UPDATE reservas_estacionamiento
+    SET estado = 'atendido', gestionado_por = ${idUsuario}, fecha_gestion = NOW()
+    WHERE id = ${idRegistro} AND estado = 'registrado' AND estado_pago IN ('pagado', 'exonerado')
+    RETURNING id;
+  `;
+  return filas.length === 1;
+}
+
+// Ampliaciones de estadía cobradas en línea en la fecha (se suman al cierre de caja)
+export async function ampliacionesDelDia(fecha) {
+  try {
+    return await sql`
+      SELECT metodo, COUNT(*)::int AS operaciones, SUM(monto) AS total FROM ampliaciones
+      WHERE monto > 0 AND (fecha AT TIME ZONE 'America/Lima')::date = ${fecha}::date
+      GROUP BY metodo ORDER BY metodo;
+    `;
+  } catch (error) {
+    if (error.code !== '42P01') console.error(error);
+    return [];
+  }
+}
+
+// Total descontado con cupones en la fecha
+export async function descuentosDelDia(fecha) {
+  try {
+    const [fila] = await sql`
+      SELECT COUNT(*)::int AS cupones, COALESCE(SUM(descuento), 0) AS total FROM pagos
+      WHERE estado = 'aprobado' AND descuento > 0 AND (fecha_pago AT TIME ZONE 'America/Lima')::date = ${fecha}::date;
+    `;
+    return { cupones: fila.cupones, total: Number(fila.total) };
+  } catch (error) {
+    if (error.code !== '42703' && error.code !== '42P01') console.error(error);
+    return { cupones: 0, total: 0 };
+  }
+}

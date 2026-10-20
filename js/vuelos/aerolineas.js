@@ -1,8 +1,10 @@
 // js/vuelos/aerolineas.js
 // Tarjetas de cada aerolínea con su mostrador, contacto, destinos y próximo vuelo
 import { AEROLINEAS, obtenerVuelos, destinosDe, vuelosDiariosDe } from './datos-vuelos.js';
+import { cargarCambios } from './cambios.js';
 
 const lista = document.getElementById('lista-aerolineas');
+await cargarCambios();
 const vuelos = obtenerVuelos();
 
 function crear(etiqueta, clase, texto) {

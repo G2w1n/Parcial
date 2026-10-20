@@ -1,5 +1,6 @@
 import { sql } from '../config/neon-config.js';
 import { exigirRol } from '../auth/auth.js';
+import { cargarConfiguracion } from '../config/configuracion.js';
 import {
   calcularMontoServicio, desglosarMonto, formatearSoles, marcado, NOMBRES_VEHICULO,
   TARIFA_POR_HORA, ADICIONAL_ZONA_VIP, RECARGO_BUS_CAMION, HORAS_MAXIMAS,
@@ -9,7 +10,26 @@ import { sinAnimaciones } from '../config/ui.js';
 const usuario = exigirRol('cliente');
 if (!usuario) throw new Error('Acceso denegado');
 
+// Tarifas vigentes que configura el administrador (si no hay, se usan las de tarifario.js)
+await cargarConfiguracion();
+
+// Una placa en la lista negra no puede reservar en línea (debe acercarse a caja)
+async function placaBloqueada(placa) {
+  try {
+    const filas = await sql`SELECT 1 FROM lista_negra WHERE placa = ${placa.toUpperCase()} AND activo;`;
+    return filas.length > 0;
+  } catch (error) {
+    if (error.code !== '42P01') console.error(error);
+    return false;
+  }
+}
+
 export async function guardarReservaEstacionamiento(datos) {
+  if (await placaBloqueada(datos.placa)) {
+    const error = new Error('Placa con restricción');
+    error.name = 'PlacaBloqueada';
+    throw error;
+  }
   const codigo = 'COD-' + Date.now().toString().slice(-8);
   const monto = calcularMontoServicio(datos); // se recalcula aquí: no se confía en la pantalla
   const filas = await sql`
@@ -329,7 +349,9 @@ if (formReserva) {
       botonReservar.classList.remove('cargando');
       botonReservar.disabled = false;
       textoBoton.textContent = textoOriginal;
-      mostrarMensaje('Ocurrió un error al registrar tu reserva. Intenta de nuevo.', true);
+      mostrarMensaje(error.name === 'PlacaBloqueada'
+        ? 'Esta placa tiene una restricción pendiente. Acércate a la caja del estacionamiento para regularizarla.'
+        : 'Ocurrió un error al registrar tu reserva. Intenta de nuevo.', true);
       sacudir();
     }
   });

@@ -1,0 +1,60 @@
+/* css/garita.css — Garita de salida (fase 5) */
+
+.garita-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 20px; align-items: start; }
+
+.camara {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #0b1b2d;
+  display: grid;
+  place-items: center;
+}
+.camara video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+.camara .marco { position: absolute; width: 58%; aspect-ratio: 1; border: 3px solid rgba(255,255,255,0.85); border-radius: 18px; box-shadow: 0 0 0 999px rgba(0,0,0,0.25); display: none; }
+.camara.activa video, .camara.activa .marco { display: block; }
+.camara.activa .camara-apagada { display: none; }
+.camara-apagada { color: #9fb4c8; margin: 0; }
+.camara.activa .marco { animation: escaneo 1.6s ease-in-out infinite; }
+@keyframes escaneo { 50% { border-color: var(--color-accent); } }
+
+.resultado-garita { display: grid; gap: 14px; margin-bottom: 20px; }
+.resultado-vacio { margin: 0; padding: 30px 20px; text-align: center; color: var(--color-ink-soft); background: var(--color-surface); border: 2px dashed var(--color-line); border-radius: 14px; }
+
+.pase-salida { border-radius: 16px; padding: 20px; background: var(--color-surface); border: 3px solid var(--color-line); animation: aparecer-confirmacion 0.3s ease; }
+.pase-salida h2 { margin: 0 0 12px; font-size: 1.3rem; }
+.pase-salida.habilitada { border-color: #1f8a4c; background: #effaf3; }
+.pase-salida.habilitada h2 { color: #1f8a4c; }
+.pase-salida.pendiente { border-color: #d99121; background: #fff8ee; }
+.pase-salida.pendiente h2 { color: #9a5f05; }
+.pase-salida.cancelada, .pase-salida.usada { border-color: #8796a5; }
+.pase-salida.bloqueada { border-color: #c0392b; background: #fff4f4; }
+.pase-salida.bloqueada h2 { color: #b53030; }
+.motivo-bloqueo { margin: 0 0 10px; font-weight: 600; color: #8a1f1f; }
+.pase-salida dl { margin: 0 0 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; }
+.pase-salida dt { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-soft); }
+.pase-salida dd { margin: 0; font-weight: 700; }
+.btn-salida {
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 12px;
+  background: #1f8a4c;
+  color: #fff;
+  font: 700 1.05rem var(--font-body);
+  cursor: pointer;
+}
+.btn-salida:hover { opacity: 0.92; }
+.btn-salida.cargando { opacity: 0.7; cursor: wait; }
+
+.historial { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.historial li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: 8px; background: var(--color-bg); font-size: 0.88rem; }
+.historial:empty::after { content: "Todavía no hay salidas en este turno."; color: var(--color-ink-soft); font-size: 0.85rem; }
+
+@media (max-width: 860px) {
+  .garita-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .camara.activa .marco, .pase-salida { animation: none; }
+}

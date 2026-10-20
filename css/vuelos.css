@@ -242,6 +242,7 @@ h2 { color: var(--color-ink); font-family: var(--font-display); font-size: 1.4re
 .tv-estado.est-demorado { background: #fdf1de; color: #b5720c; }
 .tv-estado.est-cancelado { background: #fbe5e5; color: #b53030; }
 .tv-estado.est-cerrado, .tv-estado.est-despego { background: #eef1f5; color: #3b4a5a; }
+.tv-nota { margin: 10px 0 0; display: block; font-size: 0.82rem; color: #9a5f05; font-weight: 600; }
 .tv-quitar {
   position: absolute;
   top: 10px;

@@ -321,3 +321,9 @@ dialog[open] { animation: modal-entrar 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2) bot
   .tarjeta-kpi, .kpi-numero.latido, .fila-entrada, .barra-esqueleto, .salida,
   .ultimo-cobro.visible, dialog[open], .aviso, .aviso-barra { animation: none; }
 }
+/* ====== Fase 5: lista negra, salida y descuentos ====== */
+.fila-bloqueada td { background: #fff4f4; }
+.chip-bloqueo { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #fbe5e5; color: #b53030; font-size: 0.72rem; font-weight: 700; cursor: help; }
+.salida-bloqueada { border-color: #c0392b !important; box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15); }
+.alerta-bloqueo { margin: 8px 0; padding: 10px 12px; border-radius: 8px; background: #fbe5e5; color: #8a1f1f; font-weight: 600; font-size: 0.88rem; }
+.descuentos-dia { margin: 4px 0 0; font-size: 0.82rem; color: var(--color-ink-soft); text-align: right; }

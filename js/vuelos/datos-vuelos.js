@@ -125,14 +125,23 @@ function diaSiguiente(dia) {
   return d.toISOString().slice(0, 10);
 }
 
+// Cambios manuales hechos desde el panel (tabla "vuelos_cambios"), por "AAAA-MM-DD|LA 2021".
+// Los carga js/vuelos/cambios.js; si no hay, se usa solo el itinerario simulado
+let cambiosVigentes = {};
+export function establecerCambios(cambios) {
+  cambiosVigentes = cambios ?? {};
+}
+
 function construirVuelo([aerolinea, numero, tipo, ciudad, hora], dia, desfase, ahora) {
   const codigo = `${aerolinea} ${numero}`;
   const semilla = `${dia}|${codigo}`;
   const r = azar(semilla);
+  const cambio = cambiosVigentes[semilla];
 
   // Algunos vuelos se demoran, muy pocos se cancelan y algunos cambian de puerta
-  const cancelado = r > 0.965;
-  const demora = !cancelado && r > 0.78 ? 15 + Math.round(azar(semilla + 'd') * 9) * 5 : 0;
+  const cancelado = cambio ? Boolean(cambio.cancelado) : r > 0.965;
+  const demoraSimulada = r > 0.78 && r <= 0.965 ? 15 + Math.round(azar(semilla + 'd') * 9) * 5 : 0;
+  const demora = cancelado ? 0 : (cambio && cambio.demora_minutos != null ? Number(cambio.demora_minutos) : demoraSimulada);
   const puertas = PUERTAS[tipo];
   const puertaOriginal = puertas[Math.floor(azar(semilla + 'p') * puertas.length)];
   const cambiaPuerta = tipo === 'salida' && azar(semilla + 'c') > 0.8;
@@ -144,7 +153,7 @@ function construirVuelo([aerolinea, numero, tipo, ciudad, hora], dia, desfase, a
   const estimada = programada + demora;
   const faltan = estimada - ahora;
   // El cambio de puerta se anuncia 90 minutos antes de la salida
-  const puerta = cambiaPuerta && faltan <= 90 ? puertaNueva : puertaOriginal;
+  const puerta = cambio?.puerta ? cambio.puerta : (cambiaPuerta && faltan <= 90 ? puertaNueva : puertaOriginal);
 
   return {
     id: `${dia}|${codigo}`,
@@ -164,6 +173,8 @@ function construirVuelo([aerolinea, numero, tipo, ciudad, hora], dia, desfase, a
     puerta,
     puertaCambiada: puerta !== puertaOriginal,
     estado: calcularEstado(tipo, cancelado, demora, faltan),
+    nota: cambio?.nota ?? null,
+    manual: Boolean(cambio),
   };
 }
 

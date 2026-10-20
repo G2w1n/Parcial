@@ -3,6 +3,7 @@
 // No usa la base de datos: las tarjetas se guardan en este navegador.
 import { AEROLINEAS, obtenerVuelos, aHora } from '../vuelos/datos-vuelos.js';
 import { avisar } from '../config/ui.js';
+import { cargarCambios } from '../vuelos/cambios.js';
 import { t } from '../config/idioma.js';
 
 const $ = (id) => document.getElementById(id);
@@ -18,6 +19,7 @@ const selectVuelo = $('ck-vuelo');
 const mapa = $('mapa-asientos');
 const botonConfirmar = $('confirmar-asiento');
 
+await cargarCambios();
 let vuelos = obtenerVuelos();
 let datosPasajero = null;
 let asientoElegido = null;

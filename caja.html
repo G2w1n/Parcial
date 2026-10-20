@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/caja.css">
+  <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
 
@@ -25,6 +26,7 @@
       </nav>
     </div>
   </header>
+  <div id="menu-admin" data-pagina="caja"></div>
 
   <main>
     <section class="caja">
@@ -148,6 +150,7 @@
             </table>
           </div>
           <p class="total-dia">Total recaudado: <strong id="total-dia">S/ 0.00</strong></p>
+          <p id="descuentos-dia" class="descuentos-dia"></p>
         </section>
 
       </div>
@@ -210,6 +213,7 @@
   </dialog>
 
   <script type="module" src="js/caja/caja.js"></script>
+  <script type="module" src="js/panel/menu-admin.js"></script>
   <script type="module" src="js/auth/nav-sesion.js"></script>
   <script type="module" src="js/config/idioma.js"></script>
 

@@ -30,13 +30,23 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 - **Ampliar estadía** de una reserva pagada, pagando solo la diferencia.
 - **Comprobante** imprimible que habilita el pase de salida.
 
+### Seguridad (garita)
+- **Garita** (`garita.html`): lee con la cámara el **código QR del comprobante**, o se escribe la placa. Muestra si la salida está habilitada, alerta si la placa está en la lista negra y registra la salida.
+
 ### Cajero
 - **Cobro presencial** en efectivo (con cálculo de vuelto), POS o billetera.
 - **Control de salida (garita)** por placa o código.
 - **Conciliación** de los pagos recibidos por la pasarela.
-- **Cierre de caja** con resumen del día, que se actualiza cada 15 segundos.
+- **Cierre de caja** con resumen del día (incluye ampliaciones y descuentos por cupones), que se actualiza cada 15 segundos.
+- Alerta de **placas en lista negra** al cobrar y en el control de salida.
 
 ### Administrador y empleado
+- **Barra del personal** en todas sus páginas: pestañas según el rol, **búsqueda global** (placa, código, nombre, pago o pedido) y **notificaciones** (pedidos nuevos, pagos por verificar, vehículos por llegar, placas en lista negra).
+- **Pedidos** (`panel-pedidos.html`): Recibido → Preparando → Listo → Entregado, o Cancelar.
+- **Vuelos** (`panel-vuelos.html`): demoras, cancelaciones, cambios de puerta y notas, que el tablero público muestra al instante.
+- **Estadísticas** (`panel-estadisticas.html`, solo administrador): ingresos y reservas por día, horas pico, medios de pago y estados.
+- **Configuración** (`panel-config.html`, solo administrador): tarifas, capacidad del estacionamiento, cupones, avisos generales y lista negra de placas.
+- **Bitácora** (`panel-bitacora.html`, solo administrador): quién hizo qué y cuándo.
 - **Panel** con indicadores, búsqueda y filtros de reservas.
 - Crear, editar, atender y cancelar reservas.
 - **Gestión de empleados** con horarios de turno (diurno o nocturno, hora de Perú).
@@ -56,7 +66,7 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 | Tipografías | Space Grotesk e Inter (Google Fonts) |
 | Clima | [Open-Meteo](https://open-meteo.com) (gratis, sin clave) |
 | Tipo de cambio | [ExchangeRate-API](https://www.exchangerate-api.com) (open.er-api.com, gratis, sin clave) |
-| Código QR | qrcode-generator 1.4.4 (MIT), incluido en `js/vendor/` |
+| Código QR | qrcode-generator 1.4.4 (MIT) para generarlo y jsQR 1.4.0 (Apache 2.0) para leerlo con la cámara, incluidos en `js/vendor/` |
 
 ## Estructura del proyecto
 
@@ -68,6 +78,8 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 ├── terminal.html            Mapa del terminal
 ├── estacionamiento.html     Espacios libres, tarifas y calculadora
 ├── ampliar.html             Ampliar estadía (cliente)
+├── garita.html              Garita de salida con lector QR (seguridad)
+├── panel-*.html             Pedidos, vuelos, estadísticas, configuración y bitácora
 ├── pasajero.html            Guía del pasajero
 ├── turismo.html             Descubre Cusco
 ├── Servicios.html, Objetos.html, tienda_restaurante.html
@@ -100,9 +112,11 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 │   ├── terminal/            Plano del terminal y lugares
 │   ├── estacionamiento/     Mapa de espacios y ampliar estadía
 │   ├── servicios/           Sala VIP, calificaciones y pedidos
-│   └── vendor/              qrcode-generator 1.4.4 (MIT, Kazuhiko Arase)
+│   ├── garita/              Lector QR y salida de vehículos
+│   └── vendor/              qrcode-generator 1.4.4 (MIT) y jsQR 1.4.0 (Apache 2.0)
 ├── database/
-│   └── fase-4.sql           Tablas de cupones, ampliaciones, calificaciones y pedidos
+│   ├── fase-4.sql           Tablas de cupones, ampliaciones, calificaciones y pedidos
+│   └── fase-5.sql           Rol seguridad, vuelos, avisos, bitácora, configuración y lista negra
 ├── imagenes/
 └── docs/capturas/
 ```
@@ -126,6 +140,8 @@ La cadena de conexión está en `js/config/neon-config.js`. Para usar tu propia 
 
 **Tablas de la fase 4:** abre `database/fase-4.sql`, pégalo en *Neon → SQL Editor* y pulsa *Run* (una sola vez; se puede repetir sin problemas). Crea las tablas `cupones`, `ampliaciones`, `calificaciones` y `pedidos`, y agrega las columnas `cupon` y `descuento` a `pagos`. Mientras no se ejecute, esas funciones muestran un aviso y el resto del sitio sigue funcionando.
 
+**Tablas de la fase 5:** después del de la fase 4, ejecuta igual `database/fase-5.sql`. Agrega el rol `seguridad` (con una cuenta de prueba) y crea las tablas `vuelos_cambios`, `avisos`, `bitacora`, `configuracion` y `lista_negra`.
+
 Cupones de prueba: `BIENVENIDO10` (10 %), `CUSCO5` (S/ 5 desde S/ 20), `VIAJERO20` (20 % desde S/ 50) y `VENCIDO` (para probar el error).
 
 ## Roles
@@ -135,7 +151,8 @@ Cupones de prueba: `BIENVENIDO10` (10 %), `CUSCO5` (S/ 5 desde S/ 20), `VIAJERO2
 | `cliente` | Reservar estacionamiento | Creando una cuenta en `login.html` |
 | `cajero` | Caja | Asignado en la tabla `usuarios` |
 | `empleado` | Panel (solo dentro de su turno) | Creado por el administrador desde el panel |
-| `administrador` | Panel (con acceso a caja) | Asignado en la tabla `usuarios` |
+| `administrador` | Panel (con acceso a todo) | Asignado en la tabla `usuarios` |
+| `seguridad` | Garita | Asignado en la tabla `usuarios` · cuenta de prueba `garita@qorikancha.pe` / `garita123` |
 
 ## Vuelos simulados
 
@@ -182,6 +199,11 @@ La página de pago tiene botones que llenan el formulario automáticamente.
 | `ampliaciones` | Horas extra pagadas sobre una reserva ya pagada (fase 4) |
 | `calificaciones` | Estrellas y comentarios de los servicios (fase 4) |
 | `pedidos` | Pedidos de comida para recoger y su estado (fase 4) |
+| `vuelos_cambios` | Demoras, cancelaciones y puertas cambiadas a mano (fase 5) |
+| `avisos` | Avisos generales que se muestran en todas las páginas (fase 5) |
+| `bitacora` | Actividad del personal (fase 5) |
+| `configuracion` | Tarifas y capacidad editables desde el panel (fase 5) |
+| `lista_negra` | Placas bloqueadas (fase 5) |
 
 > `fecha_hora_entrada` se guarda en hora de Perú (como la escribe el formulario). De ella dependen la tarifa nocturna, el descuento de fin de semana y el mapa de espacios ocupados.
 

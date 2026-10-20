@@ -1,6 +1,7 @@
 // js/terminal/terminal.js
 // Mapa interactivo del terminal (SVG), buscador de lugares y tiempo de espera en seguridad
 import { NIVELES, ZONAS, CATEGORIAS, LUGARES } from './lugares.js';
+import { cargarCambios } from '../vuelos/cambios.js';
 import { obtenerVuelos, ahoraEnLima, aMinutos, normalizar } from '../vuelos/datos-vuelos.js';
 
 const $ = (id) => document.getElementById(id);
@@ -250,6 +251,7 @@ contCategorias.addEventListener('click', (e) => {
 // ---------- Arranque ----------
 elegirNivel(1);
 pintarEspera();
+cargarCambios().then(pintarEspera);
 setInterval(pintarEspera, 60000);
 const lugarUrl = new URLSearchParams(location.search).get('lugar');
 if (lugarUrl) irALugar(lugarUrl);
