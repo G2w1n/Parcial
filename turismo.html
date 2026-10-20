@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <title>Descubre Cusco — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Clima en vivo de Cusco, consejos contra el soroche, tours a Machu Picchu y el Valle Sagrado, y conversor de monedas. Aeropuerto Internacional Qorikancha. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/turismo.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Vuelos</a>
+        <a href="pasajero.html">Pasajeros</a>
+        <a href="turismo.html" aria-current="page">Turismo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="portada-turismo">
+      <div class="wrap portada-grid">
+        <div>
+          <p class="kicker" data-i18n>Bienvenido al ombligo del mundo</p>
+          <h1 data-i18n>Descubre Cusco</h1>
+          <p class="lede" data-i18n>Antigua capital del Imperio inca, a 3,399 metros de altura. Revisa el clima, cuida tu salud en la altura y planifica tus visitas.</p>
+          <nav class="atajos" aria-label="Secciones de turismo">
+            <a href="#clima" data-i18n>Clima</a>
+            <a href="#soroche" data-i18n>Soroche</a>
+            <a href="#tours" data-i18n>Tours y destinos</a>
+            <a href="#monedas" data-i18n>Cambio de moneda</a>
+          </nav>
+        </div>
+
+        <!-- Clima en vivo -->
+        <section id="clima" class="clima" aria-labelledby="t-clima" aria-live="polite">
+          <h2 id="t-clima" class="clima-titulo" data-i18n>Clima en Cusco ahora</h2>
+          <div id="clima-actual" class="clima-actual">
+            <p class="clima-cargando" data-i18n>Consultando el clima…</p>
+          </div>
+          <ul id="clima-dias" class="clima-dias"></ul>
+          <p class="clima-fuente"><span data-i18n>Fuente:</span> <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a></p>
+        </section>
+      </div>
+    </section>
+
+    <!-- Soroche -->
+    <section id="soroche" class="bloque">
+      <div class="wrap">
+        <h2 data-i18n>Soroche: el mal de altura</h2>
+        <p class="section-intro" data-i18n>Al llegar a Cusco hay menos oxígeno que a nivel del mar. Es normal sentir algunos síntomas las primeras horas.</p>
+        <div class="soroche-grid">
+          <div class="tarjeta-info">
+            <h3 data-i18n>Síntomas comunes</h3>
+            <ul class="lista-iconos">
+              <li><span aria-hidden="true">🤕</span> <span data-i18n>Dolor de cabeza</span></li>
+              <li><span aria-hidden="true">😮‍💨</span> <span data-i18n>Falta de aire al caminar o subir escaleras</span></li>
+              <li><span aria-hidden="true">😴</span> <span data-i18n>Cansancio y problemas para dormir</span></li>
+              <li><span aria-hidden="true">🤢</span> <span data-i18n>Náuseas o poco apetito</span></li>
+            </ul>
+          </div>
+          <div class="tarjeta-info tarjeta-consejos">
+            <h3 data-i18n>Consejos para el primer día</h3>
+            <ol class="consejos">
+              <li data-i18n>Descansa las primeras horas y camina despacio.</li>
+              <li data-i18n>Toma mucha agua y prueba un mate de coca.</li>
+              <li data-i18n>Come ligero y evita el alcohol la primera noche.</li>
+              <li data-i18n>Si puedes, duerme la primera noche en el Valle Sagrado (2,800 m), que es más bajo.</li>
+            </ol>
+          </div>
+          <div class="tarjeta-info tarjeta-alerta">
+            <h3 data-i18n>Busca ayuda médica si…</h3>
+            <p data-i18n>El dolor de cabeza no pasa con descanso, tienes vómitos, confusión o mucha dificultad para respirar. En el aeropuerto hay un tópico en el nivel 1 y oxígeno disponible.</p>
+          </div>
+        </div>
+        <div class="altitud" aria-label="Altura de los destinos más visitados">
+          <h3 data-i18n>¿A qué altura estarás?</h3>
+          <div id="barras-altitud" class="barras-altitud"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tours -->
+    <section id="tours" class="bloque bloque-alterno">
+      <div class="wrap">
+        <h2 data-i18n>Tours y destinos</h2>
+        <p class="section-intro" data-i18n>Los lugares más visitados desde Cusco, con el tiempo de viaje desde el aeropuerto.</p>
+        <div class="chips-filtro" role="group" aria-label="Filtrar tours">
+          <button type="button" class="chip activo" data-filtro="" aria-pressed="true" data-i18n>Todos</button>
+          <button type="button" class="chip" data-filtro="medio" aria-pressed="false" data-i18n>Medio día</button>
+          <button type="button" class="chip" data-filtro="completo" aria-pressed="false" data-i18n>Día completo</button>
+          <button type="button" class="chip" data-filtro="aventura" aria-pressed="false" data-i18n>Aventura</button>
+        </div>
+        <div id="lista-tours" class="lista-tours"></div>
+      </div>
+    </section>
+
+    <!-- Conversor de monedas -->
+    <section id="monedas" class="bloque">
+      <div class="wrap monedas">
+        <div>
+          <h2 data-i18n>Conversor de monedas</h2>
+          <p class="section-intro" data-i18n>En Perú se usa el sol (S/). En el aeropuerto hay casas de cambio y cajeros en el nivel 1.</p>
+          <ul class="consejos-dinero">
+            <li data-i18n>Lleva billetes de dólar sin roturas: en las casas de cambio no aceptan billetes dañados.</li>
+            <li data-i18n>En mercados y taxis se paga en efectivo y en soles.</li>
+            <li data-i18n>Muchos comercios aceptan tarjeta y billeteras como Yape o Plin.</li>
+          </ul>
+        </div>
+        <form id="form-monedas" class="conversor" novalidate>
+          <div class="campo">
+            <label for="cm-monto" data-i18n>Monto</label>
+            <input type="number" id="cm-monto" name="monto" value="100" min="0" step="0.01" inputmode="decimal">
+          </div>
+          <div class="fila-monedas">
+            <div class="campo">
+              <label for="cm-desde" data-i18n>De</label>
+              <select id="cm-desde" name="desde"></select>
+            </div>
+            <button type="button" id="cm-invertir" class="btn-invertir" aria-label="Invertir monedas">⇄</button>
+            <div class="campo">
+              <label for="cm-hacia" data-i18n>A</label>
+              <select id="cm-hacia" name="hacia"></select>
+            </div>
+          </div>
+          <output id="cm-resultado" class="cm-resultado" for="cm-monto cm-desde cm-hacia"></output>
+          <p id="cm-tasa" class="cm-tasa"></p>
+          <p id="cm-fuente" class="cm-fuente"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/turismo/turismo.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>

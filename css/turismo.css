@@ -1,0 +1,200 @@
+/* css/turismo.css — Descubre Cusco (los estilos comunes están en base.css) */
+
+h1, h2, h3 { font-family: var(--font-display); color: var(--color-ink); }
+h2 { font-size: 1.6rem; margin: 0 0 6px; }
+.section-intro { color: var(--color-ink-soft); margin: 0 0 24px; max-width: 680px; }
+.bloque { padding: 52px 0; scroll-margin-top: 70px; }
+.bloque-alterno { background: var(--color-surface); border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); }
+
+/* Portada con clima */
+.portada-turismo {
+  background:
+    linear-gradient(rgba(11, 27, 45, 0.78), rgba(11, 27, 45, 0.88)),
+    url("../imagenes/aeropuerto-banner.webp") center / cover;
+  color: #fff;
+  padding: 52px 0;
+}
+.portada-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: center; }
+.portada-turismo .kicker { margin: 0 0 6px; color: var(--color-accent); font-weight: 600; font-size: 0.9rem; }
+.portada-turismo h1 { color: #fff; font-size: clamp(2rem, 5vw, 2.8rem); margin: 0 0 10px; }
+.portada-turismo .lede { color: #cfe0ea; margin: 0 0 22px; }
+.atajos { display: flex; flex-wrap: wrap; gap: 10px; }
+.atajos a {
+  margin-left: 0;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.atajos a:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+.clima {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  scroll-margin-top: 80px;
+}
+.clima-titulo { color: #fff; font-size: 1rem; margin: 0 0 12px; }
+.clima-actual { display: flex; align-items: center; gap: 18px; min-height: 92px; }
+.clima-cargando, .clima-error { margin: 0; color: #cfe0ea; font-size: 0.9rem; }
+.clima-principal { display: flex; align-items: center; gap: 6px; }
+.clima-icono { font-size: 2.8rem; line-height: 1; }
+.clima-temp { font-family: var(--font-display); font-size: 3.4rem; font-weight: 700; line-height: 1; }
+.clima-detalle { display: flex; flex-direction: column; gap: 3px; font-size: 0.85rem; color: #cfe0ea; }
+.clima-detalle strong { color: #fff; font-size: 1.05rem; }
+.clima-uv { color: #f5c542; }
+.clima-dias { list-style: none; margin: 16px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.clima-dias li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  font-size: 0.8rem;
+}
+.dia-nombre { text-transform: capitalize; font-weight: 600; }
+.dia-icono { font-size: 1.4rem; }
+.dia-temp { font-weight: 700; }
+.dia-lluvia { color: #9fd3ff; font-size: 0.75rem; }
+.clima-fuente { margin: 10px 0 0; font-size: 0.72rem; color: #9fb4c8; }
+.clima-fuente a { color: #cfe0ea; }
+
+/* Soroche */
+.soroche-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tarjeta-info { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 14px; padding: 20px; }
+.tarjeta-info h3 { margin: 0 0 12px; font-size: 1.05rem; }
+.tarjeta-info p { margin: 0; color: var(--color-ink-soft); font-size: 0.9rem; }
+.lista-iconos { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 0.9rem; }
+.lista-iconos li { display: flex; gap: 10px; align-items: flex-start; }
+.consejos { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 0.9rem; }
+.tarjeta-consejos { border-top: 4px solid #1f8a4c; }
+.tarjeta-alerta { border-top: 4px solid #c0392b; background: #fff8f7; }
+
+.altitud { margin-top: 28px; }
+.altitud h3 { font-size: 1.05rem; margin: 0 0 12px; }
+.barras-altitud { display: grid; gap: 8px; }
+.barra-altitud { display: grid; grid-template-columns: 170px 1fr 70px; gap: 12px; align-items: center; font-size: 0.85rem; }
+.barra { height: 12px; border-radius: 999px; background: var(--color-line); position: relative; overflow: hidden; }
+.barra::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--ancho);
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7cc4ff, var(--color-primary));
+  animation: crecer 1s ease both;
+}
+@keyframes crecer { from { width: 0; } }
+.barra-altitud.actual { font-weight: 700; }
+.barra-altitud.actual .barra::after { background: linear-gradient(90deg, #f5c542, var(--color-accent)); }
+.barra-metros { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Tours */
+.chips-filtro { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip {
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  padding: 7px 14px;
+  border-radius: 999px;
+  font: 500 0.85rem var(--font-body);
+  cursor: pointer;
+}
+.chip.activo { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.lista-tours { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.tour {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.tour:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(22, 58, 92, 0.1); }
+.tour-cabecera { display: flex; justify-content: space-between; align-items: center; }
+.tour-icono { font-size: 2rem; }
+.tour-tipo { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 999px; background: #e3edf9; color: #1c5fa8; }
+.tour-completo .tour-tipo { background: #e3f6ea; color: #1f8a4c; }
+.tour-aventura .tour-tipo { background: #fdf1de; color: #9a5f05; }
+.tour h3 { margin: 0; font-size: 1.1rem; }
+.tour-desc { margin: 0; font-size: 0.88rem; color: var(--color-ink-soft); }
+.tour-datos { margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tour-datos dt { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-soft); }
+.tour-datos dd { margin: 0; font-weight: 700; font-size: 0.85rem; }
+.tour-consejo { margin: auto 0 0; padding: 10px 12px; border-radius: 8px; background: var(--color-surface); font-size: 0.82rem; }
+
+/* Monedas */
+.monedas { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.consejos-dinero { margin: 0; padding-left: 18px; display: grid; gap: 8px; color: var(--color-ink-soft); font-size: 0.9rem; }
+.conversor {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(15, 39, 64, 0.06);
+}
+.campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; min-width: 0; }
+.campo label { font-size: 0.85rem; font-weight: 600; }
+.conversor input, .conversor select {
+  font: 1rem var(--font-body);
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--color-ink);
+  min-width: 0;
+}
+.conversor input:focus, .conversor select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.12); }
+.fila-monedas { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: end; }
+.btn-invertir {
+  margin-bottom: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--color-line);
+  background: var(--color-bg);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+.btn-invertir:hover { transform: rotate(180deg); }
+.cm-resultado {
+  display: block;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  word-break: break-word;
+}
+.cm-tasa { margin: 10px 0 0; font-weight: 600; font-size: 0.9rem; }
+.cm-fuente { margin: 4px 0 0; font-size: 0.75rem; color: var(--color-ink-soft); }
+
+@media (max-width: 900px) {
+  .portada-grid, .monedas { grid-template-columns: 1fr; }
+  .soroche-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .barra-altitud { grid-template-columns: 110px 1fr 58px; font-size: 0.78rem; }
+  .clima-dias { grid-template-columns: repeat(2, 1fr); }
+  .tour-datos { grid-template-columns: 1fr 1fr; }
+  .fila-monedas { grid-template-columns: 1fr; }
+  .btn-invertir { margin: 0 auto; transform: rotate(90deg); }
+  .btn-invertir:hover { transform: rotate(270deg); }
+  .clima-temp { font-size: 2.8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .barra::after, .tour, .btn-invertir { animation: none; transition: none; }
+}
