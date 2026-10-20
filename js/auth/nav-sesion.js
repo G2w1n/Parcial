@@ -1,7 +1,8 @@
 // js/auth/nav-sesion.js
 import { rutaInicioSegunRol } from './roles.js';
+import { mostrarAvisoGeneral } from '../config/aviso-general.js';
 
-const ETIQUETA_INICIO = { cliente: 'Reservas', administrador: 'Panel', empleado: 'Panel', cajero: 'Caja' };
+const ETIQUETA_INICIO = { cliente: 'Reservas', administrador: 'Panel', empleado: 'Panel', cajero: 'Caja', seguridad: 'Garita' };
 
 let usuarioGuardado = null;
 try {
@@ -55,3 +56,6 @@ if (enlaceSesion && usuarioGuardado) {
   // Cierra el menú si se hace clic en cualquier otro lado de la página
   document.addEventListener('click', () => contenedor.classList.remove('abierto'));
 }
+
+// Aviso general del administrador (por ejemplo, vuelos demorados por mal clima)
+mostrarAvisoGeneral();
