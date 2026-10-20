@@ -19,6 +19,8 @@ export const TRADUCCIONES = {
   'Reservar': { en: 'Book' },
   'Reservar estacionamiento': { en: 'Book parking' },
   'Pagar': { en: 'Pay' },
+  'Estacionamiento': { en: 'Parking' },
+  'Mapa del terminal': { en: 'Terminal map' },
   'Horarios de vuelo': { en: 'Flight schedule', qu: 'Phawaykunaq pachan' },
   'Cómo funciona': { en: 'How it works' },
   'Av. de la Aviación s/n, Cusco, Perú': { en: 'Av. de la Aviación s/n, Cusco, Peru' },

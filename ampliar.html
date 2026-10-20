@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <title>Ampliar estadía — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Agrega horas a tu reserva de estacionamiento ya pagada y paga solo la diferencia. Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/ampliar.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Vuelos</a>
+        <a href="estacionamiento.html">Estacionamiento</a>
+        <a href="mis-reservas.html">Mis reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="ampliar">
+    <div class="wrap">
+      <p class="miga"><a href="mis-reservas.html">Mis reservas</a> / Ampliar estadía</p>
+      <h1>Ampliar estadía</h1>
+      <p class="section-intro">¿Tu vuelo de regreso cambió? Agrega horas a tu reserva pagada y paga solo la diferencia.</p>
+
+      <div id="aviso" class="aviso-ampliar" role="status" hidden></div>
+
+      <div id="contenido" class="ampliar-grid" hidden>
+        <section class="tarjeta" aria-labelledby="t-horas">
+          <h2 id="t-horas">1. ¿Cuántas horas más?</h2>
+          <dl class="actual">
+            <div><dt>Reserva</dt><dd id="am-codigo">—</dd></div>
+            <div><dt>Placa</dt><dd id="am-placa">—</dd></div>
+            <div><dt>Horas pagadas</dt><dd id="am-horas">—</dd></div>
+            <div><dt>Salida actual</dt><dd id="am-salida">—</dd></div>
+          </dl>
+
+          <label for="am-extra" class="etiqueta">Horas adicionales</label>
+          <div class="selector-horas">
+            <button type="button" class="paso" data-delta="-1" aria-label="Una hora menos">−</button>
+            <input type="number" id="am-extra" min="1" max="72" step="1" value="2" inputmode="numeric">
+            <button type="button" class="paso" data-delta="1" aria-label="Una hora más">+</button>
+          </div>
+          <div class="rapidos" role="group" aria-label="Atajos de horas">
+            <button type="button" data-horas="2">+2 h</button>
+            <button type="button" data-horas="6">+6 h</button>
+            <button type="button" data-horas="12">+12 h</button>
+            <button type="button" data-horas="24">+1 día</button>
+          </div>
+
+          <div class="nueva-salida">
+            <span>Nueva salida</span>
+            <strong id="am-nueva-salida">—</strong>
+          </div>
+          <ul id="am-desglose" class="desglose"></ul>
+          <dl class="totales">
+            <div><dt>Nuevo total</dt><dd id="am-nuevo-total">—</dd></div>
+            <div><dt>Ya pagaste</dt><dd id="am-pagado">—</dd></div>
+            <div class="diferencia"><dt>Pagas ahora</dt><dd id="am-diferencia">—</dd></div>
+          </dl>
+        </section>
+
+        <section class="tarjeta" aria-labelledby="t-pago">
+          <h2 id="t-pago">2. Paga la diferencia</h2>
+          <div class="metodos" role="radiogroup" aria-label="Medio de pago">
+            <label><input type="radio" name="forma" value="tarjeta" checked> Tarjeta</label>
+            <label><input type="radio" name="forma" value="billetera"> Billetera (AndiPay / PagoMóvil)</label>
+          </div>
+
+          <form id="form-ampliar" novalidate>
+            <div id="campos-tarjeta">
+              <div class="campo">
+                <label for="am-numero">Número de tarjeta</label>
+                <input id="am-numero" name="numero" inputmode="numeric" autocomplete="cc-number" placeholder="4111 1111 1111 1111">
+              </div>
+              <div class="fila">
+                <div class="campo">
+                  <label for="am-venc">Vencimiento</label>
+                  <input id="am-venc" name="vencimiento" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5">
+                </div>
+                <div class="campo">
+                  <label for="am-cvv">CVV</label>
+                  <input id="am-cvv" name="cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4">
+                </div>
+              </div>
+              <div class="campo">
+                <label for="am-titular">Titular</label>
+                <input id="am-titular" name="titular" autocomplete="cc-name">
+              </div>
+            </div>
+
+            <div id="campos-billetera" hidden>
+              <div class="campo">
+                <label for="am-proveedor">Billetera</label>
+                <select id="am-proveedor" name="proveedor">
+                  <option value="andipay">AndiPay</option>
+                  <option value="pagomovil">PagoMóvil</option>
+                </select>
+              </div>
+              <div class="fila">
+                <div class="campo">
+                  <label for="am-celular">Celular</label>
+                  <input id="am-celular" name="celular" inputmode="numeric" maxlength="9">
+                </div>
+                <div class="campo">
+                  <label for="am-codigo-aprob">Código de aprobación</label>
+                  <input id="am-codigo-aprob" name="codigo" inputmode="numeric" maxlength="6">
+                </div>
+              </div>
+            </div>
+
+            <p id="am-errores" class="errores" role="alert"></p>
+            <button type="submit" id="am-pagar" class="btn">Pagar y ampliar</button>
+            <button type="button" id="am-prueba" class="btn-texto">Usar datos de prueba</button>
+          </form>
+          <p id="am-resultado" class="resultado" role="status" aria-live="polite" hidden></p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/estacionamiento/ampliar.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>

@@ -124,3 +124,5 @@ h1 { text-align: center; color: var(--color-ink); font-family: var(--font-displa
     print-color-adjust: exact;
   }
 }
+/* Fase 4: ampliaciones de estadía */
+.titulo-ampliaciones { margin: 14px 0 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-ink-soft); }

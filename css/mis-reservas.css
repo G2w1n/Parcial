@@ -90,6 +90,18 @@ tbody tr:last-child td { border-bottom: none; }
   font-weight: 600;
 }
 .btn-editar-fila:hover { background: var(--color-primary-dark); }
+.btn-ampliar-fila {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-accent);
+  color: #9a5f05;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.btn-ampliar-fila:hover { background: #fff6e8; }
 
 .reservas-vacio {
   display: none;

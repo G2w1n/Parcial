@@ -334,3 +334,31 @@ h2 { color: var(--color-primary); font-family: var(--font-display); font-size: 1
   .mensaje, .aviso, .aviso-barra, .sacudir, .btn.cargando::before { animation: none; }
   .tarjeta-vista { transition: none; }
 }
+/* ====== Fase 4: cupones ====== */
+.form-cupon { margin: 14px 0 0; padding-top: 12px; border-top: 1px dashed var(--color-line); }
+.form-cupon label { font-size: 0.85rem; font-weight: 600; }
+.cupon-fila { display: flex; gap: 8px; margin-top: 6px; }
+.cupon-fila input {
+  flex: 1;
+  min-width: 0;
+  font: 0.9rem var(--font-body);
+  padding: 9px 10px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.btn-cupon {
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0 14px;
+  font: 600 0.85rem var(--font-body);
+  cursor: pointer;
+}
+.btn-cupon.quitar { background: transparent; color: var(--color-primary); }
+.mensaje-cupon { min-height: 1em; margin: 6px 0 0; font-size: 0.8rem; }
+.mensaje-cupon.ok { color: #1f8a4c; font-weight: 600; }
+.mensaje-cupon.error { color: #b53030; }
+.desglose li.linea-descuento span:last-child { color: #1f8a4c; }

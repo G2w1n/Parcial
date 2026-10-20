@@ -1,11 +1,11 @@
 // js/pago/pago.js
 import { exigirRol } from '../auth/auth.js';
-import { desglosarMonto, formatearSoles, NOMBRES_VEHICULO } from '../registro/tarifario.js';
+import { desglosarGuardado, formatearSoles, redondear, NOMBRES_VEHICULO } from '../registro/tarifario.js';
 import {
   formatearNumeroTarjeta, formatearVencimiento, detectarMarca,
   validarFormularioTarjeta, validarCelular, validarCodigoAprobacion,
 } from './validaciones.js';
-import { obtenerRegistro, listarPendientesCliente, pagarConTarjeta, pagarConBilletera } from './pasarela.js';
+import { obtenerRegistro, listarPendientesCliente, pagarConTarjeta, pagarConBilletera, revisarCupon } from './pasarela.js';
 import { avisar, lanzarConfeti, sinAnimaciones } from '../config/ui.js';
 
 const usuario = exigirRol('cliente');
@@ -35,6 +35,7 @@ const vista = {
 
 let registroActual = null;
 let cobrando = false;
+let cuponAplicado = null; // { cupon, descuento, descripcion }
 
 function mostrarMensaje(texto, tipo) {
   mensaje.textContent = texto;
@@ -84,9 +85,65 @@ function pintarResumen() {
   agregarFila(detalle, 'Reserva', r.codigo_seguimiento);
   agregarFila(detalle, 'Placa', r.placa);
   agregarFila(detalle, 'Vehículo', `${NOMBRES_VEHICULO[r.tipo_vehiculo] ?? r.tipo_vehiculo}${r.zona_vip ? ' · zona VIP' : ''}`);
-  desglosarMonto(r).lineas.forEach((linea) => agregarFila(detalle, linea.etiqueta, formatearSoles(linea.valor)));
-  resumenMonto.textContent = formatearSoles(Number(r.monto_calculado)); // el total sale de la base de datos
+  desglosarGuardado(r, r.monto_calculado).lineas.forEach((linea) => agregarFila(detalle, linea.etiqueta, formatearSoles(linea.valor)));
+  let total = Number(r.monto_calculado); // el total sale de la base de datos
+  if (cuponAplicado) {
+    agregarFila(detalle, `Cupón ${cuponAplicado.cupon}`, formatearSoles(-cuponAplicado.descuento));
+    detalle.lastElementChild.classList.add('linea-descuento');
+    total = redondear(total - cuponAplicado.descuento);
+  }
+  resumenMonto.textContent = formatearSoles(total);
 }
+
+// ---- Cupón de descuento ----
+const formCupon = $('#form-cupon');
+const inputCupon = $('#cupon');
+const botonCupon = $('#btn-cupon');
+const mensajeCupon = $('#mensaje-cupon');
+
+function mostrarCupon(texto, tipo = '') {
+  mensajeCupon.textContent = texto;
+  mensajeCupon.className = `mensaje-cupon ${tipo}`;
+}
+
+function quitarCupon(mensaje = '') {
+  cuponAplicado = null;
+  inputCupon.disabled = false;
+  inputCupon.value = '';
+  botonCupon.textContent = 'Aplicar';
+  botonCupon.classList.remove('quitar');
+  mostrarCupon(mensaje, mensaje ? 'error' : '');
+  pintarResumen();
+}
+
+formCupon.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (cuponAplicado) {
+    quitarCupon();
+    return;
+  }
+  if (!registroActual) return;
+  botonCupon.disabled = true;
+  try {
+    const revision = await revisarCupon(inputCupon.value, registroActual.monto_calculado);
+    if (revision.error) {
+      mostrarCupon(revision.error, 'error');
+      return;
+    }
+    cuponAplicado = revision;
+    inputCupon.value = revision.cupon;
+    inputCupon.disabled = true;
+    botonCupon.textContent = 'Quitar';
+    botonCupon.classList.add('quitar');
+    mostrarCupon(`✓ ${revision.descripcion}: ahorras ${formatearSoles(revision.descuento)}.`, 'ok');
+    pintarResumen();
+  } catch (error) {
+    console.error(error);
+    mostrarCupon('No se pudo revisar el cupón. Intenta de nuevo.', 'error');
+  } finally {
+    botonCupon.disabled = false;
+  }
+});
 
 // ---- Reservas pendientes del cliente ----
 async function cargarPendientes() {
@@ -120,6 +177,7 @@ async function cargarPendientes() {
 
 async function seleccionarRegistro() {
   registroActual = await obtenerRegistro(Number(selectRegistro.value), usuario.id);
+  if (cuponAplicado) quitarCupon(); // el cupón se vuelve a revisar con el monto de la otra reserva
   pintarResumen();
 }
 
@@ -187,6 +245,7 @@ async function procesar(formulario, operacion) {
       sacudir(formulario);
       // Si ya estaba pagada o cancelada, se refresca la lista de pendientes
       if (/ya fue pagada|cancelada|No se encontró/.test(resultado.motivo)) await cargarPendientes();
+      if (/cupón/i.test(resultado.motivo)) quitarCupon(resultado.motivo);
     }
   } catch (error) {
     console.error(error);
@@ -223,6 +282,7 @@ formTarjeta.addEventListener('submit', async (e) => {
     anio: venc.anio,
     cvv: datos.cvv,
     marca,
+    cupon: cuponAplicado?.cupon ?? null,
   }));
 });
 
@@ -246,6 +306,7 @@ formBilletera.addEventListener('submit', async (e) => {
     proveedor: datos.proveedor,
     celular: datos.celular,
     codigoAprobacion: datos.codigo,
+    cupon: cuponAplicado?.cupon ?? null,
   }));
 });
 

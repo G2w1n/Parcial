@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <title>Mapa del terminal — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Mapa interactivo del terminal, tiempo de espera en el control de seguridad y cómo llegar al Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/terminal.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Vuelos</a>
+        <a href="pasajero.html">Pasajeros</a>
+        <a href="turismo.html">Turismo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="terminal">
+    <div class="wrap">
+      <p class="miga"><a href="pasajero.html">Guía del pasajero</a> / Mapa del terminal</p>
+      <h1>Mapa del terminal</h1>
+      <p class="section-intro">Encuentra mostradores, puertas, baños, restaurantes y servicios. Toca un punto del mapa para ver sus detalles.</p>
+
+      <!-- Tiempo de espera en seguridad -->
+      <section class="espera" aria-labelledby="t-espera">
+        <div class="espera-actual">
+          <h2 id="t-espera">Espera en el control de seguridad</h2>
+          <p class="espera-minutos"><strong id="espera-min">--</strong> <span>min aprox.</span></p>
+          <p id="espera-texto" class="espera-texto"></p>
+        </div>
+        <div class="espera-grafico">
+          <p class="espera-sub">Espera estimada por hora (hoy)</p>
+          <div id="grafico-espera" class="grafico" role="img"></div>
+        </div>
+      </section>
+
+      <!-- Mapa interactivo -->
+      <section class="mapa-terminal" aria-labelledby="t-mapa">
+        <h2 id="t-mapa" class="visually-hidden">Mapa interactivo</h2>
+        <div class="controles">
+          <div class="niveles" role="tablist" aria-label="Nivel del terminal">
+            <button type="button" role="tab" id="tab-nivel-1" aria-selected="true" aria-controls="plano" data-nivel="1">Nivel 1</button>
+            <button type="button" role="tab" id="tab-nivel-2" aria-selected="false" aria-controls="plano" data-nivel="2">Nivel 2</button>
+          </div>
+          <label class="visually-hidden" for="buscar-lugar">Buscar en el mapa</label>
+          <input type="search" id="buscar-lugar" placeholder="¿Qué buscas? (baño, cajero, puerta 3, café…)" autocomplete="off">
+        </div>
+        <div id="categorias" class="categorias" role="group" aria-label="Filtrar por categoría"></div>
+
+        <div class="mapa-cuerpo">
+          <div class="plano-contenedor">
+            <p id="nombre-nivel" class="nombre-nivel"></p>
+            <svg id="plano" class="plano" viewBox="0 0 1000 560" role="tabpanel" aria-labelledby="tab-nivel-1"></svg>
+          </div>
+          <aside id="detalle" class="detalle" aria-live="polite">
+            <p class="detalle-vacio">Toca un punto del mapa o busca un lugar.</p>
+          </aside>
+        </div>
+        <ul id="resultados" class="resultados" aria-label="Lugares encontrados"></ul>
+      </section>
+
+      <!-- Cómo llegar -->
+      <section class="como-llegar" aria-labelledby="t-llegar">
+        <h2 id="t-llegar">¿Cómo llegar?</h2>
+        <p class="section-intro">El aeropuerto está a 4 km de la Plaza de Armas de Cusco.</p>
+        <div class="llegar-grid">
+          <iframe class="mapa-google" title="Ubicación del aeropuerto en Google Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            src="https://maps.google.com/maps?q=-13.5357,-71.9388&amp;z=14&amp;output=embed"></iframe>
+          <div class="opciones-llegar">
+            <a href="taxis.html" class="opcion-llegar"><span aria-hidden="true">🚕</span><div><strong>Taxi oficial</strong><small>15 a 20 min · S/ 20 a 25 al centro</small></div></a>
+            <a href="buses.html" class="opcion-llegar"><span aria-hidden="true">🚌</span><div><strong>Bus Airport Express</strong><small>30 min · S/ 8 · cada 20 min</small></div></a>
+            <a href="estacionamiento.html" class="opcion-llegar"><span aria-hidden="true">🚗</span><div><strong>Auto propio</strong><small>15 min · estacionamiento desde S/ 7 la hora</small></div></a>
+            <a href="alquiler.html" class="opcion-llegar"><span aria-hidden="true">🔑</span><div><strong>Alquiler de autos</strong><small>Recoge el auto en el nivel 1</small></div></a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/terminal/terminal.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>

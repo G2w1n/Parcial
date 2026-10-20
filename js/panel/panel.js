@@ -20,7 +20,7 @@ const filtroEstado = $('filtro-estado');
 const filtroAuditEmpleado = $('filtro-audit-empleado');
 const filtroAuditFecha = $('filtro-audit-fecha');
 
-const crear = { horas: $('pn-horas'), vehiculo: $('pn-vehiculo'), vip: $('pn-vip'), costo: $('pn-costo') };
+const crear = { horas: $('pn-horas'), vehiculo: $('pn-vehiculo'), vip: $('pn-vip'), costo: $('pn-costo'), fecha: $('pn-fecha') };
 const editar = {
   horas: $('pe-horas'), vehiculo: $('pe-vehiculo'), vip: $('pe-vip'), costo: $('pe-costo'),
   estado: $('pe-estado'), avisoPago: $('pe-aviso-pago'),
@@ -42,7 +42,9 @@ function mostrarSoloAdmin() {
 }
 
 // Datos de tarifa de un grupo de campos (crear o editar)
+// La fecha de entrada decide las tarifas especiales (nocturna y fin de semana)
 const leerTarifa = (grupo) => ({
+  fecha_hora_entrada: grupo.fecha ? grupo.fecha.value : grupo.fechaEntrada,
   horas: grupo.horas.value,
   tipo_vehiculo: grupo.vehiculo.value,
   zona_vip: grupo.vip.checked,
@@ -56,7 +58,7 @@ function mostrarCostoEditar() {
   editar.costo.textContent = formatearSoles(calcularMontoServicio(leerTarifa(editar)));
 }
 
-[crear.horas, crear.vehiculo, crear.vip].forEach((campo) => {
+[crear.horas, crear.vehiculo, crear.vip, crear.fecha].forEach((campo) => {
   campo.addEventListener('input', mostrarCostoCrear);
   campo.addEventListener('change', mostrarCostoCrear);
 });
@@ -595,7 +597,6 @@ if (formCrear) {
     const datos = {
       nombre_pasajero: $('pn-nombre').value,
       placa: $('pn-placa').value,
-      fecha_hora_entrada: $('pn-fecha').value,
       notas: $('pn-notas').value.trim() || null,
       ...leerTarifa(crear),
     };
@@ -630,6 +631,7 @@ function abrirModalEditar(reserva) {
   editar.estado.value = reserva.estado;
   $('pe-notas').value = reserva.notas || '';
 
+  editar.fechaEntrada = reserva.fecha_hora_entrada;
   editar.horas.value = Number(reserva.horas);
   editar.vehiculo.value = reserva.tipo_vehiculo;
   editar.vip.checked = reserva.zona_vip;

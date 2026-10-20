@@ -1,7 +1,7 @@
 // js/comprobante/comprobante.js
 import { sql } from '../config/neon-config.js';
 import { exigirSesion, rutaInicioSegunRol } from '../auth/auth.js';
-import { desglosarMonto, formatearSoles, NOMBRES_VEHICULO } from '../registro/tarifario.js';
+import { desglosarGuardado, formatearSoles, NOMBRES_VEHICULO } from '../registro/tarifario.js';
 
 const usuario = exigirSesion();
 if (!usuario) throw new Error('Sin sesión');
@@ -23,9 +23,8 @@ const op = new URLSearchParams(location.search).get('op');
 
 const filas = op
   ? await sql`
-      SELECT p.codigo_operacion, p.canal, p.metodo, p.proveedor_billetera, p.marca_tarjeta, p.referencia,
-             p.monto, p.monto_recibido, p.vuelto, p.fecha_pago, p.id_usuario,
-             r.codigo_seguimiento, r.nombre_pasajero AS pasajero, r.placa, r.horas, r.tipo_vehiculo, r.zona_vip,
+      SELECT p.*, r.id AS id_reserva,
+             r.codigo_seguimiento, r.nombre_pasajero AS pasajero, r.placa, r.horas, r.tipo_vehiculo, r.zona_vip, r.fecha_hora_entrada,
              c.nombre AS cajero
       FROM pagos p
       JOIN reservas_estacionamiento r ON r.id = p.id_registro
@@ -34,6 +33,19 @@ const filas = op
     `
   : [];
 const pago = filas[0];
+
+// Horas extra pagadas después (fase 4). Si la tabla aún no existe, no hay ampliaciones
+let ampliaciones = [];
+if (pago) {
+  try {
+    ampliaciones = await sql`
+      SELECT codigo_operacion, horas_extra, monto, fecha FROM ampliaciones
+      WHERE id_registro = ${pago.id_reserva} ORDER BY fecha;
+    `;
+  } catch (error) {
+    if (error.code !== '42P01') console.error(error);
+  }
+}
 
 function crear(etiqueta, clase, texto) {
   const el = document.createElement(etiqueta);
@@ -88,18 +100,34 @@ if (!pago || (usuario.rol === 'cliente' && pago.id_usuario !== usuario.id)) {
   agregarDato(lista, 'Fecha y hora', new Date(pago.fecha_pago).toLocaleString('es-PE', { timeZone: 'America/Lima' }));
   cuerpo.append(lista);
 
-  // Desglose del cobro
+  // Desglose del cobro, con las horas que tenía la reserva al pagarla
+  const horasExtra = ampliaciones.reduce((suma, a) => suma + Number(a.horas_extra), 0);
+  const descuento = Number(pago.descuento ?? 0);
   const desglose = crear('ul', 'desglose-comp');
-  desglosarMonto(pago).lineas.forEach((linea) => {
+  const agregarLinea = (etiqueta, valor) => {
     const li = crear('li', '');
-    li.append(crear('span', '', linea.etiqueta), crear('span', '', formatearSoles(linea.valor)));
+    li.append(crear('span', '', etiqueta), crear('span', '', formatearSoles(valor)));
     desglose.append(li);
-  });
+  };
+  desglosarGuardado({ ...pago, horas: Number(pago.horas) - horasExtra }, Number(pago.monto) + descuento)
+    .lineas.forEach((linea) => agregarLinea(linea.etiqueta, linea.valor));
+  if (descuento > 0) agregarLinea(`Cupón ${pago.cupon}`, -descuento);
   cuerpo.append(desglose);
 
   const total = crear('p', 'total-comp');
   total.append(crear('span', '', 'Total pagado'), crear('strong', '', formatearSoles(Number(pago.monto))));
   cuerpo.append(total);
+
+  if (ampliaciones.length) {
+    const titulo = crear('p', 'titulo-ampliaciones', 'Ampliaciones de estadía');
+    const lista = crear('ul', 'desglose-comp');
+    ampliaciones.forEach((a) => {
+      const li = crear('li', '');
+      li.append(crear('span', '', `+${Number(a.horas_extra)} h · ${a.codigo_operacion}`), crear('span', '', formatearSoles(Number(a.monto))));
+      lista.append(li);
+    });
+    cuerpo.append(titulo, lista);
+  }
 
   const pie = crear('footer', 'constancia-pie');
   pie.append(crear('p', 'pie-codigo', pago.codigo_operacion), crear('div', 'ticket-barras'));
