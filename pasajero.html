@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <title>Guía del pasajero — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Guía del pasajero del Aeropuerto Internacional Qorikancha, Cusco: primera vez volando, calculadora de equipaje, objetos prohibidos, preguntas frecuentes y equipaje perdido. Caso académico ficticio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/pasajero.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="vuelos.html">Vuelos</a>
+        <a href="pasajero.html" aria-current="page">Pasajeros</a>
+        <a href="turismo.html">Turismo</a>
+        <a href="index.html#servicios">Servicios</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="portada-pasajero">
+      <div class="wrap">
+        <p class="kicker" data-i18n>Todo lo que necesitas antes de volar</p>
+        <h1 data-i18n>Guía del pasajero</h1>
+        <p class="lede" data-i18n>Prepara tu viaje sin sorpresas: revisa tu equipaje, lo que puedes llevar y los pasos dentro del aeropuerto.</p>
+        <nav class="atajos" aria-label="Secciones de la guía">
+          <a href="checkin.html" class="atajo-destacado" data-i18n>Hacer check-in</a>
+          <a href="#primera-vez" data-i18n>¿Primera vez volando?</a>
+          <a href="#equipaje" data-i18n>Calculadora de equipaje</a>
+          <a href="#prohibidos" data-i18n>Objetos prohibidos</a>
+          <a href="#faq" data-i18n>Preguntas frecuentes</a>
+          <a href="#perdido" data-i18n>Equipaje perdido</a>
+        </nav>
+      </div>
+    </section>
+
+    <!-- 1. Primera vez volando -->
+    <section id="primera-vez" class="bloque">
+      <div class="wrap">
+        <h2 data-i18n>¿Primera vez volando?</h2>
+        <p class="section-intro" data-i18n>Sigue estos seis pasos desde tu casa hasta el avión.</p>
+        <ol class="linea-tiempo">
+          <li>
+            <span class="lt-cuando" data-i18n>1 día antes</span>
+            <h3 data-i18n>Prepara tus documentos</h3>
+            <p data-i18n>Ten a la mano tu DNI (vuelos nacionales) o pasaporte (internacionales) y haz el check-in en línea para elegir tu asiento.</p>
+          </li>
+          <li>
+            <span class="lt-cuando" data-i18n>2 a 3 horas antes</span>
+            <h3 data-i18n>Llega al aeropuerto</h3>
+            <p data-i18n>Llega 2 horas antes en vuelos nacionales y 3 horas antes en internacionales. Revisa el tablero para confirmar tu vuelo.</p>
+          </li>
+          <li>
+            <span class="lt-cuando" data-i18n>Nivel 1</span>
+            <h3 data-i18n>Documenta tu equipaje</h3>
+            <p data-i18n>Ve al mostrador de tu aerolínea para entregar la maleta de bodega. Si solo llevas equipaje de mano y ya hiciste check-in, pasa directo al control.</p>
+          </li>
+          <li>
+            <span class="lt-cuando" data-i18n>Nivel 2</span>
+            <h3 data-i18n>Pasa el control de seguridad</h3>
+            <p data-i18n>Saca la laptop y los líquidos (máximo 100 ml cada uno, en bolsa transparente). Quítate correa, reloj y objetos metálicos.</p>
+          </li>
+          <li>
+            <span class="lt-cuando" data-i18n>40 minutos antes</span>
+            <h3 data-i18n>Ve a tu puerta de embarque</h3>
+            <p data-i18n>La puerta aparece en tu tarjeta de embarque y en el tablero. El embarque empieza unos 40 minutos antes y la puerta cierra 10 minutos antes.</p>
+          </li>
+          <li>
+            <span class="lt-cuando" data-i18n>A bordo</span>
+            <h3 data-i18n>¡Buen viaje!</h3>
+            <p data-i18n>Muestra tu tarjeta de embarque y tu documento, guarda tu equipaje de mano y abróchate el cinturón.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 2. Calculadora de equipaje -->
+    <section id="equipaje" class="bloque bloque-alterno">
+      <div class="wrap">
+        <h2 data-i18n>Calculadora de equipaje</h2>
+        <p class="section-intro" data-i18n>Ingresa el peso y las medidas de tu maleta para saber si cumple con las reglas de tu aerolínea.</p>
+
+        <div class="calculadora">
+          <form id="form-equipaje" class="calc-form" novalidate>
+            <div class="campo">
+              <label for="eq-aerolinea" data-i18n>Aerolínea</label>
+              <select id="eq-aerolinea" name="aerolinea"></select>
+            </div>
+
+            <fieldset class="tipos-equipaje">
+              <legend data-i18n>Tipo de equipaje</legend>
+              <div id="eq-tipos" class="opciones-tipo"></div>
+            </fieldset>
+
+            <div class="campo">
+              <label for="eq-peso" data-i18n>Peso (kg)</label>
+              <input type="number" id="eq-peso" name="peso" min="0.1" max="80" step="0.1" inputmode="decimal" value="9">
+            </div>
+
+            <fieldset class="medidas">
+              <legend data-i18n>Medidas (cm)</legend>
+              <div class="fila-medidas">
+                <label><span data-i18n>Alto</span><input type="number" name="alto" min="1" max="200" inputmode="numeric" value="55"></label>
+                <label><span data-i18n>Ancho</span><input type="number" name="ancho" min="1" max="200" inputmode="numeric" value="35"></label>
+                <label><span data-i18n>Largo</span><input type="number" name="largo" min="1" max="200" inputmode="numeric" value="23"></label>
+              </div>
+            </fieldset>
+          </form>
+
+          <div class="calc-resultado">
+            <div class="maleta" aria-hidden="true">
+              <div id="maleta-dibujo" class="maleta-dibujo"><span class="maleta-asa"></span></div>
+              <span id="maleta-peso" class="maleta-peso">9 kg</span>
+            </div>
+            <div id="eq-resultado" class="resultado" role="status" aria-live="polite"></div>
+            <dl id="eq-limites" class="limites"></dl>
+          </div>
+        </div>
+        <p class="nota" data-i18n>Reglas referenciales de la tarifa básica. Confirma siempre con tu aerolínea antes de viajar.</p>
+      </div>
+    </section>
+
+    <!-- 3. Objetos prohibidos -->
+    <section id="prohibidos" class="bloque">
+      <div class="wrap">
+        <h2 data-i18n>¿Qué puedo llevar?</h2>
+        <p class="section-intro" data-i18n>Busca un objeto para saber si puede ir en tu equipaje de mano (cabina) o en la maleta documentada (bodega).</p>
+
+        <div class="filtros-objetos">
+          <label class="visually-hidden" for="buscar-objeto" data-i18n>Buscar objeto</label>
+          <input type="search" id="buscar-objeto" placeholder="Busca un objeto (ej. batería, líquidos, coca)" data-i18n-placeholder autocomplete="off">
+          <div class="chips-filtro" role="group" aria-label="Filtrar objetos">
+            <button type="button" class="chip activo" data-filtro="" aria-pressed="true" data-i18n>Todos</button>
+            <button type="button" class="chip" data-filtro="permitido" aria-pressed="false" data-i18n>Permitidos</button>
+            <button type="button" class="chip" data-filtro="solo-cabina" aria-pressed="false" data-i18n>Solo cabina</button>
+            <button type="button" class="chip" data-filtro="solo-bodega" aria-pressed="false" data-i18n>Solo bodega</button>
+            <button type="button" class="chip" data-filtro="prohibido" aria-pressed="false" data-i18n>Prohibidos</button>
+          </div>
+        </div>
+        <ul id="lista-objetos" class="lista-objetos"></ul>
+        <p id="objetos-vacio" class="vacio" hidden data-i18n>No encontramos ese objeto. Consulta con tu aerolínea.</p>
+      </div>
+    </section>
+
+    <!-- 4. Preguntas frecuentes -->
+    <section id="faq" class="bloque bloque-alterno">
+      <div class="wrap">
+        <h2 data-i18n>Preguntas frecuentes</h2>
+        <label class="visually-hidden" for="buscar-faq" data-i18n>Buscar en preguntas frecuentes</label>
+        <input type="search" id="buscar-faq" class="buscar-faq" placeholder="Escribe tu duda (ej. mascota, menor, wifi)" data-i18n-placeholder autocomplete="off">
+        <div id="lista-faq" class="faq">
+          <details>
+            <summary data-i18n>¿Con cuánta anticipación debo llegar al aeropuerto?</summary>
+            <p data-i18n>Llega 2 horas antes en vuelos nacionales y 3 horas antes en vuelos internacionales. En temporada alta (junio a agosto) agrega 30 minutos.</p>
+          </details>
+          <details>
+            <summary data-i18n>¿Hasta qué hora puedo hacer el check-in?</summary>
+            <p data-i18n>El check-in en línea abre 48 horas antes y cierra 45 minutos antes de la salida. En el mostrador también cierra 45 minutos antes.</p>
+          </details>
+          <details>
+            <summary data-i18n>¿Qué documentos necesito?</summary>
+            <p data-i18n>DNI vigente para peruanos en vuelos nacionales. Extranjeros y vuelos internacionales: pasaporte vigente y, según el destino, visa.</p>
+          </details>
+          <details>
+            <summary data-i18n>¿Puede viajar un menor de edad solo?</summary>
+            <p data-i18n>Sí, con el servicio de menor no acompañado de la aerolínea y un permiso notarial de viaje firmado por los padres.</p>
+          </details>
+          <details>
+            <summary data-i18n>¿Puedo viajar con mi mascota?</summary>
+            <p data-i18n>Perros y gatos pequeños pueden ir en cabina en un transportador (hasta 7 kg con el transportador). Necesitas certificado de salud y debes reservarlo con la aerolínea.</p>
+          </details>
+          <details>
+            <summary data-i18n>¿Hay wifi gratis en el aeropuerto?</summary>
+            <p data-i18n>Sí. Conéctate a la red "Qorikancha_Free" y acepta los términos. Tienes 60 minutos gratis por día.</p>
+          </details>
+          <details>
+            <summary data-i18n>¿Qué hago si mi vuelo se demora o se cancela?</summary>
+            <p data-i18n>Sigue tu vuelo en el tablero y acércate al mostrador de tu aerolínea. Si se cancela, la aerolínea debe reprogramarte o devolverte el dinero.</p>
+          </details>
+          <details>
+            <summary data-i18n>¿Hay atención para personas con discapacidad?</summary>
+            <p data-i18n>Sí. Pide silla de ruedas o asistencia al comprar tu pasaje o en el mostrador. El aeropuerto tiene rampas, ascensores y baños accesibles.</p>
+          </details>
+        </div>
+        <p id="faq-vacio" class="vacio" hidden data-i18n>No encontramos esa pregunta. Escríbenos a informes@aeropuertoqorikancha.pe.</p>
+      </div>
+    </section>
+
+    <!-- 5. Equipaje perdido -->
+    <section id="perdido" class="bloque">
+      <div class="wrap perdido">
+        <div>
+          <h2 data-i18n>¿Tu maleta no llegó?</h2>
+          <p class="section-intro" data-i18n>Si al llegar a Cusco tu equipaje no aparece en la faja, no salgas de la sala de llegadas.</p>
+          <ol class="pasos-perdido">
+            <li data-i18n>Ve al mostrador de equipajes de tu aerolínea, junto a las fajas.</li>
+            <li data-i18n>Presenta tu tarjeta de embarque y el ticket de equipaje (la etiqueta que te dieron al documentar).</li>
+            <li data-i18n>Llena el reporte de irregularidad de equipaje (PIR) y guarda tu número de reporte.</li>
+            <li data-i18n>La aerolínea te avisará cuando lo encuentre y lo enviará a tu hotel o domicilio.</li>
+          </ol>
+        </div>
+        <aside class="tarjeta-perdido">
+          <h3 data-i18n>¿Olvidaste algo dentro del aeropuerto?</h3>
+          <p data-i18n>Si perdiste un objeto en la terminal (no en el avión), repórtalo en nuestra oficina de objetos perdidos.</p>
+          <a href="Objetos.html" class="btn-pasajero" data-i18n>Reportar objeto perdido</a>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/pasajero/pasajero.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>
