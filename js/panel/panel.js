@@ -184,7 +184,7 @@ export async function listarTodos() {
 export async function listarDeHoy() {
   return await sql`
     SELECT * FROM reservas_estacionamiento
-    WHERE fecha_hora_entrada::date = CURRENT_DATE
+    WHERE fecha_hora_entrada::date = (NOW() AT TIME ZONE 'America/Lima')::date
     ORDER BY fecha_registro DESC;
   `;
 }
@@ -265,7 +265,7 @@ export async function contarDeHoyPorEstado() {
   return await sql`
     SELECT estado, COUNT(*)::int AS total
     FROM reservas_estacionamiento
-    WHERE fecha_hora_entrada::date = CURRENT_DATE
+    WHERE fecha_hora_entrada::date = (NOW() AT TIME ZONE 'America/Lima')::date
     GROUP BY estado;
   `;
 }

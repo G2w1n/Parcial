@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
   <title>Horarios de vuelo — Aeropuerto Internacional Qorikancha</title>
   <meta name="description" content="Horarios de salidas y llegadas del Aeropuerto Internacional Qorikancha, Cusco. Caso académico ficticio.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/vuelos.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/vuelos.css">
 </head>
 <body>
 
@@ -17,10 +20,11 @@
       <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
       <nav aria-label="Navegación principal">
         <a href="index.html#inicio">Inicio</a>
-        <a href="vuelos.html">Horarios de vuelo</a>
+        <a href="vuelos.html" aria-current="page">Horarios de vuelo</a>
         <a href="index.html#servicios">Servicios</a>
         <a href="index.html#como-funciona">Cómo funciona</a>
-        <a href="index.html#formulario">Formulario</a>
+        <a href="login.html" id="nav-reservas">Reservas</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
       </nav>
     </div>
   </header>
@@ -29,9 +33,9 @@
     <section class="vuelos">
       <div class="wrap">
         <picture>
-          <source media="(max-width: 600px)" srcset="img/pista-vuelos-mobile.jpg">
-          <source media="(min-width: 601px)" srcset="img/pista-vuelos.jpg">
-          <img src="img/pista-vuelos.jpg" alt="Pista del Aeropuerto Internacional Qorikancha" class="foto-banner">
+          <source media="(max-width: 600px)" srcset="imagenes/aeropuerto-movil.webp">
+          <source media="(min-width: 601px)" srcset="imagenes/aeropuerto.webp">
+          <img src="imagenes/aeropuerto.webp" alt="Vista del Aeropuerto Internacional Qorikancha" class="foto-banner">
         </picture>
 
         <div class="vuelos-header">
@@ -120,6 +124,7 @@
       </address>
     </div>
   </footer>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
 
 </body>
 </html>

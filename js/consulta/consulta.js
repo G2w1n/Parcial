@@ -6,7 +6,6 @@ import { formatearFecha } from '../config/ui.js';
 const usuario = exigirRol('cliente');
 if (!usuario) throw new Error('Acceso denegado');
 
-const SELECT_RESERVAS = `ignorado`; // (las consultas se escriben completas abajo: sql`` nunca se arma con texto)
 
 export async function consultarMisReservas() {
   return await sql`
