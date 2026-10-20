@@ -36,16 +36,59 @@
 
         <div class="servicios-cabecera">
           <h1>Encuentra información de nuestros servicios</h1>
-          <form class="buscador" action="#" method="get" role="search">
+          <form class="buscador" id="form-buscar-servicio" action="#" method="get" role="search">
             <label for="buscar-servicio" class="visually-hidden">Buscar servicio</label>
             <input type="search" id="buscar-servicio" name="q" placeholder="Buscar servicio">
             <button type="submit" class="btn">Buscar</button>
           </form>
         </div>
 
-        <div class="servicios-grid">
+        <div class="servicios-grid" id="servicios-grid">
 
-          <a href="#" class="servicio-card">
+          <a href="terminal.html" class="servicio-card destacada">
+            <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg>
+            <h3>Mapa del terminal</h3>
+            <p>Encuentra puertas, baños, restaurantes y servicios en el mapa interactivo.</p>
+            <span class="card-flecha">→</span>
+          </a>
+
+          <a href="#sala-vip" class="servicio-card destacada">
+            <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11V8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v3"/><path d="M3 11h18v5H3zM6 16v3M18 16v3"/></svg>
+            <h3>Sala VIP</h3>
+            <p>Descansa antes de tu vuelo con comida, bebidas, duchas y wifi rápido.</p>
+            <span class="card-flecha">→</span>
+          </a>
+
+          <a href="#wifi" class="servicio-card destacada">
+            <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/></svg>
+            <h3>Wi-Fi gratis</h3>
+            <p>Conéctate a "Qorikancha_Free" y navega 60 minutos gratis al día.</p>
+            <span class="card-flecha">→</span>
+          </a>
+
+          <a href="tienda_restaurante.html" class="servicio-card destacada">
+            <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3v8a2 2 0 0 0 4 0V3M8 11v10M16 3c-2 2-2 6 0 8v10"/></svg>
+            <h3>Pide para recoger</h3>
+            <p>Haz tu pedido en línea y recógelo listo antes de embarcar.</p>
+            <span class="card-flecha">→</span>
+          </a>
+
+          <a href="estacionamiento.html" class="servicio-card destacada">
+            <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M10 17V7h3a3 3 0 0 1 0 6h-3"/></svg>
+            <h3>Estacionamiento</h3>
+            <p>Mira los espacios libres en vivo, las tarifas y calcula cuánto pagarás.</p>
+            <span class="card-flecha">→</span>
+          </a>
+
+          <a href="#calificar" class="servicio-card destacada">
+            <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>
+            <h3>Califica nuestros servicios</h3>
+            <p>Cuéntanos cómo te fue y mira lo que opinan otros viajeros.</p>
+            <span class="card-flecha">→</span>
+          </a>
+
+
+          <a href="#asistencia" class="servicio-card">
             <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="17" r="4"/><path d="M8 17V7h3M8 12h6l3 5"/><circle cx="18" cy="6" r="1.5"/></svg>
             <h3>Accesibilidad</h3>
             <p>Facilidades gratuitas accesibles e inclusivas para la atención preferencial.</p>
@@ -59,63 +102,63 @@
             <span class="card-flecha">→</span>
           </a>
 
-          <a href="#" class="servicio-card">
+          <a href="terminal.html?lugar=topico" class="servicio-card">
             <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
             <h3>Asistencia médica</h3>
             <p>24/7 ante cualquier emergencia o urgencia.</p>
             <span class="card-flecha">→</span>
           </a>
 
-          <a href="#" class="servicio-card">
+          <a href="terminal.html?lugar=banco" class="servicio-card">
             <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 10l8-5 8 5"/><path d="M5 10v9h14v-9"/><path d="M12 13v4"/></svg>
             <h3>Bancos</h3>
             <p>Realiza operaciones financieras con total seguridad en el banco que encuentras dentro del terminal.</p>
             <span class="card-flecha">→</span>
           </a>
 
-          <a href="#" class="servicio-card">
+          <a href="terminal.html?lugar=cajeros" class="servicio-card">
             <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="1.5"/><path d="M8 9h1M8 13h1M15 9h1M15 13h1"/></svg>
             <h3>Cajeros</h3>
             <p>Retira dinero con total seguridad en todos los cajeros que encuentras dentro del aeropuerto.</p>
             <span class="card-flecha">→</span>
           </a>
 
-          <a href="#" class="servicio-card">
+          <a href="turismo.html#monedas" class="servicio-card">
             <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
             <h3>Casas de cambio</h3>
             <p>Cambia dinero de forma rápida y sencilla con las opciones que tenemos para ti en nuestro aeropuerto.</p>
             <span class="card-flecha">→</span>
           </a>
 
-          <a href="#" class="servicio-card">
+          <a href="terminal.html?lugar=migraciones" class="servicio-card">
             <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v4M12 3l3 3M12 3 9 6"/></svg>
             <h3>Entidades aeroportuarias</h3>
             <p>Conoce la lista de entidades públicas y privadas que operan dentro del aeropuerto.</p>
             <span class="card-flecha">→</span>
           </a>
 
-          <a href="#" class="servicio-card">
+          <a href="terminal.html?lugar=descanso" class="servicio-card">
             <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="9" width="14" height="10" rx="1.5"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
             <h3>Estaciones de descanso</h3>
             <p>Estaciones de descanso en el aeropuerto para viajeros.</p>
             <span class="card-flecha">→</span>
           </a>
 
-          <a href="#" class="servicio-card">
+          <a href="terminal.html?lugar=fast-track" class="servicio-card">
             <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 4v6M6 10c3 0 3-2 6-2s3 2 6 2M6 10v10"/></svg>
             <h3>Fast Track</h3>
             <p>Acelera tu proceso de viaje con nuestro servicio.</p>
             <span class="card-flecha">→</span>
           </a>
 
-          <a href="#" class="servicio-card">
+          <a href="terminal.html?lugar=informacion" class="servicio-card">
             <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3c-3 3-3 5 0 8s3 5 0 8"/><circle cx="12" cy="9" r="2"/></svg>
             <h3>Hotel</h3>
             <p>El Hotel Costa del Sol Wyndham, perteneciente a la cadena peruana de Hoteles Costa del Sol.</p>
             <span class="card-flecha">→</span>
           </a>
 
-          <a href="#" class="servicio-card">
+          <a href="terminal.html?lugar=informacion" class="servicio-card">
             <svg class="card-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 11h1v5h1"/></svg>
             <h3>Módulo de información</h3>
             <p>Contamos con personal enfocado en el servicio al cliente para atender tus consultas.</p>
@@ -129,6 +172,128 @@
             <span class="card-flecha">→</span>
           </a>
 
+        </div>
+        <p id="servicios-vacio" class="servicios-vacio" hidden>No encontramos ese servicio. Prueba en el <a href="terminal.html">mapa del terminal</a>.</p>
+      </div>
+    </section>
+
+    <!-- Sala VIP -->
+    <section id="sala-vip" class="bloque-servicio bloque-alterno" aria-labelledby="t-vip">
+      <div class="wrap vip-grid">
+        <div>
+          <p class="kicker">Nivel 2 · junto a la puerta 6</p>
+          <h2 id="t-vip">Sala VIP Qorikancha</h2>
+          <p class="intro">Espera tu vuelo con tranquilidad. Abierta de 04:30 a 21:00.</p>
+          <ul class="incluye">
+            <li>🍽️ Comida y bebidas ilimitadas</li>
+            <li>🚿 Duchas con toallas</li>
+            <li>📶 Wi-Fi de alta velocidad sin límite</li>
+            <li>🛋️ Sillones reclinables y zona de descanso</li>
+            <li>🔌 Enchufes en cada asiento</li>
+            <li>📺 Pantallas con el estado de tu vuelo</li>
+          </ul>
+          <p class="precio-vip"><strong>S/ 129</strong> por persona · hasta 3 horas · menores de 2 años gratis</p>
+        </div>
+        <form id="form-vip" class="tarjeta-form" novalidate>
+          <h3>Reserva tu acceso</h3>
+          <div class="fila">
+            <div class="campo">
+              <label for="vip-fecha">Fecha</label>
+              <input type="date" id="vip-fecha" name="fecha" required>
+            </div>
+            <div class="campo">
+              <label for="vip-hora">Hora de llegada</label>
+              <input type="time" id="vip-hora" name="hora" min="04:30" max="20:00" step="900" value="08:00" required>
+            </div>
+          </div>
+          <div class="fila">
+            <div class="campo">
+              <label for="vip-personas">Personas</label>
+              <input type="number" id="vip-personas" name="personas" min="1" max="6" value="1" required>
+            </div>
+            <div class="campo">
+              <label for="vip-nombre">Nombre</label>
+              <input id="vip-nombre" name="nombre" autocomplete="name" required>
+            </div>
+          </div>
+          <div class="campo">
+            <label for="vip-correo">Correo</label>
+            <input type="email" id="vip-correo" name="correo" autocomplete="email" required>
+          </div>
+          <p class="total-vip">Total <strong id="vip-total">S/ 129.00</strong> <small>(se paga en la sala)</small></p>
+          <p id="vip-error" class="error-form" role="alert"></p>
+          <button type="submit" class="btn-servicio">Reservar acceso</button>
+          <div id="vip-confirmacion" class="confirmacion-vip" role="status" aria-live="polite" hidden></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Wi-Fi -->
+    <section id="wifi" class="bloque-servicio" aria-labelledby="t-wifi">
+      <div class="wrap">
+        <h2 id="t-wifi">Wi-Fi gratis</h2>
+        <p class="intro">Conéctate en toda la terminal en 3 pasos.</p>
+        <ol class="pasos-wifi">
+          <li><strong>Busca la red</strong> <code>Qorikancha_Free</code> en tu celular o laptop.</li>
+          <li><strong>Abre el navegador</strong>: aparecerá la página de bienvenida.</li>
+          <li><strong>Acepta los términos</strong> con tu correo o tu número de vuelo. ¡Listo!</li>
+        </ol>
+        <p class="nota-wifi">Tienes 60 minutos gratis por día. En la Sala VIP el wifi es ilimitado. Si no carga la página de bienvenida, abre <code>http://neverssl.com</code>.</p>
+      </div>
+    </section>
+
+    <!-- Servicios especiales -->
+    <section id="asistencia" class="bloque-servicio bloque-alterno" aria-labelledby="t-asistencia">
+      <div class="wrap">
+        <h2 id="t-asistencia">Servicios especiales</h2>
+        <p class="intro">Viaja con tranquilidad. Solicítalos a tu aerolínea al comprar el pasaje o al menos 48 horas antes.</p>
+        <div class="especiales">
+          <article><span aria-hidden="true">♿</span><h3>Silla de ruedas</h3><p>Te acompañan desde el mostrador hasta el avión, con prioridad en el control y el embarque. Es gratuito.</p></article>
+          <article><span aria-hidden="true">🐕</span><h3>Viajar con mascotas</h3><p>Perros y gatos pequeños en cabina (hasta 7 kg con el transportador); los más grandes en bodega. Necesitas certificado de salud.</p></article>
+          <article><span aria-hidden="true">🧒</span><h3>Menores no acompañados</h3><p>Personal de la aerolínea cuida al menor durante el viaje. Necesitas el permiso notarial de viaje firmado por los padres.</p></article>
+          <article><span aria-hidden="true">🤰</span><h3>Embarazadas y adultos mayores</h3><p>Fila preferente en mostradores y seguridad. Desde la semana 28 de embarazo, lleva un certificado médico.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Calificaciones -->
+    <section id="calificar" class="bloque-servicio" aria-labelledby="t-calificar">
+      <div class="wrap">
+        <h2 id="t-calificar">¿Cómo te atendimos?</h2>
+        <p class="intro">Tu opinión nos ayuda a mejorar. Las calificaciones son públicas y anónimas si no dejas tu nombre.</p>
+        <div class="calificar-grid">
+          <div>
+            <div id="resumen-calificaciones" class="resumen-calif" aria-live="polite"></div>
+            <h3 class="titulo-comentarios">Últimos comentarios</h3>
+            <ul id="comentarios" class="comentarios"></ul>
+          </div>
+          <form id="form-calificar" class="tarjeta-form" novalidate>
+            <h3>Califica un servicio</h3>
+            <div class="campo">
+              <label for="cal-servicio">Servicio</label>
+              <select id="cal-servicio" name="servicio" required></select>
+            </div>
+            <fieldset class="estrellas">
+              <legend>Tu calificación</legend>
+              <div class="estrellas-opciones">
+                <input type="radio" id="estrella-5" name="estrellas" value="5"><label for="estrella-5" title="Excelente">★<span class="visually-hidden">5 estrellas</span></label>
+                <input type="radio" id="estrella-4" name="estrellas" value="4"><label for="estrella-4" title="Bueno">★<span class="visually-hidden">4 estrellas</span></label>
+                <input type="radio" id="estrella-3" name="estrellas" value="3"><label for="estrella-3" title="Regular">★<span class="visually-hidden">3 estrellas</span></label>
+                <input type="radio" id="estrella-2" name="estrellas" value="2"><label for="estrella-2" title="Malo">★<span class="visually-hidden">2 estrellas</span></label>
+                <input type="radio" id="estrella-1" name="estrellas" value="1"><label for="estrella-1" title="Muy malo">★<span class="visually-hidden">1 estrella</span></label>
+              </div>
+            </fieldset>
+            <div class="campo">
+              <label for="cal-comentario">Comentario (opcional)</label>
+              <textarea id="cal-comentario" name="comentario" rows="3" maxlength="300"></textarea>
+            </div>
+            <div class="campo">
+              <label for="cal-nombre">Tu nombre (opcional)</label>
+              <input id="cal-nombre" name="nombre" maxlength="40" autocomplete="given-name">
+            </div>
+            <p id="cal-error" class="error-form" role="alert"></p>
+            <button type="submit" class="btn-servicio">Enviar calificación</button>
+          </form>
         </div>
       </div>
     </section>
@@ -146,6 +311,7 @@
       </address>
     </div>
   </footer>
+  <script type="module" src="js/servicios/servicios.js"></script>
   <script type="module" src="js/auth/nav-sesion.js"></script>
   <script type="module" src="js/config/idioma.js"></script>
 
