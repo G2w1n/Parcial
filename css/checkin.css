@@ -54,7 +54,7 @@
   padding: 10px 12px;
   border: 1px solid var(--color-line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--color-surface);
   color: var(--color-ink);
   min-width: 0;
 }
@@ -92,7 +92,7 @@
 .resumen-vuelo { margin: 0; color: var(--color-ink-soft); font-size: 0.9rem; }
 .leyenda-asientos { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.78rem; color: var(--color-ink-soft); }
 .leyenda-asientos li { display: flex; align-items: center; gap: 6px; }
-.muestra { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--color-line); background: #fff; }
+.muestra { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--color-line); background: var(--color-surface); }
 .muestra.ocupado { background: #d7dde3; border-color: #d7dde3; }
 .muestra.salida { border-color: #1f8a4c; }
 .muestra.elegido { background: var(--color-accent); border-color: var(--color-accent); }
@@ -118,7 +118,7 @@
   min-height: 34px;
   border-radius: 8px 8px 5px 5px;
   border: 1.5px solid #b9c5d0;
-  background: #fff;
+  background: var(--color-surface);
   cursor: pointer;
   transition: transform 0.12s ease, background-color 0.15s ease;
 }
@@ -152,7 +152,7 @@
   display: grid;
   grid-template-columns: 1fr 210px;
   grid-template-rows: auto 1fr;
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 18px 40px rgba(15, 39, 64, 0.16);

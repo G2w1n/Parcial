@@ -28,7 +28,7 @@
   border-radius: 999px;
   background: var(--color-bg);
 }
-.busqueda-global input:focus { outline: none; border-color: var(--color-primary); background: #fff; }
+.busqueda-global input:focus { outline: none; border-color: var(--color-primary); background: var(--color-surface); }
 .busqueda-resultados {
   position: absolute;
   right: 0;
@@ -37,7 +37,7 @@
   list-style: none;
   margin: 0;
   padding: 6px;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-radius: 10px;
   box-shadow: 0 12px 30px rgba(15, 39, 64, 0.16);
@@ -68,7 +68,7 @@
   right: 0;
   top: calc(100% + 6px);
   width: min(320px, 90vw);
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-radius: 12px;
   box-shadow: 0 12px 30px rgba(15, 39, 64, 0.16);
@@ -104,7 +104,7 @@
   padding: 8px 10px;
   border: 1px solid var(--color-line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--color-surface);
   color: var(--color-ink);
   min-width: 0;
 }
@@ -128,8 +128,8 @@
 .adm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .adm-btn.cargando { opacity: 0.7; cursor: wait; }
 .adm-btn-acento { background: var(--color-accent); border-color: var(--color-accent); }
-.adm-btn-borde { background: #fff; color: var(--color-primary); border-color: var(--color-line); }
-.adm-btn-peligro { background: #fff; color: #b53030; border-color: #f1b9b9; }
+.adm-btn-borde { background: var(--color-surface); color: var(--color-primary); border-color: var(--color-line); }
+.adm-btn-peligro { background: var(--color-surface); color: #b53030; border-color: #f1b9b9; }
 .adm-btn-ok { background: #1f8a4c; border-color: #1f8a4c; }
 
 .adm-tabla-scroll { overflow-x: auto; }
@@ -222,3 +222,56 @@
 .barra-h-pista { height: 16px; }
 .barra-h-relleno { display: block; height: 100%; min-width: 2px; max-width: 100%; background: var(--color-primary); border-radius: 0 4px 4px 0; }
 .barra-h-valor { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ====== Reclamos (fase 6) ====== */
+.lista-reclamos { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.reclamo { padding: 14px 16px; border-radius: 12px; background: var(--color-bg); border: 1px solid var(--color-line); }
+.reclamo-cab { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.reclamo-quien { margin: 6px 0; font-size: 0.82rem; color: var(--color-ink-soft); }
+.reclamo-detalle { margin: 6px 0; white-space: pre-wrap; }
+.reclamo-pedido { margin: 6px 0; font-style: italic; color: var(--color-ink-soft); }
+.reclamo-respuesta { margin: 8px 0 4px; padding: 10px 14px; border-left: 4px solid #1f8a4c; background: var(--color-surface); border-radius: 0 8px 8px 0; white-space: pre-wrap; }
+.reclamo-form { display: grid; gap: 8px; margin-top: 8px; }
+.reclamo-form textarea { width: 100%; resize: vertical; }
+
+/* ====== Mi turno (fase 6) ====== */
+.mt-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; align-items: start; }
+.mt-estado { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin: 0 0 4px; }
+.mt-estado.trabajando { color: #1f8a4c; }
+.mt-kpis { margin-bottom: 10px; }
+.mt-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.mt-lista li { padding: 10px 12px; border-radius: 10px; background: var(--color-bg); font-size: 0.88rem; }
+.mt-lista small { display: block; color: var(--color-ink-soft); font-size: 0.75rem; margin-top: 2px; }
+.mt-lista .incidente-cab { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.mt-lista .incidente-cab .adm-btn { margin-left: auto; padding: 4px 10px; font-size: 0.78rem; }
+.mt-lista img { display: block; max-width: 220px; border-radius: 8px; margin-top: 6px; }
+.semana { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.semana li { padding: 10px; border-radius: 10px; background: var(--color-bg); text-align: center; font-size: 0.82rem; }
+.semana li.hoy { outline: 2px solid var(--color-accent); }
+.semana strong { display: block; text-transform: capitalize; }
+.turno-manana { color: #9a5f05; }
+.turno-tarde { color: #1c5fa8; }
+.turno-noche { color: #6b46c1; }
+.turno-libre { color: var(--color-ink-soft); }
+@media (max-width: 860px) {
+  .mt-grid { grid-template-columns: 1fr; }
+  .semana { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ====== Fase 6: calendario de turnos ====== */
+.leyenda-turnos { list-style: none; display: flex; flex-wrap: wrap; gap: 14px; margin: 0 0 12px; padding: 0; font-size: 0.82rem; font-weight: 600; }
+.tabla-turnos th[scope="row"] { text-align: left; white-space: nowrap; }
+.tabla-turnos th.hoy { color: var(--color-accent); }
+.rol-turno { display: block; font-size: 0.72rem; font-weight: 500; color: var(--color-ink-soft); text-transform: capitalize; }
+.select-turno { width: 100%; min-width: 92px; padding: 6px 8px; border: 1px solid var(--color-line); border-radius: 8px; background: var(--color-surface); font: 600 0.82rem var(--font-body); }
+.select-turno.turno-manana { background: #fff6e5; border-color: #f0d199; }
+.select-turno.turno-tarde { background: #e8f1fb; border-color: #a9c8ec; }
+.select-turno.turno-noche { background: #f1ecfb; border-color: #c8b6ef; }
+.celda-cobertura { text-align: center; font-size: 0.8rem; font-variant-numeric: tabular-nums; color: var(--color-ink-soft); }
+.celda-cobertura.sin-cobertura { color: #b53030; font-weight: 700; }
+.celda-cobertura.sin-cobertura::after { content: ' ⚠'; }
+
+/* ====== Fase 6: historial por placa ====== */
+.estado-placa { margin: 0 0 14px; padding: 10px 14px; border-radius: 10px; font-weight: 600; }
+.estado-placa.limpia { background: #e3f4ea; color: #17673a; }
+.estado-placa.bloqueada { background: #fbe5e5; color: #8a1f1f; }
