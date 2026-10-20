@@ -17,6 +17,8 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 - **Check-in en línea**: datos del pasajero, mapa de asientos y **tarjeta de embarque con código QR**, imprimible y guardada en el navegador.
 - **Guía del pasajero**: pasos para tu primer vuelo, **calculadora de equipaje** por aerolínea, buscador de **objetos permitidos y prohibidos**, preguntas frecuentes con buscador y qué hacer si se pierde tu maleta.
 - **Descubre Cusco**: **clima en vivo** (Open-Meteo), consejos contra el **soroche**, altura de cada destino, **tours** con filtro y **conversor de monedas** con tasas del día.
+- **Modo oscuro** y **modo accesible** (letra más grande, más contraste y sin animaciones) con los botones ☾ y Aa del menú; se recuerdan en el navegador.
+- **Animaciones al hacer scroll** en el inicio (se desactivan si el sistema pide menos movimiento).
 - **Idiomas**: selector de español, inglés y quechua en el menú. Las páginas de pasajeros, check-in y turismo están traducidas completas; en el resto se traducen el menú y el pie de página. El quechua es una traducción parcial.
 - **Mapa del terminal**: planos interactivos de los 2 niveles, con buscador, filtros por categoría, tiempo de espera estimado en el control de seguridad y **cómo llegar**.
 - **Estacionamiento**: mapa de espacios libres y ocupados (zona general, VIP y buses), tarifas y calculadora de costo.
@@ -29,6 +31,9 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 - **Pasarela de pago** con tarjeta (Visa, Mastercard, American Express) o billetera (AndiPay, PagoMóvil), y **cupones de descuento**.
 - **Ampliar estadía** de una reserva pagada, pagando solo la diferencia.
 - **Comprobante** imprimible que habilita el pase de salida.
+- **Cancelar** una reserva registrada que aún no se pagó.
+- **Mi perfil** (`perfil.html`): editar nombre y DNI, y **cambiar la contraseña**.
+- **Libro de reclamaciones** (`reclamos.html`, enlace en el pie de todas las páginas): registra el reclamo o queja con un código `LR-AAAA-XXXXX` y permite consultar su estado y la respuesta.
 
 ### Seguridad (garita)
 - **Garita** (`garita.html`): lee con la cámara el **código QR del comprobante**, o se escribe la placa. Muestra si la salida está habilitada, alerta si la placa está en la lista negra y registra la salida.
@@ -39,6 +44,11 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 - **Conciliación** de los pagos recibidos por la pasarela.
 - **Cierre de caja** con resumen del día (incluye ampliaciones y descuentos por cupones), que se actualiza cada 15 segundos.
 - Alerta de **placas en lista negra** al cobrar y en el control de salida.
+- **Apertura de caja** con fondo inicial: sin caja abierta no se puede cobrar.
+- **Arqueo** al cerrar: se cuentan billetes y monedas, se compara con el efectivo esperado (fondo + cobros en efectivo) y se imprime el reporte con firmas. Si hay diferencia, se exige una nota.
+- **Mis cobros** del día, con **anulación** (la reserva vuelve a pendiente) y **devolución** (la reserva se cancela), ambas con la autorización de un administrador (correo y contraseña).
+- **Cobro por exceso de tiempo**: si el vehículo se quedó más de lo reservado (con 15 minutos de tolerancia), se cobra la diferencia antes de dejarlo salir.
+- **Cobro rápido** por placa, **atajos de teclado** (F2 buscar, F4 cobrar el primero, F8 salida, F9 arqueo), **ticket imprimible** y **Excel del día**.
 
 ### Administrador y empleado
 - **Barra del personal** en todas sus páginas: pestañas según el rol, **búsqueda global** (placa, código, nombre, pago o pedido) y **notificaciones** (pedidos nuevos, pagos por verificar, vehículos por llegar, placas en lista negra).
@@ -51,6 +61,14 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 - Crear, editar, atender y cancelar reservas.
 - **Gestión de empleados** con horarios de turno (diurno o nocturno, hora de Perú).
 - **Auditoría**: quién gestionó cada reserva y cuándo.
+- **Mi turno** (`mi-turno.html`, empleado, cajero y seguridad): marcar entrada y salida, turnos de la semana, **mi resumen del día**, **notas entre turnos** e **incidentes** con foto.
+- **Registrar entrada** real del vehículo y **asignar el espacio** libre; el mapa público usa esos espacios.
+- **Cuentas del personal**: el administrador crea empleados, cajeros y personal de seguridad, y puede restablecer su contraseña.
+- **Turnos** (`panel-turnos.html`, solo administrador): calendario semanal (mañana, tarde, noche), cobertura por día y copiar a la semana siguiente.
+- **Rendimiento del personal** en Estadísticas: reservas, entradas y salidas, pedidos, cobros y horas trabajadas por persona.
+- **Historial por placa** (`historial.html`): reservas, pagos, excesos, incidentes y lista negra de un vehículo; se llega desde la búsqueda global.
+- **Reclamos** (`panel-reclamos.html`, solo administrador): poner en revisión y responder, con el conteo de días hábiles.
+- **Exportar a Excel** las reservas, la bitácora, el día de caja y el historial de una placa.
 
 ![Tablero de vuelos](docs/capturas/vuelos.webp)
 
@@ -113,10 +131,14 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 │   ├── estacionamiento/     Mapa de espacios y ampliar estadía
 │   ├── servicios/           Sala VIP, calificaciones y pedidos
 │   ├── garita/              Lector QR y salida de vehículos
+│   ├── reclamos/            Libro de reclamaciones
+│   ├── perfil/              Mi perfil y cambio de contraseña
+│   ├── inicio/              Animaciones del inicio
 │   └── vendor/              qrcode-generator 1.4.4 (MIT) y jsQR 1.4.0 (Apache 2.0)
 ├── database/
 │   ├── fase-4.sql           Tablas de cupones, ampliaciones, calificaciones y pedidos
-│   └── fase-5.sql           Rol seguridad, vuelos, avisos, bitácora, configuración y lista negra
+│   ├── fase-5.sql           Rol seguridad, vuelos, avisos, bitácora, configuración y lista negra
+│   └── fase-6.sql           Contraseñas cifradas, caja, anulaciones, turnos, asistencia, incidentes y reclamos
 ├── imagenes/
 └── docs/capturas/
 ```
@@ -142,6 +164,8 @@ La cadena de conexión está en `js/config/neon-config.js`. Para usar tu propia 
 
 **Tablas de la fase 5:** después del de la fase 4, ejecuta igual `database/fase-5.sql`. Agrega el rol `seguridad` (con una cuenta de prueba) y crea las tablas `vuelos_cambios`, `avisos`, `bitacora`, `configuracion` y `lista_negra`.
 
+**Tablas de la fase 6:** después del de la fase 5, ejecuta `database/fase-6.sql`. **Cifra las contraseñas** con bcrypt (extensión `pgcrypto`; las cuentas siguen entrando con la misma contraseña), permite el estado `anulado` en `pagos`, agrega la entrada y salida reales y el espacio a las reservas, y crea las tablas `cajas`, `anulaciones`, `turnos`, `asistencia`, `notas_turno`, `incidentes` y `reclamos`. También crea la cuenta de cajero de prueba `caja@qorikancha.pe` / `caja123`.
+
 Cupones de prueba: `BIENVENIDO10` (10 %), `CUSCO5` (S/ 5 desde S/ 20), `VIAJERO20` (20 % desde S/ 50) y `VENCIDO` (para probar el error).
 
 ## Roles
@@ -149,10 +173,10 @@ Cupones de prueba: `BIENVENIDO10` (10 %), `CUSCO5` (S/ 5 desde S/ 20), `VIAJERO2
 | Rol | Página de inicio | Cómo se obtiene |
 |---|---|---|
 | `cliente` | Reservar estacionamiento | Creando una cuenta en `login.html` |
-| `cajero` | Caja | Asignado en la tabla `usuarios` |
+| `cajero` | Caja | Creado por el administrador desde el panel · cuenta de prueba `caja@qorikancha.pe` / `caja123` |
 | `empleado` | Panel (solo dentro de su turno) | Creado por el administrador desde el panel |
 | `administrador` | Panel (con acceso a todo) | Asignado en la tabla `usuarios` |
-| `seguridad` | Garita | Asignado en la tabla `usuarios` · cuenta de prueba `garita@qorikancha.pe` / `garita123` |
+| `seguridad` | Garita | Creado por el administrador desde el panel · cuenta de prueba `garita@qorikancha.pe` / `garita123` |
 
 ## Vuelos simulados
 
@@ -204,6 +228,11 @@ La página de pago tiene botones que llenan el formulario automáticamente.
 | `bitacora` | Actividad del personal (fase 5) |
 | `configuracion` | Tarifas y capacidad editables desde el panel (fase 5) |
 | `lista_negra` | Placas bloqueadas (fase 5) |
+| `cajas` | Apertura y arqueo de caja de cada cajero (fase 6) |
+| `anulaciones` | Cobros anulados y devoluciones, con quién autorizó (fase 6) |
+| `turnos`, `asistencia` | Calendario de turnos y marcas de entrada y salida (fase 6) |
+| `notas_turno`, `incidentes` | Notas entre turnos e incidentes con foto (fase 6) |
+| `reclamos` | Libro de reclamaciones (fase 6) |
 
 > `fecha_hora_entrada` se guarda en hora de Perú (como la escribe el formulario). De ella dependen la tarifa nocturna, el descuento de fin de semana y el mapa de espacios ocupados.
 
@@ -213,4 +242,6 @@ La página de pago tiene botones que llenan el formulario automáticamente.
 - Las consultas usan plantillas con parámetros del driver de Neon, lo que evita la inyección SQL.
 - Los datos se muestran con `textContent` o escapados, lo que evita la inyección de HTML (XSS).
 - Los montos siempre se recalculan o se leen de la base de datos; nunca se confía en el valor del formulario.
+- Las contraseñas se guardan **cifradas con bcrypt** (`crypt()` de `pgcrypto`) desde la fase 6.
+- Anular o devolver un cobro exige la contraseña de un administrador y queda registrado en `anulaciones` y en la bitácora.
 - Los pagos se confirman en **transacciones**: se descuenta el saldo, se registra el pago y se marca la reserva, o no se hace nada.
