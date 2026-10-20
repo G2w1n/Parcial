@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
+  <script>try{var d=document.documentElement;if(localStorage.getItem("qorikancha.tema")==="oscuro")d.dataset.tema="oscuro";if(localStorage.getItem("qorikancha.accesible")==="1")d.dataset.accesible=""}catch(e){}</script>
   <link rel="stylesheet" href="css/panel.css">
   <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -154,7 +155,7 @@
             <option value="cancelado">Cancelado</option>
           </select>
 
-          <button type="button" id="btn-exportar-csv" class="btn btn-outline btn-exportar" data-solo-admin style="display: none;">Exportar CSV</button>
+          <button type="button" id="btn-exportar-csv" class="btn btn-outline btn-exportar" data-solo-admin style="display: none;">Exportar a Excel</button>
         </div>
 
         <div class="tabla-scroll">
@@ -179,11 +180,19 @@
         </div>
 
         <div id="seccion-empleados" class="seccion-admin" data-solo-admin style="display: none;">
-          <h2 class="titulo-tabla">Gestión de empleados</h2>
+          <h2 class="titulo-tabla">Gestión del personal</h2>
 
           <div class="panel-crear">
-            <h2>Nueva cuenta de empleado</h2>
+            <h2>Nueva cuenta del personal</h2>
             <form id="form-crear-empleado" class="formulario" action="#" method="post">
+              <div class="campo">
+                <label for="em-rol">Tipo de cuenta</label>
+                <select id="em-rol">
+                  <option value="empleado">Empleado (con horario de turno)</option>
+                  <option value="cajero">Cajero</option>
+                  <option value="seguridad">Seguridad (garita)</option>
+                </select>
+              </div>
               <div class="campo">
                 <label for="em-nombre">Nombre completo</label>
                 <input type="text" id="em-nombre" required minlength="3">
@@ -208,7 +217,7 @@
                   <input type="time" id="em-fin" value="18:00">
                 </div>
               </div>
-              <button type="submit" class="btn">Crear empleado</button>
+              <button type="submit" class="btn">Crear cuenta</button>
             </form>
             <p id="empleado-confirmacion" class="confirmacion-estacionamiento"></p>
           </div>
@@ -327,6 +336,7 @@
       <div>
         <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
         <p>Av. de la Aviación s/n, Cusco, Perú</p>
+        <p><a href="reclamos.html" class="libro-footer">📖 Libro de reclamaciones</a></p>
       </div>
       <address>
         <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>

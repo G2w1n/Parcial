@@ -6,9 +6,14 @@ import { consultarSalida, placasBloqueadas, registrarSalida } from '../caja/caja
 import { avisar, conCarga } from '../config/ui.js';
 import { registrar } from '../config/bitacora.js';
 import { formatearSoles, NOMBRES_VEHICULO } from '../registro/tarifario.js';
+import { calcularExceso } from '../estacionamiento/espacios.js';
+import { cargarConfiguracion } from '../config/configuracion.js';
 
 const usuario = exigirRol('seguridad', 'cajero', 'administrador');
 if (!usuario) throw new Error('Acceso denegado');
+
+// Tarifas vigentes (para calcular el exceso de tiempo)
+await cargarConfiguracion();
 
 const $ = (id) => document.getElementById(id);
 const video = $('video');
@@ -102,7 +107,10 @@ function tarjeta(r, bloqueo) {
   let titulo = `Pendiente de pago: ${formatearSoles(Number(r.monto_calculado))}. Envíalo a caja.`;
   if (cancelada) { clase = 'cancelada'; titulo = 'Reserva cancelada: no corresponde salida con este pase.'; }
   else if (yaSalio) { clase = 'usada'; titulo = 'Este pase ya se usó: el vehículo ya salió.'; }
-  else if (pagada) { clase = 'habilitada'; titulo = '✓ Salida habilitada'; }
+  const exceso = pagada && !cancelada && !yaSalio ? calcularExceso(r) : { monto: 0 };
+  if (!cancelada && !yaSalio && pagada && exceso.monto > 0) {
+    titulo = `Exceso de tiempo: ${exceso.horasExtra} h más. Debe pagar ${formatearSoles(exceso.monto)} en caja.`;
+  } else if (pagada && !cancelada && !yaSalio) { clase = 'habilitada'; titulo = '✓ Salida habilitada'; }
   if (bloqueo) { clase = 'bloqueada'; titulo = '⛔ Placa en lista negra: no dejar salir. Llama al administrador.'; }
 
   const art = crear('article', `pase-salida ${clase}`);
@@ -114,7 +122,13 @@ function tarjeta(r, bloqueo) {
   dato(lista, 'Pasajero', r.nombre_pasajero);
   dato(lista, 'Estadía', `${Number(r.horas)} h · ${NOMBRES_VEHICULO[r.tipo_vehiculo] ?? r.tipo_vehiculo}${r.zona_vip ? ' · VIP' : ''}`);
   dato(lista, 'Pago', r.codigo_operacion ? `${r.codigo_operacion} (${r.canal === 'pasarela' ? 'en línea' : 'ventanilla'})` : r.estado_pago);
+  if (r.espacio) dato(lista, 'Espacio', r.espacio);
   art.append(lista);
+  if (exceso.monto > 0 && usuario.rol !== 'seguridad') {
+    const enlace = crear('a', 'btn-salida btn-exceso', `Cobrar ${formatearSoles(exceso.monto)} en caja`);
+    enlace.href = `caja.html?salida=${encodeURIComponent(r.codigo_seguimiento)}`;
+    art.append(enlace);
+  }
 
   if (clase === 'habilitada') {
     const boton = crear('button', 'btn-salida', 'Registrar salida y abrir barrera');
