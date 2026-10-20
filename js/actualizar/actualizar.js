@@ -1,5 +1,6 @@
 import { sql } from '../config/neon-config.js';
 import { exigirRol } from '../auth/auth.js';
+import { cargarConfiguracion } from '../config/configuracion.js';
 import {
   calcularMontoServicio, desglosarMonto, formatearSoles, marcado,
   TARIFA_POR_HORA, ADICIONAL_ZONA_VIP, RECARGO_BUS_CAMION, HORAS_MAXIMAS,
@@ -8,6 +9,9 @@ import { avisar, conCarga } from '../config/ui.js';
 
 const usuario = exigirRol('cliente');
 if (!usuario) throw new Error('Acceso denegado');
+
+// Tarifas vigentes que configura el administrador (si no hay, se usan las de tarifario.js)
+await cargarConfiguracion();
 
 const codigo = new URLSearchParams(window.location.search).get('codigo');
 let reservaId = null;
