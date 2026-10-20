@@ -94,7 +94,7 @@ input:focus, select:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.15);
-  background: #fff;
+  background: var(--color-surface);
 }
 
 /* ====== Botones ====== */
@@ -273,7 +273,7 @@ dialog[open] { animation: modal-entrar 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2) bot
   align-items: center;
   gap: 10px;
   padding: 12px 14px 14px;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-left: 5px solid #1f8a4c;
   border-radius: 8px;
@@ -327,3 +327,61 @@ dialog[open] { animation: modal-entrar 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2) bot
 .salida-bloqueada { border-color: #c0392b !important; box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15); }
 .alerta-bloqueo { margin: 8px 0; padding: 10px 12px; border-radius: 8px; background: #fbe5e5; color: #8a1f1f; font-weight: 600; font-size: 0.88rem; }
 .descuentos-dia { margin: 4px 0 0; font-size: 0.82rem; color: var(--color-ink-soft); text-align: right; }
+.cobro-exceso { display: flex; gap: 8px; margin: 8px 0; }
+.cobro-exceso select { flex: 1; font: 0.9rem var(--font-body); padding: 8px 10px; border: 1px solid var(--color-line); border-radius: 8px; }
+
+/* ====== Fase 6: mi caja, arqueo, anulaciones y atajos ====== */
+.atajos-caja { margin: 6px 0 0; font-size: 0.8rem; color: var(--color-ink-soft); }
+kbd {
+  display: inline-block; min-width: 1.8em; padding: 1px 6px; border: 1px solid var(--color-line);
+  border-bottom-width: 2px; border-radius: 5px; background: var(--color-surface);
+  font: 600 0.75rem var(--font-body); text-align: center; color: var(--color-ink);
+}
+.mi-caja-cabecera { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+.mi-caja-acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.estado-caja { margin: 0; padding: 6px 12px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; display: inline-block; }
+.estado-caja.abierta { background: #e3f4ea; color: #17673a; }
+.estado-caja.cerrada { background: #fdf0e3; color: #8a4b12; }
+.form-linea { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.form-linea label { font-size: 0.88rem; font-weight: 500; }
+.form-linea input { width: 130px; }
+.tabla-mis-cobros caption { text-align: left; font-size: 0.85rem; color: var(--color-ink-soft); padding-bottom: 6px; }
+.fila-anulada td { color: var(--color-ink-soft); text-decoration: line-through; }
+.fila-anulada td:last-child, .fila-anulada td:nth-last-child(2) { text-decoration: none; }
+.enlace-ticket { font-size: 0.82rem; font-weight: 600; margin-left: 10px; }
+.tabla-mis-cobros .enlace-ticket { margin-left: 0; }
+.btn-anular { color: #b53030; border-color: #f0c4c4; }
+.btn-anular:hover { border-color: #b53030; }
+.btn-peligro { background: #b53030; color: #fff; }
+
+.dialogo-caja { width: min(560px, 94vw); }
+.dialogo-caja form { padding: 26px 28px; }
+.dialogo-caja label { display: block; margin: 12px 0 6px; font-size: 0.88rem; font-weight: 500; }
+.dialogo-caja input { width: 100%; }
+.arqueo-ayuda { margin: 0 0 8px; font-size: 0.88rem; color: var(--color-ink-soft); }
+.denominaciones { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; max-height: 42vh; overflow-y: auto; }
+.dialogo-caja .denominacion { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; padding: 6px 10px; border: 1px solid var(--color-line); border-radius: 8px; font-size: 0.82rem; }
+.dialogo-caja .denominacion input { width: 64px; padding: 4px 6px; text-align: right; }
+.arqueo-totales { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 4px; }
+.arqueo-totales div { padding: 8px 10px; border-radius: 8px; background: var(--color-bg); }
+.arqueo-totales dt { font-size: 0.75rem; color: var(--color-ink-soft); }
+.arqueo-totales dd { margin: 0; font-family: var(--font-display); font-weight: 700; }
+#arqueo-diferencia.cuadra { color: #17673a; }
+#arqueo-diferencia.descuadre { color: #b53030; }
+.error-dialogo { min-height: 1.2em; margin: 10px 0 0; color: #b53030; font-size: 0.85rem; font-weight: 600; }
+
+.reporte-arqueo { display: none; }
+@media print {
+  body.imprimiendo-arqueo > *:not(#reporte-arqueo) { display: none !important; }
+  body.imprimiendo-arqueo #reporte-arqueo { display: block; color: #000; font: 12pt/1.4 var(--font-body); }
+  #reporte-arqueo h1 { font-size: 16pt; }
+  #reporte-arqueo dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; }
+  #reporte-arqueo dd { margin: 0; }
+  #reporte-arqueo table { border-collapse: collapse; margin: 14px 0; }
+  #reporte-arqueo th, #reporte-arqueo td { border: 1px solid #999; padding: 4px 10px; }
+  #reporte-arqueo .firmas { margin-top: 48px; }
+}
+@media (max-width: 700px) {
+  .arqueo-totales { grid-template-columns: 1fr; }
+  .dialogo-caja form { padding: 22px 18px; }
+}

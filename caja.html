@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
+  <script>try{var d=document.documentElement;if(localStorage.getItem("qorikancha.tema")==="oscuro")d.dataset.tema="oscuro";if(localStorage.getItem("qorikancha.accesible")==="1")d.dataset.accesible=""}catch(e){}</script>
   <link rel="stylesheet" href="css/caja.css">
   <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -36,6 +37,7 @@
           <div>
             <h1>Módulo de caja</h1>
             <p class="section-intro">Atiende <strong id="nombre-cajero"></strong> · <span id="fecha-actual"></span></p>
+            <p class="atajos-caja">Atajos: <kbd>F2</kbd> buscar · <kbd>F4</kbd> cobrar el primero · <kbd>F8</kbd> garita · <kbd>F9</kbd> arqueo</p>
           </div>
           <div class="caja-controles">
             <label for="fecha-caja">Fecha de trabajo</label>
@@ -67,6 +69,33 @@
           </div>
         </div>
 
+
+        <!-- Fase 6: apertura y arqueo -->
+        <section id="mi-caja" class="bloque mi-caja" aria-labelledby="t-mi-caja" hidden>
+          <div class="mi-caja-cabecera">
+            <div>
+              <h2 id="t-mi-caja">Mi caja</h2>
+              <p id="estado-caja" class="estado-caja">—</p>
+            </div>
+            <div class="mi-caja-acciones">
+              <button type="button" id="btn-arqueo" class="btn" hidden>Cerrar caja (arqueo)</button>
+              <button type="button" id="btn-excel-caja" class="btn btn-outline">Exportar día a Excel</button>
+            </div>
+          </div>
+          <form id="form-abrir-caja" class="form-linea" hidden novalidate>
+            <label for="monto-inicial">Fondo inicial (sencillo en el cajón)</label>
+            <input id="monto-inicial" type="number" min="0" step="0.1" value="100" inputmode="decimal">
+            <button type="submit" class="btn">Abrir caja</button>
+          </form>
+          <div class="tabla-scroll">
+            <table class="tabla-mis-cobros">
+              <caption>Mis cobros en ventanilla de la fecha</caption>
+              <thead><tr><th>Hora</th><th>Operación</th><th>Reserva</th><th>Medio</th><th>Monto</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="tabla-mis-cobros"></tbody>
+            </table>
+          </div>
+        </section>
+
         <section class="bloque" aria-labelledby="t-salida">
           <h2 id="t-salida">Control de salida (garita)</h2>
           <p class="bloque-ayuda">Escribe la placa o el código de la reserva para confirmar si el pase de salida está habilitado.</p>
@@ -84,6 +113,7 @@
             <label for="criterio" class="visually-hidden">Código, placa, DNI o nombre</label>
             <input id="criterio" name="criterio" type="search" autocomplete="off" placeholder="Código, placa, DNI o nombre">
             <button type="submit" class="btn">Buscar</button>
+            <button type="submit" id="btn-cobro-rapido" class="btn btn-outline" title="Busca la placa y abre el cobro si hay una sola reserva pendiente">Cobro rápido</button>
           </form>
           <p id="ultimo-cobro" class="ultimo-cobro" role="status" hidden></p>
           <div class="tabla-scroll">
@@ -162,6 +192,7 @@
       <div>
         <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
         <p>Av. de la Aviación s/n, Cusco, Perú</p>
+        <p><a href="reclamos.html" class="libro-footer">📖 Libro de reclamaciones</a></p>
       </div>
       <address>
         <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
@@ -211,6 +242,52 @@
       </div>
     </form>
   </dialog>
+
+
+  <!-- Arqueo de caja -->
+  <dialog id="dialogo-arqueo" class="dialogo-caja" aria-labelledby="t-arqueo">
+    <form id="form-arqueo" novalidate>
+      <h2 id="t-arqueo">Arqueo de caja</h2>
+      <p class="arqueo-ayuda">Cuenta el efectivo del cajón y escribe cuántos billetes y monedas hay de cada valor.</p>
+      <div id="denominaciones" class="denominaciones"></div>
+      <dl class="arqueo-totales">
+        <div><dt>Contado</dt><dd id="arqueo-contado">S/ 0.00</dd></div>
+        <div><dt>Esperado</dt><dd id="arqueo-esperado">S/ 0.00</dd></div>
+        <div class="arqueo-diferencia"><dt>Diferencia</dt><dd id="arqueo-diferencia">S/ 0.00</dd></div>
+      </dl>
+      <label for="arqueo-nota">Nota (obligatoria si hay diferencia)</label>
+      <input id="arqueo-nota" maxlength="200" placeholder="Ej. Se dio vuelto de más a un cliente">
+      <div class="dialogo-botones">
+        <button type="button" id="cancelar-arqueo" class="btn btn-outline">Seguir atendiendo</button>
+        <button type="submit" class="btn btn-confirmar">Cerrar caja</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Autorización del administrador para anular o devolver -->
+  <dialog id="dialogo-anular" class="dialogo-caja" aria-labelledby="t-anular">
+    <form id="form-anular" novalidate>
+      <h2 id="t-anular">Anular cobro</h2>
+      <p id="anular-resumen" class="arqueo-ayuda"></p>
+      <label for="anular-motivo">Motivo</label>
+      <input id="anular-motivo" maxlength="200" required placeholder="Ej. Se cobró a la reserva equivocada">
+      <div id="anular-autorizacion">
+        <p class="arqueo-ayuda">Necesita la autorización de un administrador:</p>
+        <label for="anular-correo">Correo del administrador</label>
+        <input id="anular-correo" type="email" autocomplete="off">
+        <label for="anular-clave">Contraseña del administrador</label>
+        <input id="anular-clave" type="password" autocomplete="off">
+      </div>
+      <p id="anular-error" class="error-dialogo" role="alert"></p>
+      <div class="dialogo-botones">
+        <button type="button" id="cancelar-anular" class="btn btn-outline">Volver</button>
+        <button type="submit" class="btn btn-peligro">Confirmar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Reporte de arqueo para imprimir -->
+  <section id="reporte-arqueo" class="reporte-arqueo" aria-hidden="true"></section>
 
   <script type="module" src="js/caja/caja.js"></script>
   <script type="module" src="js/panel/menu-admin.js"></script>
