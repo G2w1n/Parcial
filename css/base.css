@@ -134,6 +134,71 @@ nav a:hover { color: var(--color-accent); }
 address { font-style: normal; color: #cfe0ea; }
 address a { color: #fff; text-decoration: underline; }
 
+/* Avisos emergentes (los crea ui.js en cualquier página) */
+.avisos {
+  position: fixed;
+  top: 84px;
+  right: 20px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(340px, calc(100vw - 40px));
+  pointer-events: none;
+}
+.aviso {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 14px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-left: 5px solid #1f8a4c;
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(22, 58, 92, 0.18);
+  font-size: 0.9rem;
+  font-weight: 500;
+  overflow: hidden;
+  cursor: pointer;
+  pointer-events: auto;
+  animation: aparecer-confirmacion 0.4s ease both;
+}
+.aviso-error { border-left-color: var(--cancel); }
+.aviso-icono {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #1f8a4c;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.aviso-error .aviso-icono { background: var(--cancel); }
+.aviso-barra {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: #1f8a4c;
+  animation: barra-aviso 3.8s linear forwards;
+}
+.aviso-error .aviso-barra { background: var(--cancel); }
+@keyframes barra-aviso { from { width: 100%; } to { width: 0; } }
+.aviso.saliendo { animation: aviso-salir 0.3s ease forwards; }
+@keyframes aviso-salir {
+  to { opacity: 0; transform: translateX(40px); }
+}
+@keyframes aparecer-confirmacion {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* Enfoque visible con teclado en todos los enlaces y botones */
 a:focus-visible,
 button:focus-visible {
