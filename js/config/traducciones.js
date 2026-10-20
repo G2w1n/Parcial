@@ -26,6 +26,9 @@ export const TRADUCCIONES = {
   'Cómo funciona': { en: 'How it works' },
   'Av. de la Aviación s/n, Cusco, Perú': { en: 'Av. de la Aviación s/n, Cusco, Peru' },
   'Central telefónica: (084) 000-000': { en: 'Switchboard: (084) 000-000' },
+  '📖 Libro de reclamaciones': { en: '📖 Complaints book' },
+  'Mi perfil': { en: 'My profile' },
+  'Mi turno': { en: 'My shift' },
 
   // ---------- Guía del pasajero ----------
   'Todo lo que necesitas antes de volar': { en: 'Everything you need before you fly' },

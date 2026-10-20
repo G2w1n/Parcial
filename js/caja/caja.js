@@ -4,12 +4,18 @@ import { formatearSoles, redondear, NOMBRES_VEHICULO } from '../registro/tarifar
 import { avisar, animarNumero, mostrarEsqueleto, sinAnimaciones } from '../config/ui.js';
 import {
   buscarPendientes, cobrarPresencial, listarPagosEnLinea, verificarPago, resumenDelDia, consultarSalida,
-  placasBloqueadas, registrarSalida, ampliacionesDelDia, descuentosDelDia,
+  placasBloqueadas, registrarSalida, ampliacionesDelDia, descuentosDelDia, cobrarExceso,
 } from './caja-datos.js';
+import { calcularExceso } from '../estacionamiento/espacios.js';
+import { cargarConfiguracion } from '../config/configuracion.js';
 import { registrar } from '../config/bitacora.js';
+import { iniciarSesionCaja, puedeCobrar, iniciarDevolucion, abrirArqueo, refrescarSesionCaja } from './sesion-caja.js';
 
 const usuario = exigirRol('cajero', 'administrador');
 if (!usuario) throw new Error('Acceso denegado');
+
+// Tarifas vigentes (para calcular el exceso de tiempo)
+await cargarConfiguracion();
 
 const NOMBRES_METODO = {
   tarjeta_debito: 'Tarjeta de débito',
@@ -119,6 +125,11 @@ $('#form-buscar').addEventListener('submit', async (e) => {
   e.preventDefault();
   try {
     await pintarPendientes(new FormData(e.target).get('criterio') ?? '');
+    // Cobro rápido: si se buscó con ese botón y hay una sola reserva, se abre el cobro directo
+    if (e.submitter?.id === 'btn-cobro-rapido') {
+      if (pendientesCache.length === 1) abrirCobro(pendientesCache[0]);
+      else avisar(pendientesCache.length ? `Hay ${pendientesCache.length} reservas: elige una de la lista.` : 'No hay reservas pendientes con esa placa.', 'error');
+    }
   } catch (error) {
     console.error(error);
     avisar('No se pudo buscar. Intenta de nuevo.', 'error');
@@ -158,6 +169,7 @@ $('#billetes').addEventListener('click', (e) => {
 });
 
 function abrirCobro(registro) {
+  if (!puedeCobrar()) return;
   registroEnCobro = registro;
   $('#cobro-codigo').textContent = registro.codigo_seguimiento;
   $('#cobro-total').textContent = formatearSoles(Number(registro.monto_calculado));
@@ -188,7 +200,13 @@ function mostrarUltimoCobro(codigo, vuelto) {
   enlace.target = '_blank';
   enlace.rel = 'noopener';
   enlace.textContent = 'Ver comprobante';
-  caja.replaceChildren(texto, enlace);
+  const ticket = document.createElement('a');
+  ticket.href = `comprobante.html?op=${encodeURIComponent(codigo)}&imprimir=1`;
+  ticket.target = '_blank';
+  ticket.rel = 'noopener';
+  ticket.className = 'enlace-ticket';
+  ticket.textContent = '🖨 Imprimir ticket';
+  caja.replaceChildren(texto, enlace, ticket);
   caja.hidden = false;
   caja.classList.remove('visible');
   void caja.offsetWidth;
@@ -226,6 +244,7 @@ formCobro.addEventListener('submit', async (e) => {
     avisar('Cobro registrado. Pase de salida habilitado.');
     registroEnCobro = null;
     await Promise.all([pintarPendientes($('#criterio').value), refrescar()]);
+    refrescarSesionCaja();
     if (ultimoCriterioSalida) await pintarSalida(ultimoCriterioSalida);
   } catch (error) {
     console.error(error);
@@ -246,7 +265,10 @@ function dato(lista, etiqueta, valor) {
 
 function tarjetaSalida(r, bloqueo) {
   const cancelada = r.estado === 'cancelado';
-  const habilitado = !cancelada && (r.estado_pago === 'pagado' || r.estado_pago === 'exonerado');
+  const pagada = !cancelada && (r.estado_pago === 'pagado' || r.estado_pago === 'exonerado');
+  // Si se quedó más tiempo del reservado, primero se cobra el exceso
+  const exceso = pagada && r.estado === 'registrado' ? calcularExceso(r) : { monto: 0 };
+  const habilitado = pagada && exceso.monto === 0;
   const clase = cancelada ? 'salida-cancelado' : habilitado ? 'salida-habilitado' : 'salida-pendiente';
 
   const tarjeta = document.createElement('article');
@@ -257,7 +279,9 @@ function tarjetaSalida(r, bloqueo) {
     ? 'Reserva cancelada: no corresponde pase de salida'
     : habilitado
       ? '✓ Pase de salida HABILITADO'
-      : `Pendiente de pago: cobrar ${formatearSoles(Number(r.monto_calculado))}`;
+      : exceso.monto > 0
+        ? `Exceso de tiempo: ${exceso.horasExtra} h más · cobrar ${formatearSoles(exceso.monto)}`
+        : `Pendiente de pago: cobrar ${formatearSoles(Number(r.monto_calculado))}`;
   tarjeta.append(titulo);
   if (bloqueo) {
     tarjeta.classList.add('salida-bloqueada');
@@ -273,6 +297,8 @@ function tarjetaSalida(r, bloqueo) {
   dato(lista, 'Pasajero', r.nombre_pasajero);
   dato(lista, 'Estadía', `${Number(r.horas)} h · ${NOMBRES_VEHICULO[r.tipo_vehiculo] ?? r.tipo_vehiculo}${r.zona_vip ? ' · VIP' : ''}`);
   dato(lista, 'Monto', formatearSoles(Number(r.monto_calculado)));
+  if (r.espacio) dato(lista, 'Espacio', r.espacio);
+  if (r.hora_entrada_real) dato(lista, 'Entró', new Date(r.hora_entrada_real).toLocaleString('es-PE', { timeZone: 'America/Lima', dateStyle: 'short', timeStyle: 'short' }));
   if (r.codigo_operacion) {
     dato(lista, 'Operación', r.codigo_operacion);
     dato(lista, 'Canal', r.canal === 'pasarela' ? 'Pago en línea' : 'Ventanilla');
@@ -280,13 +306,33 @@ function tarjetaSalida(r, bloqueo) {
   }
   tarjeta.append(lista);
 
-  if (!habilitado && !cancelada) {
+  if (!pagada && !cancelada) {
     salidaCache.set(r.id, r);
     tarjeta.append(boton('Cobrar ahora', 'cobrar-salida', r.id, 'btn btn-confirmar'));
+  }
+  if (exceso.monto > 0) {
+    salidaCache.set(r.id, { ...r, exceso });
+    const fila = document.createElement('div');
+    fila.className = 'cobro-exceso';
+    const select = document.createElement('select');
+    select.setAttribute('aria-label', 'Medio de pago del exceso');
+    [['efectivo', 'Efectivo'], ['pos', 'Tarjeta (POS)'], ['andipay', 'AndiPay'], ['pagomovil', 'PagoMóvil']].forEach(([v, t]) => {
+      const op = document.createElement('option');
+      op.value = v;
+      op.textContent = t;
+      select.append(op);
+    });
+    fila.append(select, boton(`Cobrar ${formatearSoles(exceso.monto)}`, 'cobrar-exceso', r.id, 'btn btn-confirmar'));
+    tarjeta.append(fila);
   }
   if (habilitado && r.estado === 'registrado' && !bloqueo) {
     salidaCache.set(r.id, r);
     tarjeta.append(boton('Registrar salida', 'registrar-salida', r.id, 'btn btn-confirmar'));
+  }
+  // Devolución: reserva pagada cuyo vehículo todavía no salió (requiere autorización del administrador)
+  if (r.estado_pago === 'pagado' && r.estado === 'registrado' && r.codigo_operacion) {
+    salidaCache.set(r.id, salidaCache.get(r.id) ?? r);
+    tarjeta.append(boton('Devolver pago', 'devolver', r.id, 'btn btn-peligro'));
   }
   if (r.codigo_operacion) {
     const enlace = document.createElement('a');
@@ -330,6 +376,25 @@ $('#form-salida').addEventListener('submit', async (e) => {
 });
 
 resultadoSalida.addEventListener('click', async (e) => {
+  const botonExceso = e.target.closest('button[data-accion="cobrar-exceso"]');
+  if (botonExceso) {
+    const registro = salidaCache.get(Number(botonExceso.dataset.id));
+    const opcion = botonExceso.parentElement.querySelector('select').value;
+    if (!registro || !puedeCobrar() || !confirm(`¿Cobrar ${formatearSoles(registro.exceso.monto)} por ${registro.exceso.horasExtra} h de exceso a ${registro.placa}?`)) return;
+    botonExceso.disabled = true;
+    try {
+      const codigo = await cobrarExceso({ registro, exceso: registro.exceso, opcion, idCajero: usuario.id });
+      registrar(usuario, 'Cobro de exceso', `${codigo} · ${registro.codigo_seguimiento} · ${formatearSoles(registro.exceso.monto)} · ${opcion}`);
+      avisar(`Exceso cobrado (${codigo}). Ya puede salir.`);
+      await Promise.all([pintarSalida(ultimoCriterioSalida), refrescar()]);
+      refrescarSesionCaja();
+    } catch (error) {
+      console.error(error);
+      avisar(error.message || 'No se pudo cobrar el exceso.', 'error');
+      botonExceso.disabled = false;
+    }
+    return;
+  }
   const salida = e.target.closest('button[data-accion="registrar-salida"]');
   if (salida) {
     const registro = salidaCache.get(Number(salida.dataset.id));
@@ -349,6 +414,12 @@ resultadoSalida.addEventListener('click', async (e) => {
       avisar('No se pudo registrar la salida.', 'error');
       salida.disabled = false;
     }
+    return;
+  }
+  const devolver = e.target.closest('button[data-accion="devolver"]');
+  if (devolver) {
+    const registro = salidaCache.get(Number(devolver.dataset.id));
+    if (registro) iniciarDevolucion(registro).catch((error) => { console.error(error); avisar('No se pudo iniciar la devolución.', 'error'); });
     return;
   }
   const b = e.target.closest('button[data-accion="cobrar-salida"]');
@@ -417,7 +488,7 @@ async function pintarResumen() {
     resumenDelDia(inputFecha.value), ampliacionesDelDia(inputFecha.value), descuentosDelDia(inputFecha.value),
   ]);
   // Las ampliaciones de estadía se pagan en línea: se suman como un canal más
-  const filas = [...cobros, ...ampliaciones.map((a) => ({ ...a, canal: 'ampliacion' }))];
+  const filas = [...cobros, ...ampliaciones.map((a) => ({ ...a, canal: a.tipo === 'exceso' ? 'exceso' : 'ampliacion' }))];
   tablaResumen.replaceChildren();
   if (filas.length === 0) filaVacia(tablaResumen, 4, 'Sin cobros aprobados en esta fecha.');
 
@@ -430,11 +501,11 @@ async function pintarResumen() {
     const importe = Number(f.total);
     total += importe;
     operaciones += f.operaciones;
-    if (f.canal === 'caja') ventanilla += importe;
+    if (f.canal === 'caja' || f.canal === 'exceso') ventanilla += importe;
     else enLinea += importe;
 
     const tr = document.createElement('tr');
-    celda(tr, { pasarela: 'En línea', ampliacion: 'Ampliación (en línea)' }[f.canal] ?? 'Ventanilla');
+    celda(tr, { pasarela: 'En línea', ampliacion: 'Ampliación (en línea)', exceso: 'Exceso de tiempo (ventanilla)' }[f.canal] ?? 'Ventanilla');
     celda(tr, NOMBRES_METODO[f.metodo] ?? f.metodo);
     celda(tr, String(f.operaciones));
     celda(tr, formatearSoles(importe));
@@ -474,10 +545,42 @@ setInterval(() => {
   pintarPendientes($('#criterio').value).catch((error) => console.error(error));
 }, 15000);
 
+/* ============================== Atajos de teclado ============================== */
+// F2 buscar · F4 cobrar la primera pendiente · F8 control de salida · F9 arqueo
+document.addEventListener('keydown', (e) => {
+  if (document.querySelector('dialog[open]')) return;
+  const acciones = {
+    F2: () => $('#criterio').focus(),
+    F4: () => pendientesCache[0] && abrirCobro(pendientesCache[0]),
+    F8: () => $('#criterio-salida').focus(),
+    F9: () => abrirArqueo(),
+  };
+  if (!acciones[e.key]) return;
+  e.preventDefault();
+  acciones[e.key]();
+});
+
 /* ============================== Arranque ============================== */
+iniciarSesionCaja(usuario, {
+  fecha: () => inputFecha.value,
+  alCambiar: () => {
+    pintarPendientes($('#criterio').value).catch((error) => console.error(error));
+    refrescar();
+    if (ultimoCriterioSalida) pintarSalida(ultimoCriterioSalida).catch((error) => console.error(error));
+  },
+});
+inputFecha.addEventListener('change', refrescarSesionCaja);
+
 mostrarEsqueleto(tablaPendientes, 6);
 mostrarEsqueleto(tablaEnLinea, 8);
 mostrarEsqueleto(tablaResumen, 4, 3);
+
+// Desde la garita se llega con ?salida=COD-... para cobrar el exceso de tiempo
+const salidaUrl = new URLSearchParams(location.search).get('salida');
+if (salidaUrl) {
+  $('#criterio-salida').value = salidaUrl;
+  pintarSalida(salidaUrl).then(() => resultadoSalida.scrollIntoView({ block: 'center' })).catch((error) => console.error(error));
+}
 
 pintarPendientes().catch((error) => {
   console.error(error);

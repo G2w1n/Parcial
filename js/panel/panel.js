@@ -1,7 +1,9 @@
 import { sql } from '../config/neon-config.js';
-import { exigirRol, consultarTurno, textoTurno, tipoTurno, expulsar } from '../auth/auth.js';
+import { exigirRol, consultarTurno, textoTurno, tipoTurno, expulsar, crearUsuario, cambiarContrasena } from '../auth/auth.js';
 import { cargarConfiguracion } from '../config/configuracion.js';
 import { registrar } from '../config/bitacora.js';
+import { descargarExcel } from '../config/excel.js';
+import { espaciosOcupados, registrarEntrada, zonaDe, codigoEspacio } from '../estacionamiento/espacios.js';
 import { calcularMontoServicio, formatearSoles, NOMBRES_VEHICULO } from '../registro/tarifario.js';
 import {
   escaparHTML, formatearFecha, avisar, conCarga, animarNumero, mostrarEsqueleto, sinAnimaciones,
@@ -11,8 +13,8 @@ import {
 const usuario = exigirRol('administrador', 'empleado');
 if (!usuario) throw new Error('Acceso denegado');
 
-// Tarifas vigentes que configura el administrador
-await cargarConfiguracion();
+// Tarifas y capacidad vigentes que configura el administrador
+const configuracion = await cargarConfiguracion();
 
 const esAdministrador = usuario.rol === 'administrador';
 const esEmpleado = usuario.rol === 'empleado';
@@ -327,21 +329,28 @@ export async function porCobrar() {
 // ---------- Consultas: empleados ----------
 export async function listarEmpleados() {
   return await sql`
-    SELECT id, nombre, correo, activo, hora_inicio, hora_fin
-    FROM usuarios WHERE rol = 'empleado' ORDER BY nombre;
+    SELECT id, nombre, correo, rol, activo, hora_inicio, hora_fin
+    FROM usuarios WHERE rol IN ('empleado', 'cajero', 'seguridad') ORDER BY rol, nombre;
   `;
 }
 
+// El administrador crea cuentas de empleado, cajero o seguridad (la contraseña se guarda encriptada)
 export async function crearEmpleado(datos) {
-  await sql`
-    INSERT INTO usuarios (nombre, correo, contrasena, rol, hora_inicio, hora_fin)
-    VALUES (${datos.nombre}, ${datos.correo}, ${datos.contrasena}, 'empleado', ${datos.hora_inicio}, ${datos.hora_fin});
-  `;
-  registrar(usuario, 'Empleado creado', `${datos.nombre} (${datos.correo})`);
+  const rol = ['empleado', 'cajero', 'seguridad'].includes(datos.rol) ? datos.rol : 'empleado';
+  await crearUsuario({
+    nombre: datos.nombre, correo: datos.correo, contrasena: datos.contrasena, rol,
+    horaInicio: rol === 'empleado' ? datos.hora_inicio : null, horaFin: rol === 'empleado' ? datos.hora_fin : null,
+  });
+  registrar(usuario, `Cuenta de ${rol} creada`, `${datos.nombre} (${datos.correo})`);
+}
+
+export async function restablecerContrasena(id, nueva) {
+  await cambiarContrasena(id, nueva);
+  registrar(usuario, 'Contraseña restablecida', `#${id}`);
 }
 
 export async function cambiarEstadoEmpleado(id, activo) {
-  await sql`UPDATE usuarios SET activo = ${activo} WHERE id = ${id} AND rol = 'empleado';`;
+  await sql`UPDATE usuarios SET activo = ${activo} WHERE id = ${id} AND rol IN ('empleado', 'cajero', 'seguridad');`;
   registrar(usuario, activo ? 'Empleado activado' : 'Empleado desactivado', `#${id}`);
 }
 
@@ -370,6 +379,13 @@ function pintarFila(reserva) {
   const botonAtender = reserva.estado === 'registrado'
     ? '<button type="button" class="btn-fila btn-atender">Marcar atendido</button>'
     : '';
+  // Fase 6: el empleado registra la llegada real del vehículo y le asigna un espacio
+  const botonEntrada = reserva.estado === 'registrado' && 'hora_entrada_real' in reserva && !reserva.hora_entrada_real
+    ? '<button type="button" class="btn-fila btn-entrada">Registrar entrada</button>'
+    : '';
+  const entradaReal = reserva.hora_entrada_real
+    ? `<small class="entrada-real">Entró ${formatearFecha(reserva.hora_entrada_real)}${reserva.espacio ? ` · espacio ${escaparHTML(reserva.espacio)}` : ''}</small>`
+    : '';
   const botonEliminar = esAdministrador
     ? '<button type="button" class="btn-fila btn-eliminar">Eliminar</button>'
     : '';
@@ -385,10 +401,11 @@ function pintarFila(reserva) {
     <td>${escaparHTML(estadia)}</td>
     <td>${formatearSoles(Number(reserva.monto_calculado))}</td>
     <td><span class="pago-badge pago-${reserva.estado_pago}">${reserva.estado_pago}</span>${canalPago}</td>
-    <td>${formatearFecha(reserva.fecha_hora_entrada)}</td>
+    <td>${formatearFecha(reserva.fecha_hora_entrada)}${entradaReal}</td>
     <td><span class="estado-badge estado-${reserva.estado}">${reserva.estado}</span></td>
     <td class="celda-notas">${escaparHTML(reserva.notas) || '—'}</td>
     <td class="celda-acciones">
+      ${botonEntrada}
       ${botonAtender}
       <button type="button" class="btn-fila btn-editar">Editar</button>
       ${botonEliminar}
@@ -462,6 +479,9 @@ async function cargarTabla(soloHoy = false, destacar = null) {
 
       const botonAtender = tr.querySelector('.btn-atender');
       if (botonAtender) botonAtender.addEventListener('click', () => marcarComoAtendida(reserva.id, tr));
+
+      const botonEntrada = tr.querySelector('.btn-entrada');
+      if (botonEntrada) botonEntrada.addEventListener('click', () => abrirEntrada(reserva));
 
       tr.querySelector('.btn-editar').addEventListener('click', () => abrirModalEditar(reserva));
 
@@ -709,48 +729,100 @@ if (filtroTurno) {
   filtroTurno.addEventListener('change', () => cargarTabla(filtroTurno.checked));
 }
 
-// ---------- Exportar a CSV (administrador) ----------
-function celdaCSV(valor) {
-  const texto = valor === null || valor === undefined ? '' : String(valor);
-  return '"' + texto.replace(/"/g, '""') + '"';
+// ---------- Registrar la entrada real y asignar espacio (fase 6) ----------
+const dialogoEntrada = document.createElement('dialog');
+dialogoEntrada.className = 'dialogo-entrada';
+dialogoEntrada.innerHTML = `
+  <form method="dialog">
+    <h2>Registrar entrada</h2>
+    <p class="entrada-resumen"></p>
+    <label for="espacio-entrada">Espacio asignado</label>
+    <select id="espacio-entrada"></select>
+    <p class="entrada-ayuda">Se muestran solo los espacios libres de la zona que le corresponde.</p>
+    <div class="entrada-botones">
+      <button type="button" class="btn btn-outline" value="cancelar">Cancelar</button>
+      <button type="submit" class="btn">Registrar entrada</button>
+    </div>
+  </form>`;
+document.body.append(dialogoEntrada);
+let reservaEntrada = null;
+
+async function abrirEntrada(reserva) {
+  reservaEntrada = reserva;
+  const zona = zonaDe(reserva);
+  const ocupados = await espaciosOcupados();
+  const total = Number(configuracion.capacidad[zona]) || 0;
+  const libres = Array.from({ length: total }, (_, i) => codigoEspacio(zona, i)).filter((c) => !ocupados.has(c));
+  dialogoEntrada.querySelector('.entrada-resumen').textContent =
+    `${reserva.placa} · ${reserva.nombre_pasajero} · ${libres.length} espacio(s) libre(s) en la zona ${zona === 'normal' ? 'general' : zona === 'vip' ? 'VIP' : 'de buses'}`;
+  const select = dialogoEntrada.querySelector('select');
+  select.replaceChildren(...libres.map((c) => {
+    const op = document.createElement('option');
+    op.value = c;
+    op.textContent = c;
+    return op;
+  }));
+  if (libres.length === 0) {
+    avisar('No hay espacios libres en esa zona.', 'error');
+    return;
+  }
+  dialogoEntrada.showModal();
 }
 
-async function exportarCSV() {
+dialogoEntrada.querySelector('button[value="cancelar"]').addEventListener('click', () => dialogoEntrada.close());
+dialogoEntrada.querySelector('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const espacio = dialogoEntrada.querySelector('select').value;
+  const boton = dialogoEntrada.querySelector('button[type="submit"]');
+  try {
+    await asegurarTurno();
+    const ok = await conCarga(boton, () => registrarEntrada(reservaEntrada.id, espacio));
+    dialogoEntrada.close();
+    if (!ok) {
+      avisar('Esa reserva ya tenía la entrada registrada.', 'error');
+    } else {
+      registrar(usuario, 'Entrada registrada', `${reservaEntrada.codigo_seguimiento} · ${reservaEntrada.placa} · espacio ${espacio}`);
+      avisar(`Entrada registrada: ${reservaEntrada.placa} en el espacio ${espacio}.`);
+    }
+    recargarTodo();
+  } catch (error) {
+    if (esFueraDeTurno(error)) return;
+    console.error(error);
+    avisar('No se pudo registrar la entrada.', 'error');
+  }
+});
+
+// ---------- Exportar a Excel (administrador) ----------
+// Excel con dos hojas: todas las reservas y los pagos aprobados
+async function exportarExcel() {
   try {
     const reservas = await listarTodos();
-    const encabezados = [
-      'Código', 'Pasajero', 'Placa', 'Horas', 'Vehículo', 'Zona VIP', 'Monto (S/)', 'Estado de pago',
-      'Canal de pago', 'Entrada', 'Estado', 'Notas', 'Registrado el',
-    ];
-    const filas = reservas.map((r) => [
-      r.codigo_seguimiento,
-      r.nombre_pasajero,
-      r.placa,
-      Number(r.horas),
-      NOMBRES_VEHICULO[r.tipo_vehiculo] ?? r.tipo_vehiculo,
-      r.zona_vip ? 'Sí' : 'No',
-      Number(r.monto_calculado).toFixed(2),
-      r.estado_pago,
-      r.canal_pago ?? '',
-      formatearFecha(r.fecha_hora_entrada),
-      r.estado,
-      r.notas,
-      formatearFecha(r.fecha_registro),
-    ].map(celdaCSV).join(','));
-
-    // \uFEFF hace que Excel lea bien las tildes y la ñ
-    const contenido = '\uFEFF' + [encabezados.map(celdaCSV).join(','), ...filas].join('\r\n');
-    const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-
-    const enlace = document.createElement('a');
-    enlace.href = url;
-    enlace.download = 'reservas_estacionamiento.csv';
-    document.body.appendChild(enlace);
-    enlace.click();
-    enlace.remove();
-    URL.revokeObjectURL(url);
-    avisar('Archivo CSV descargado.');
+    const pagos = await sql`
+      SELECT p.codigo_operacion, r.codigo_seguimiento, r.placa, p.canal, p.metodo, p.monto, p.fecha_pago, p.verificado
+      FROM pagos p JOIN reservas_estacionamiento r ON r.id = p.id_registro
+      WHERE p.estado = 'aprobado' ORDER BY p.fecha_pago DESC;
+    `;
+    descargarExcel(`reservas_qorikancha_${new Date().toLocaleDateString('en-CA', { timeZone: 'America/Lima' })}.xlsx`, [
+      {
+        nombre: 'Reservas',
+        columnas: ['Código', 'Pasajero', 'Placa', 'Horas', 'Vehículo', 'Zona VIP', 'Monto (S/)', 'Estado de pago',
+          'Canal de pago', 'Entrada', 'Estado', 'Notas', 'Registrado el'],
+        filas: reservas.map((r) => [
+          r.codigo_seguimiento, r.nombre_pasajero, r.placa, Number(r.horas),
+          NOMBRES_VEHICULO[r.tipo_vehiculo] ?? r.tipo_vehiculo, r.zona_vip ? 'Sí' : 'No', Number(r.monto_calculado),
+          r.estado_pago, r.canal_pago ?? '', formatearFecha(r.fecha_hora_entrada), r.estado, r.notas ?? '', formatearFecha(r.fecha_registro),
+        ]),
+      },
+      {
+        nombre: 'Pagos',
+        columnas: ['Operación', 'Reserva', 'Placa', 'Canal', 'Medio', 'Monto (S/)', 'Fecha', 'Verificado'],
+        filas: pagos.map((p) => [
+          p.codigo_operacion, p.codigo_seguimiento, p.placa, p.canal === 'caja' ? 'Ventanilla' : 'En línea', p.metodo,
+          Number(p.monto), formatearFecha(p.fecha_pago), p.verificado ? 'Sí' : 'No',
+        ]),
+      },
+    ]);
+    avisar('Archivo de Excel descargado.');
   } catch (error) {
     console.error(error);
     avisar('No se pudo exportar el archivo.', 'error');
@@ -759,7 +831,7 @@ async function exportarCSV() {
 
 const botonExportar = $('btn-exportar-csv');
 if (botonExportar) {
-  botonExportar.addEventListener('click', () => conCarga(botonExportar, exportarCSV));
+  botonExportar.addEventListener('click', () => conCarga(botonExportar, exportarExcel));
 }
 
 // ---------- Gestión de empleados y horarios (administrador) ----------
@@ -799,20 +871,23 @@ async function cargarEmpleados(destacarId = null) {
       }
 
       tr.innerHTML = `
-        <td>${escaparHTML(emp.nombre)}</td>
+        <td>${escaparHTML(emp.nombre)}<br><small class="rol-personal">${escaparHTML(emp.rol)}</small></td>
         <td>${escaparHTML(emp.correo)}</td>
         <td><span class="estado-badge ${emp.activo ? 'estado-registrado' : 'estado-cancelado'}">${emp.activo ? 'activo' : 'desactivado'}</span></td>
-        <td>
-          <div class="editor-horario">
+        <td>${emp.rol !== 'empleado' ? '<span class="etiqueta-turno turno-libre">Sin control de horario</span>' : ''}
+          <div class="editor-horario"${emp.rol !== 'empleado' ? ' hidden' : ''}>
             <input type="time" class="hora-inicio" value="${inicio}" aria-label="Hora de entrada">
             <span>a</span>
             <input type="time" class="hora-fin" value="${fin}" aria-label="Hora de salida">
             <button type="button" class="btn-fila btn-editar btn-guardar-horario">Guardar</button>
             <button type="button" class="btn-fila btn-quitar-horario">Sin límite</button>
           </div>
-          <span class="etiqueta-turno turno-${tipo || 'libre'}">${tipo ? 'Turno ' + tipo : 'Sin restricción de horario'}</span>
+          ${emp.rol === 'empleado' ? `<span class="etiqueta-turno turno-${tipo || 'libre'}">${tipo ? 'Turno ' + tipo : 'Sin restricción de horario'}</span>` : ''}
         </td>
-        <td><button type="button" class="btn-fila btn-cambiar-estado ${emp.activo ? 'btn-eliminar' : 'btn-editar'}">${emp.activo ? 'Desactivar' : 'Activar'}</button></td>
+        <td>
+          <button type="button" class="btn-fila btn-cambiar-estado ${emp.activo ? 'btn-eliminar' : 'btn-editar'}">${emp.activo ? 'Desactivar' : 'Activar'}</button>
+          <button type="button" class="btn-fila btn-restablecer">Nueva contraseña</button>
+        </td>
       `;
 
       const botonGuardar = tr.querySelector('.btn-guardar-horario');
@@ -829,6 +904,23 @@ async function cargarEmpleados(destacarId = null) {
       const botonQuitar = tr.querySelector('.btn-quitar-horario');
       botonQuitar.addEventListener('click', () => {
         guardarHorario(emp.id, null, null, botonQuitar);
+      });
+
+      const botonRestablecer = tr.querySelector('.btn-restablecer');
+      botonRestablecer.addEventListener('click', async () => {
+        const nueva = prompt(`Nueva contraseña para ${emp.nombre} (mínimo 6 caracteres):`);
+        if (nueva === null) return;
+        if (nueva.length < 6) {
+          avisar('La contraseña debe tener al menos 6 caracteres.', 'error');
+          return;
+        }
+        try {
+          await conCarga(botonRestablecer, () => restablecerContrasena(emp.id, nueva));
+          avisar(`Contraseña de ${emp.nombre} restablecida. Comunícasela en persona.`);
+        } catch (error) {
+          console.error(error);
+          avisar('No se pudo restablecer la contraseña.', 'error');
+        }
       });
 
       const botonEstado = tr.querySelector('.btn-cambiar-estado');
@@ -871,14 +963,15 @@ if (formEmpleado) {
       nombre: $('em-nombre').value,
       correo: $('em-correo').value,
       contrasena: $('em-contrasena').value,
+      rol: $('em-rol') ? $('em-rol').value : 'empleado',
       hora_inicio: inicio,
       hora_fin: fin,
     };
     const boton = formEmpleado.querySelector('button[type="submit"]');
     try {
       await conCarga(boton, () => crearEmpleado(datos));
-      mostrarMensaje(mensajeEl, '✓ Cuenta de empleado creada.');
-      avisar('Cuenta de empleado creada.');
+      mostrarMensaje(mensajeEl, `✓ Cuenta de ${datos.rol} creada.`);
+      avisar(`Cuenta de ${datos.rol} creada.`);
       formEmpleado.reset();
       cargarEmpleados();
     } catch (error) {

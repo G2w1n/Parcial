@@ -142,9 +142,75 @@ async function cargar() {
   }));
 }
 
+// Rendimiento por persona: bitácora (fase 5), cobros en ventanilla y asistencia (fase 6)
+async function cargarPersonal(dias) {
+  const [personal, acciones, cobros, horas] = await Promise.all([
+    sql`SELECT id, nombre, rol FROM usuarios WHERE rol IN ('administrador', 'empleado', 'cajero', 'seguridad') ORDER BY nombre;`,
+    seguro(() => sql`
+      SELECT usuario_id,
+             COUNT(*)::int AS total,
+             COUNT(*) FILTER (WHERE accion IN ('Reserva creada', 'Reserva editada', 'Reserva atendida'))::int AS reservas,
+             COUNT(*) FILTER (WHERE accion IN ('Entrada registrada', 'Salida registrada'))::int AS movimientos,
+             COUNT(*) FILTER (WHERE accion LIKE 'Pedido %')::int AS pedidos
+      FROM bitacora
+      WHERE (fecha AT TIME ZONE 'America/Lima')::date > (NOW() AT TIME ZONE 'America/Lima')::date - ${dias}::int
+      GROUP BY usuario_id;`, []),
+    sql`
+      SELECT id_cajero AS usuario_id, COUNT(*)::int AS n, COALESCE(SUM(monto), 0) AS total FROM pagos
+      WHERE canal = 'caja' AND estado = 'aprobado' AND id_cajero IS NOT NULL
+        AND (fecha_pago AT TIME ZONE 'America/Lima')::date > (NOW() AT TIME ZONE 'America/Lima')::date - ${dias}::int
+      GROUP BY id_cajero;`,
+    seguro(() => sql`
+      SELECT usuario_id, COALESCE(SUM(EXTRACT(EPOCH FROM (COALESCE(salida, NOW()) - entrada))) / 3600, 0) AS horas
+      FROM asistencia
+      WHERE (entrada AT TIME ZONE 'America/Lima')::date > (NOW() AT TIME ZONE 'America/Lima')::date - ${dias}::int
+      GROUP BY usuario_id;`, []),
+  ]);
+  const por = (lista) => Object.fromEntries(lista.map((f) => [f.usuario_id, f]));
+  const a = por(acciones);
+  const c = por(cobros);
+  const h = por(horas);
+  const filas = personal.map((p) => ({
+    ...p,
+    acciones: a[p.id]?.total ?? 0,
+    reservas: a[p.id]?.reservas ?? 0,
+    movimientos: a[p.id]?.movimientos ?? 0,
+    pedidos: a[p.id]?.pedidos ?? 0,
+    cobros: c[p.id]?.n ?? 0,
+    cobrado: Number(c[p.id]?.total ?? 0),
+    horas: Number(h[p.id]?.horas ?? 0),
+  }));
+
+  graficoBarras($('g-personal'), filas.filter((f) => f.acciones > 0).map((f) => ({ etiqueta: f.nombre, valor: f.acciones })),
+    { nombreValor: 'Acciones registradas', formato: (n) => `${n}` });
+
+  const cuerpo = $('tabla-personal');
+  if (!filas.length) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 7;
+    td.className = 'celda-vacia';
+    td.textContent = 'No hay cuentas del personal.';
+    tr.append(td);
+    cuerpo.replaceChildren(tr);
+    return;
+  }
+  cuerpo.replaceChildren(...filas.map((f) => {
+    const tr = document.createElement('tr');
+    [f.nombre, f.rol, String(f.reservas), String(f.movimientos), String(f.pedidos),
+      f.cobros ? `${f.cobros} · ${soles(f.cobrado)}` : '—', f.horas ? `${f.horas.toFixed(1)} h` : '—'].forEach((texto) => {
+      const td = document.createElement('td');
+      td.textContent = texto;
+      tr.append(td);
+    });
+    return tr;
+  }));
+}
+
 async function recargar() {
   try {
     await cargar();
+    await cargarPersonal(Number($('periodo').value));
     $('error').hidden = true;
   } catch (error) {
     console.error(error);

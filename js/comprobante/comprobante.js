@@ -148,3 +148,7 @@ if (!pago || (usuario.rol === 'cliente' && pago.id_usuario !== usuario.id)) {
   constancia.append(cabecera, pase, cuerpo, pie);
   contenedor.replaceChildren(constancia);
 }
+// Desde la caja se abre con ?imprimir=1 para sacar el ticket directo (espera a que cargue el QR)
+if (pago && new URLSearchParams(location.search).get('imprimir') === '1') {
+  requestAnimationFrame(() => setTimeout(() => window.print(), 300));
+}

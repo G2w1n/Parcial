@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <meta name="robots" content="noindex">
+  <title>Reclamos — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Libro de reclamaciones: casos recibidos y respuestas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <script>try{var d=document.documentElement;if(localStorage.getItem("qorikancha.tema")==="oscuro")d.dataset.tema="oscuro";if(localStorage.getItem("qorikancha.accesible")==="1")d.dataset.accesible=""}catch(e){}</script>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+  <div id="menu-admin" data-pagina="reclamos"></div>
+
+  <main class="adm-pagina">
+    <div class="wrap">
+      <h1>Libro de reclamaciones</h1>
+      <p class="adm-intro">Responde cada caso en un máximo de 15 días hábiles. El cliente ve la respuesta con su código en <a href="reclamos.html">reclamos.html</a>.</p>
+      <p id="aviso-tabla" class="adm-aviso-tabla" hidden></p>
+      <div id="kpis" class="adm-kpis"></div>
+      <section class="adm-bloque" aria-labelledby="t-reclamos">
+        <div class="adm-filtros">
+          <label class="visually-hidden" for="filtro-estado">Estado</label>
+          <select id="filtro-estado"><option value="pendientes">Sin responder</option><option value="">Todos</option><option value="resuelto">Respondidos</option></select>
+          <label class="visually-hidden" for="filtro-tipo">Tipo</label>
+          <select id="filtro-tipo"><option value="">Reclamos, quejas y sugerencias</option><option value="reclamo">Reclamos</option><option value="queja">Quejas</option><option value="sugerencia">Sugerencias</option></select>
+        </div>
+        <ul id="lista-reclamos" class="lista-reclamos"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+        <p><a href="reclamos.html" class="libro-footer">📖 Libro de reclamaciones</a></p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/panel/reclamos-admin.js"></script>
+  <script type="module" src="js/panel/menu-admin.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>

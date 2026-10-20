@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <meta name="robots" content="noindex">
+  <title>Historial por placa — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Historial de reservas, pagos e incidentes de una placa.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <script>try{var d=document.documentElement;if(localStorage.getItem("qorikancha.tema")==="oscuro")d.dataset.tema="oscuro";if(localStorage.getItem("qorikancha.accesible")==="1")d.dataset.accesible=""}catch(e){}</script>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+  <div id="menu-admin" data-pagina="historial"></div>
+
+  <main class="adm-pagina">
+    <div class="wrap">
+      <div class="adm-cabecera">
+        <div>
+          <h1>Historial por placa</h1>
+          <p class="adm-intro">Todas las reservas, pagos, ampliaciones e incidentes de un vehículo.</p>
+        </div>
+        <form id="form-placa" class="adm-filtros" role="search">
+          <label class="visually-hidden" for="placa">Placa</label>
+          <input id="placa" type="search" placeholder="Placa (ej. ABC-123)" autocomplete="off" maxlength="10" required>
+          <button type="submit" class="adm-btn">Ver historial</button>
+        </form>
+      </div>
+      <p id="aviso-tabla" class="adm-aviso-tabla" hidden></p>
+      <div id="historial" hidden>
+        <p id="estado-placa" class="estado-placa"></p>
+        <div id="kpis-placa" class="adm-kpis"></div>
+        <section class="adm-bloque" aria-labelledby="t-h-reservas">
+          <div class="adm-cabecera"><h2 id="t-h-reservas">Reservas</h2><button type="button" id="btn-excel-placa" class="adm-btn adm-btn-borde">Exportar a Excel</button></div>
+          <div class="adm-tabla-scroll">
+            <table class="adm-tabla">
+              <thead><tr><th>Código</th><th>Entrada programada</th><th>Horas</th><th>Pasajero</th><th>Estado</th><th>Pago</th><th>Monto</th><th>Espacio</th></tr></thead>
+              <tbody id="h-reservas"></tbody>
+            </table>
+          </div>
+        </section>
+        <div class="adm-grid-2">
+          <section class="adm-bloque" aria-labelledby="t-h-pagos">
+            <h2 id="t-h-pagos">Pagos y ampliaciones</h2>
+            <div class="adm-tabla-scroll">
+              <table class="adm-tabla">
+                <thead><tr><th>Fecha</th><th>Operación</th><th>Concepto</th><th>Monto</th><th>Estado</th></tr></thead>
+                <tbody id="h-pagos"></tbody>
+              </table>
+            </div>
+          </section>
+          <section class="adm-bloque" aria-labelledby="t-h-incidentes">
+            <h2 id="t-h-incidentes">Incidentes</h2>
+            <ul id="h-incidentes" class="mt-lista"></ul>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+        <p><a href="reclamos.html" class="libro-footer">📖 Libro de reclamaciones</a></p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/panel/historial.js"></script>
+  <script type="module" src="js/panel/menu-admin.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>

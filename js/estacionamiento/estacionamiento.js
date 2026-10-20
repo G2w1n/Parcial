@@ -7,6 +7,7 @@ import {
 } from '../registro/tarifario.js';
 import { ahoraEnLima } from '../vuelos/datos-vuelos.js';
 import { cargarConfiguracion } from '../config/configuracion.js';
+import { espaciosOcupados as espaciosConVehiculo, codigoEspacio } from './espacios.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -49,13 +50,14 @@ function ocupacionSimulada(zona, momento) {
 }
 
 // Qué espacios aparecen ocupados: siempre los mismos durante la misma hora
-function espaciosOcupados(zona, cantidad, momento) {
+// Primero los espacios donde el personal registró un vehículo (reales) y el resto, simulados
+function espaciosOcupados(zona, cantidad, momento, asignados = new Set()) {
   const hora = Math.floor(momento.minutos / 60);
-  return new Set(
-    Array.from({ length: zona.espacios }, (_, i) => i)
-      .sort((a, b) => azar(`${momento.dia}|${hora}|${zona.clave}|${a}`) - azar(`${momento.dia}|${hora}|${zona.clave}|${b}`))
-      .slice(0, cantidad),
-  );
+  const reales = Array.from({ length: zona.espacios }, (_, i) => i).filter((i) => asignados.has(codigoEspacio(zona.clave, i)));
+  const resto = Array.from({ length: zona.espacios }, (_, i) => i)
+    .filter((i) => !reales.includes(i))
+    .sort((a, b) => azar(`${momento.dia}|${hora}|${zona.clave}|${a}`) - azar(`${momento.dia}|${hora}|${zona.clave}|${b}`));
+  return new Set([...reales, ...resto].slice(0, Math.max(cantidad, reales.length)));
 }
 
 function crear(etiqueta, clase, texto) {
@@ -77,11 +79,12 @@ async function pintarMapa() {
     $('aviso-mapa').textContent = 'No se pudieron leer las reservas en línea: el mapa muestra solo la ocupación simulada.';
   }
 
+  const asignados = await espaciosConVehiculo();
   const contadores = [];
   const bloques = ZONAS.filter((zona) => zona.espacios > 0).map((zona) => {
-    const ocupados = Math.min(zona.espacios, ocupacionSimulada(zona, momento) + (reales[zona.clave] ?? 0));
+    const marcados = espaciosOcupados(zona, Math.min(zona.espacios, ocupacionSimulada(zona, momento) + (reales[zona.clave] ?? 0)), momento, asignados);
+    const ocupados = marcados.size;
     const libres = zona.espacios - ocupados;
-    const marcados = espaciosOcupados(zona, ocupados, momento);
 
     const contador = crear('div', `contador${libres <= zona.espacios * 0.1 ? ' casi-lleno' : ''}`);
     const barra = crear('span', 'contador-barra');

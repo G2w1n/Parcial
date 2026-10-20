@@ -128,9 +128,7 @@ export async function consultarSalida(criterio) {
   const texto = (criterio ?? '').trim();
   if (!texto) return [];
   return await sql`
-    SELECT r.id, r.usuario_id, r.codigo_seguimiento, r.placa, r.nombre_pasajero, r.horas, r.tipo_vehiculo,
-           r.zona_vip, r.monto_calculado, r.estado, r.estado_pago,
-           p.codigo_operacion, p.canal, p.fecha_pago, p.verificado
+    SELECT r.*, p.codigo_operacion, p.canal, p.fecha_pago, p.verificado
     FROM reservas_estacionamiento r
     LEFT JOIN pagos p ON p.id_registro = r.id AND p.estado = 'aprobado'
     WHERE UPPER(r.codigo_seguimiento) = UPPER(${texto}) OR UPPER(r.placa) = UPPER(${texto})
@@ -154,24 +152,67 @@ export async function placasBloqueadas(placas) {
 
 // La garita marca la reserva como "atendido" cuando el vehículo sale (solo si está pagada)
 export async function registrarSalida(idRegistro, idUsuario) {
-  const filas = await sql`
-    UPDATE reservas_estacionamiento
-    SET estado = 'atendido', gestionado_por = ${idUsuario}, fecha_gestion = NOW()
-    WHERE id = ${idRegistro} AND estado = 'registrado' AND estado_pago IN ('pagado', 'exonerado')
-    RETURNING id;
-  `;
+  let filas;
+  try {
+    filas = await sql`
+      UPDATE reservas_estacionamiento
+      SET estado = 'atendido', gestionado_por = ${idUsuario}, fecha_gestion = NOW(), hora_salida_real = NOW()
+      WHERE id = ${idRegistro} AND estado = 'registrado' AND estado_pago IN ('pagado', 'exonerado')
+      RETURNING id;
+    `;
+  } catch (error) {
+    if (error.code !== '42703') throw error;
+    // Sin las columnas de la fase 6 se registra la salida como antes
+    filas = await sql`
+      UPDATE reservas_estacionamiento
+      SET estado = 'atendido', gestionado_por = ${idUsuario}, fecha_gestion = NOW()
+      WHERE id = ${idRegistro} AND estado = 'registrado' AND estado_pago IN ('pagado', 'exonerado')
+      RETURNING id;
+    `;
+  }
   return filas.length === 1;
 }
 
+// Cobro en caja del tiempo que el vehículo se quedó de más (se guarda como ampliación de tipo "exceso")
+export async function cobrarExceso({ registro, exceso, opcion, idCajero }) {
+  const forma = METODOS_CAJA[opcion];
+  if (!forma) throw new Error('Medio de pago no válido.');
+  const codigo = generarCodigoOperacion('EXC');
+  try {
+    await sql.transaction([
+      sql`INSERT INTO ampliaciones (codigo_operacion, id_registro, id_usuario, horas_extra, monto, metodo,
+                                    proveedor_billetera, referencia, tipo, id_cajero)
+          VALUES (${codigo}, ${registro.id}, ${registro.usuario_id ?? null}, ${exceso.horasExtra}, ${exceso.monto},
+                  ${forma.metodo}, ${forma.proveedor}, 'Exceso de tiempo', 'exceso', ${idCajero});`,
+      sql`UPDATE reservas_estacionamiento
+          SET horas = ${exceso.horasFacturables}, monto_calculado = monto_calculado + ${exceso.monto}
+          WHERE id = ${registro.id} AND estado = 'registrado';`,
+    ]);
+  } catch (error) {
+    if (error.code === '42703' || error.code === '42P01') throw new Error('El cobro de exceso se activa al ejecutar database/fase-6.sql.');
+    throw error;
+  }
+  return codigo;
+}
+
 // Ampliaciones de estadía cobradas en línea en la fecha (se suman al cierre de caja)
+// Ampliaciones (en línea) y excesos de tiempo (cobrados en caja, fase 6) de la fecha
 export async function ampliacionesDelDia(fecha) {
   try {
     return await sql`
-      SELECT metodo, COUNT(*)::int AS operaciones, SUM(monto) AS total FROM ampliaciones
+      SELECT tipo, metodo, COUNT(*)::int AS operaciones, SUM(monto) AS total FROM ampliaciones
       WHERE monto > 0 AND (fecha AT TIME ZONE 'America/Lima')::date = ${fecha}::date
-      GROUP BY metodo ORDER BY metodo;
+      GROUP BY tipo, metodo ORDER BY tipo, metodo;
     `;
   } catch (error) {
+    if (error.code === '42703') {
+      // Antes de la fase 6 no existe la columna "tipo": todo es ampliación en línea
+      return sql`
+        SELECT 'ampliacion' AS tipo, metodo, COUNT(*)::int AS operaciones, SUM(monto) AS total FROM ampliaciones
+        WHERE monto > 0 AND (fecha AT TIME ZONE 'America/Lima')::date = ${fecha}::date
+        GROUP BY metodo ORDER BY metodo;
+      `;
+    }
     if (error.code !== '42P01') console.error(error);
     return [];
   }
@@ -188,5 +229,95 @@ export async function descuentosDelDia(fecha) {
   } catch (error) {
     if (error.code !== '42703' && error.code !== '42P01') console.error(error);
     return { cupones: 0, total: 0 };
+  }
+}
+
+// ---------- Fase 6: sesiones de caja, arqueo y anulaciones ----------
+// Devuelve la caja abierta del cajero, null si no tiene, o undefined si la tabla aún no existe
+export async function cajaAbierta(idCajero) {
+  try {
+    const filas = await sql`SELECT * FROM cajas WHERE cajero_id = ${idCajero} AND estado = 'abierta';`;
+    return filas[0] ?? null;
+  } catch (error) {
+    if (error.code === '42P01') return undefined;
+    throw error;
+  }
+}
+
+export async function abrirCaja(idCajero, montoInicial) {
+  const filas = await sql`
+    INSERT INTO cajas (cajero_id, monto_inicial) VALUES (${idCajero}, ${montoInicial}) RETURNING *;
+  `;
+  return filas[0];
+}
+
+// Efectivo que debería haber en el cajón: fondo inicial + cobros en efectivo (incluye excesos) desde la apertura
+export async function efectivoEsperado(caja) {
+  const [cobros] = await sql`
+    SELECT COALESCE(SUM(monto), 0) AS total FROM pagos
+    WHERE id_cajero = ${caja.cajero_id} AND metodo = 'efectivo' AND estado = 'aprobado' AND fecha_pago >= ${caja.apertura};
+  `;
+  let excesos = 0;
+  try {
+    const [fila] = await sql`
+      SELECT COALESCE(SUM(monto), 0) AS total FROM ampliaciones
+      WHERE id_cajero = ${caja.cajero_id} AND metodo = 'efectivo' AND fecha >= ${caja.apertura};
+    `;
+    excesos = Number(fila.total);
+  } catch (error) {
+    if (error.code !== '42703') throw error;
+  }
+  return Number(caja.monto_inicial) + Number(cobros.total) + excesos;
+}
+
+export async function cerrarCaja(idCaja, { esperado, contado, detalle, nota }) {
+  const filas = await sql`
+    UPDATE cajas SET cierre = NOW(), efectivo_esperado = ${esperado}, efectivo_contado = ${contado},
+                     diferencia = ${contado - esperado}, detalle_conteo = ${JSON.stringify(detalle)}::jsonb,
+                     nota = ${nota}, estado = 'cerrada'
+    WHERE id = ${idCaja} AND estado = 'abierta'
+    RETURNING *;
+  `;
+  return filas[0] ?? null;
+}
+
+// Cobros en ventanilla del cajero en la fecha (aprobados y anulados)
+export async function cobrosDelCajero(idCajero, fecha) {
+  return sql`
+    SELECT p.id, p.codigo_operacion, p.metodo, p.proveedor_billetera, p.monto, p.estado, p.fecha_pago,
+           r.id AS id_registro, r.codigo_seguimiento, r.placa
+    FROM pagos p JOIN reservas_estacionamiento r ON r.id = p.id_registro
+    WHERE p.canal = 'caja' AND p.id_cajero = ${idCajero} AND p.estado IN ('aprobado', 'anulado')
+      AND (p.fecha_pago AT TIME ZONE 'America/Lima')::date = ${fecha}::date
+    ORDER BY p.fecha_pago DESC;
+  `;
+}
+
+// Pago aprobado de una reserva (para devolverlo)
+export async function pagoDeReserva(idRegistro) {
+  const filas = await sql`
+    SELECT id, codigo_operacion, metodo, monto, canal FROM pagos
+    WHERE id_registro = ${idRegistro} AND estado = 'aprobado' ORDER BY fecha_pago DESC LIMIT 1;
+  `;
+  return filas[0] ?? null;
+}
+
+// Anulación (error de cobro: la reserva vuelve a "pendiente") o devolución (la reserva se cancela)
+export async function anularPago({ pago, idRegistro, tipo, motivo, autorizadoPor, idCajero }) {
+  const reserva = tipo === 'devolucion'
+    ? sql`UPDATE reservas_estacionamiento SET estado = 'cancelado', estado_pago = 'pendiente', canal_pago = NULL, fecha_pago = NULL
+          WHERE id = ${idRegistro} AND estado = 'registrado';`
+    : sql`UPDATE reservas_estacionamiento SET estado_pago = 'pendiente', canal_pago = NULL, fecha_pago = NULL
+          WHERE id = ${idRegistro} AND estado = 'registrado';`;
+  try {
+    await sql.transaction([
+      sql`UPDATE pagos SET estado = 'anulado' WHERE id = ${pago.id} AND estado = 'aprobado';`,
+      reserva,
+      sql`INSERT INTO anulaciones (codigo_operacion, tipo, monto, metodo, motivo, cajero_id, autorizado_por)
+          VALUES (${pago.codigo_operacion}, ${tipo}, ${pago.monto}, ${pago.metodo}, ${motivo}, ${idCajero}, ${autorizadoPor});`,
+    ]);
+  } catch (error) {
+    if (error.code === '23514' || error.code === '42P01') throw new Error('Las anulaciones se activan al ejecutar database/fase-6.sql.');
+    throw error;
   }
 }

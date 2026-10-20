@@ -4,6 +4,7 @@ import { sql } from '../config/neon-config.js';
 import { exigirRol } from '../auth/auth.js';
 import { formatearFecha } from '../config/ui.js';
 import { normalizar } from '../vuelos/datos-vuelos.js';
+import { descargarExcel } from '../config/excel.js';
 
 const usuario = exigirRol('administrador');
 if (!usuario) throw new Error('Acceso denegado');
@@ -47,12 +48,16 @@ async function cargar() {
   pintar();
 }
 
-function pintar() {
+function filtrados() {
   const persona = $('filtro-persona').value;
   const rol = $('filtro-rol').value;
   const buscado = normalizar($('filtro-buscar').value);
-  const visibles = registros.filter((r) => (!persona || r.usuario_nombre === persona) && (!rol || r.rol === rol)
+  return registros.filter((r) => (!persona || r.usuario_nombre === persona) && (!rol || r.rol === rol)
     && (!buscado || normalizar(`${r.accion} ${r.detalle ?? ''}`).includes(buscado)));
+}
+
+function pintar() {
+  const visibles = filtrados();
   $('contador').textContent = `${visibles.length} acción(es)`;
   const cuerpo = $('tabla-bitacora');
   if (visibles.length === 0) {
@@ -77,4 +82,13 @@ $('filtro-fecha').value = new Date().toLocaleDateString('en-CA', { timeZone: 'Am
 $('filtro-fecha').addEventListener('change', cargar);
 ['filtro-persona', 'filtro-rol'].forEach((id) => $(id).addEventListener('change', pintar));
 $('filtro-buscar').addEventListener('input', pintar);
+// Exporta lo que se ve en pantalla (con los filtros aplicados)
+$('btn-excel-bitacora').addEventListener('click', () => {
+  const fecha = $('filtro-fecha').value;
+  descargarExcel(`bitacora_${fecha}.xlsx`, [{
+    nombre: 'Bitácora',
+    columnas: ['Fecha y hora', 'Persona', 'Rol', 'Acción', 'Detalle'],
+    filas: filtrados().map((r) => [formatearFecha(r.fecha), r.usuario_nombre, r.rol, r.accion, r.detalle ?? '']),
+  }]);
+});
 cargar();

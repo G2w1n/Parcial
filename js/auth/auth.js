@@ -4,8 +4,55 @@ import { rutaInicioSegunRol } from './roles.js';
 
 export { rutaInicioSegunRol };
 
+// ---------- Contraseñas ----------
+// Desde la fase 6 las contraseñas se guardan encriptadas con bcrypt (extensión pgcrypto de Neon).
+// Mientras no se ejecute database/fase-6.sql, la función crypt() no existe y se usa el modo anterior.
+const sinCrypt = (error) => error.code === '42883' || error.code === '22023';
+
+export async function crearUsuario({ nombre, correo, contrasena, rol = 'cliente', horaInicio = null, horaFin = null }) {
+  try {
+    await sql`
+      INSERT INTO usuarios (nombre, correo, contrasena, rol, hora_inicio, hora_fin)
+      VALUES (${nombre}, ${correo}, crypt(${contrasena}, gen_salt('bf')), ${rol}, ${horaInicio}, ${horaFin});
+    `;
+  } catch (error) {
+    if (!sinCrypt(error)) throw error;
+    await sql`
+      INSERT INTO usuarios (nombre, correo, contrasena, rol, hora_inicio, hora_fin)
+      VALUES (${nombre}, ${correo}, ${contrasena}, ${rol}, ${horaInicio}, ${horaFin});
+    `;
+  }
+}
+
 export async function registrarUsuario(nombre, correo, contrasena) {
-  await sql`INSERT INTO usuarios (nombre, correo, contrasena) VALUES (${nombre}, ${correo}, ${contrasena})`;
+  await crearUsuario({ nombre, correo, contrasena });
+}
+
+// Devuelve { id, nombre, rol } si el correo y la contraseña coinciden (y la cuenta está activa)
+export async function verificarCredenciales(correo, contrasena) {
+  let filas;
+  try {
+    filas = await sql`
+      SELECT id, nombre, rol FROM usuarios
+      WHERE correo = ${correo} AND activo = TRUE AND contrasena = crypt(${contrasena}, contrasena);
+    `;
+  } catch (error) {
+    if (!sinCrypt(error)) throw error;
+    filas = await sql`
+      SELECT id, nombre, rol FROM usuarios
+      WHERE correo = ${correo} AND activo = TRUE AND contrasena = ${contrasena};
+    `;
+  }
+  return filas[0] ?? null;
+}
+
+export async function cambiarContrasena(idUsuario, nueva) {
+  try {
+    await sql`UPDATE usuarios SET contrasena = crypt(${nueva}, gen_salt('bf')) WHERE id = ${idUsuario};`;
+  } catch (error) {
+    if (!sinCrypt(error)) throw error;
+    await sql`UPDATE usuarios SET contrasena = ${nueva} WHERE id = ${idUsuario};`;
+  }
 }
 
 // Revisa con el reloj de Neon (hora de Perú) si el usuario está dentro de su horario
@@ -38,13 +85,8 @@ export function tipoTurno(turno) {
 }
 
 export async function iniciarSesion(correo, contrasena) {
-  const filas = await sql`
-    SELECT id, nombre, rol FROM usuarios
-    WHERE correo = ${correo} AND contrasena = ${contrasena} AND activo = TRUE;
-  `;
-  if (filas.length === 0) return null;
-
-  const usuario = filas[0];
+  const usuario = await verificarCredenciales(correo, contrasena);
+  if (!usuario) return null;
 
   if (usuario.rol === 'empleado') {
     const turno = await consultarTurno(usuario.id);

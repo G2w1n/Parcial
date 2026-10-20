@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
+  <script>try{var d=document.documentElement;if(localStorage.getItem("qorikancha.tema")==="oscuro")d.dataset.tema="oscuro";if(localStorage.getItem("qorikancha.accesible")==="1")d.dataset.accesible=""}catch(e){}</script>
   <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
@@ -51,6 +52,19 @@
         <section class="adm-bloque grafico" aria-labelledby="t-g4"><h2 id="t-g4">Recaudado por medio de pago</h2><div id="g-medios" class="grafico-cuerpo"></div></section>
         <section class="adm-bloque grafico" aria-labelledby="t-g5"><h2 id="t-g5">Reservas por estado</h2><div id="g-estados" class="grafico-cuerpo"></div></section>
       </div>
+      <section class="adm-bloque" aria-labelledby="t-rendimiento">
+        <h2 id="t-rendimiento">Rendimiento del personal</h2>
+        <p class="adm-nota">Acciones registradas en la bitácora, cobros en ventanilla y horas marcadas en el periodo elegido.</p>
+        <div class="adm-grid-2">
+          <div id="g-personal" class="grafico-cuerpo"></div>
+          <div class="adm-tabla-scroll">
+            <table class="adm-tabla">
+              <thead><tr><th>Persona</th><th>Rol</th><th>Reservas</th><th>Entradas / salidas</th><th>Pedidos</th><th>Cobros</th><th>Horas</th></tr></thead>
+              <tbody id="tabla-personal"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
@@ -59,6 +73,7 @@
       <div>
         <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
         <p>Av. de la Aviación s/n, Cusco, Perú</p>
+        <p><a href="reclamos.html" class="libro-footer">📖 Libro de reclamaciones</a></p>
       </div>
       <address>
         <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>

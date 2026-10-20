@@ -1,0 +1,23 @@
+/* css/perfil.css — Mi perfil (fase 6) */
+.perfil { padding: 36px 0 56px; }
+.perfil-cabecera { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.avatar { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--color-primary); color: #fff; font: 700 1.4rem var(--font-display); }
+.perfil h1 { font-family: var(--font-display); font-size: 1.9rem; color: var(--color-primary); margin: 0; }
+.rol { margin: 2px 0 0; color: var(--color-ink-soft); }
+.perfil-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.tarjeta-perfil { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 14px; padding: 22px; }
+.tarjeta-perfil h2 { font-family: var(--font-display); font-size: 1.15rem; margin: 0 0 14px; }
+.campo { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.campo label { font-size: 0.88rem; font-weight: 600; }
+.campo small { color: var(--color-ink-soft); font-size: 0.78rem; }
+.campo input { font: 0.95rem var(--font-body); padding: 10px 12px; border: 1px solid var(--color-line); border-radius: 8px; background: var(--color-surface); color: var(--color-ink); min-width: 0; }
+.campo input[readonly] { background: var(--color-bg); color: var(--color-ink-soft); }
+.campo input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.12); }
+.con-boton { display: flex; gap: 6px; }
+.con-boton input { flex: 1; }
+.ver-clave { border: 1px solid var(--color-line); background: var(--color-bg); border-radius: 8px; padding: 0 12px; cursor: pointer; font: 600 0.8rem var(--font-body); }
+.error { min-height: 1em; color: #b53030; font-size: 0.85rem; margin: 0 0 10px; }
+.btn { position: relative; border: 0; border-radius: var(--radius); background: var(--color-accent); color: #fff; padding: 11px 20px; font: 700 0.92rem var(--font-body); cursor: pointer; }
+.btn:hover { opacity: 0.9; }
+.btn.cargando { opacity: 0.7; cursor: wait; }
+@media (max-width: 760px) { .perfil-grid { grid-template-columns: 1fr; } }

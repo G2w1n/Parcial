@@ -3,6 +3,7 @@
 // y los textos marcados con data-i18n (las páginas de pasajeros, check-in y turismo están completas).
 // Los módulos de cada página usan t() para sus textos y escuchan el evento "cambio-idioma" para repintar.
 import { TRADUCCIONES, PATRONES } from './traducciones.js';
+import { crearPreferencias } from './preferencias.js';
 
 const CLAVE = 'qorikancha.idioma';
 export const IDIOMAS = { es: 'Español', en: 'English', qu: 'Runasimi (quechua)' };
@@ -93,6 +94,7 @@ function crearSelector() {
 // Se espera a que todos los módulos de la página terminen (nav-sesion.js cambia el menú)
 function iniciar() {
   crearSelector();
+  crearPreferencias();
   if (idioma !== 'es') {
     traducirPagina();
     document.dispatchEvent(new CustomEvent('cambio-idioma', { detail: idioma }));

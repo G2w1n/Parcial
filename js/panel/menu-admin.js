@@ -14,13 +14,17 @@ try {
 }
 
 const PESTANAS = [
+  { pagina: 'mi-turno', texto: 'Mi turno', href: 'mi-turno.html', roles: ['empleado', 'cajero', 'seguridad'] },
   { pagina: 'reservas', texto: 'Reservas', href: 'panel.html', roles: ['administrador', 'empleado'] },
   { pagina: 'pedidos', texto: 'Pedidos', href: 'panel-pedidos.html', roles: ['administrador', 'empleado'] },
   { pagina: 'vuelos', texto: 'Vuelos', href: 'panel-vuelos.html', roles: ['administrador', 'empleado'] },
   { pagina: 'caja', texto: 'Caja', href: 'caja.html', roles: ['administrador', 'cajero'] },
   { pagina: 'garita', texto: 'Garita', href: 'garita.html', roles: ['administrador', 'cajero', 'seguridad'] },
   { pagina: 'estadisticas', texto: 'Estadísticas', href: 'panel-estadisticas.html', roles: ['administrador'] },
+  { pagina: 'historial', texto: 'Historial', href: 'historial.html', roles: ['administrador', 'empleado', 'cajero'] },
+  { pagina: 'turnos', texto: 'Turnos', href: 'panel-turnos.html', roles: ['administrador'] },
   { pagina: 'config', texto: 'Configuración', href: 'panel-config.html', roles: ['administrador'] },
+  { pagina: 'reclamos', texto: 'Reclamos', href: 'panel-reclamos.html', roles: ['administrador'] },
   { pagina: 'bitacora', texto: 'Bitácora', href: 'panel-bitacora.html', roles: ['administrador'] },
 ];
 
@@ -59,6 +63,14 @@ async function buscar(texto) {
       ? `panel.html?buscar=${encodeURIComponent(r.codigo_seguimiento)}`
       : `garita.html?codigo=${encodeURIComponent(r.codigo_seguimiento)}`,
   }));
+
+  // Historial completo de cada placa encontrada
+  if (rol !== 'seguridad') {
+    [...new Set(reservas.map((r) => r.placa?.toUpperCase()).filter(Boolean))].slice(0, 3).forEach((placa) => resultados.push({
+      tipo: 'Historial', titulo: placa, detalle: 'Reservas, pagos e incidentes de la placa',
+      href: `historial.html?placa=${encodeURIComponent(placa)}`,
+    }));
+  }
 
   if (rol !== 'seguridad') {
     const pagos = await seguro(() => sql`
@@ -120,9 +132,14 @@ async function notificaciones() {
     if (n.n) lista.push({ icono: '⛔', texto: `${n.n} reserva(s) con placa en lista negra`, href: rol === 'administrador' ? 'panel-config.html#lista-negra' : 'garita.html' });
   }
 
+  const [inc] = await seguro(() => sql`SELECT COUNT(*)::int AS n FROM incidentes WHERE estado = 'abierto';`, [{ n: 0 }]);
+  if (inc.n) lista.push({ icono: '⚠️', texto: `${inc.n} incidente(s) sin resolver`, href: 'mi-turno.html' });
+
   if (rol === 'administrador') {
     const [a] = await seguro(() => sql`SELECT COUNT(*)::int AS n FROM avisos WHERE activo AND (hasta IS NULL OR hasta > NOW());`, [{ n: 0 }]);
     if (a.n) lista.push({ icono: '📢', texto: `${a.n} aviso(s) general(es) publicado(s)`, href: 'panel-config.html#avisos' });
+    const [rc] = await seguro(() => sql`SELECT COUNT(*)::int AS n FROM reclamos WHERE estado <> 'resuelto';`, [{ n: 0 }]);
+    if (rc.n) lista.push({ icono: '📖', texto: `${rc.n} reclamo(s) sin responder`, href: 'panel-reclamos.html' });
   }
   return lista;
 }

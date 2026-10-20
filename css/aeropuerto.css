@@ -258,3 +258,6 @@ button.btn {
   .campo-grupo { grid-template-columns: 1fr; }
   h1 { font-size: 1.6rem; }
 }
+/* Fase 6: aparición al hacer scroll (js/inicio/revelar.js) */
+.tarjeta.revelar { transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.15s ease; }
+.tarjeta.revelar.visible:hover { transition-delay: 0s; }

@@ -153,6 +153,8 @@ nav a[aria-current="page"] { color: #fff; box-shadow: inset 0 -2px 0 var(--color
   gap: 20px;
 }
 .footer-grid .logo { color: #fff; }
+.libro-footer { color: #cfe0ea; font-size: 0.88rem; }
+.libro-footer:hover { color: #fff; }
 address { font-style: normal; color: #cfe0ea; }
 address a { color: #fff; text-decoration: underline; }
 
@@ -174,7 +176,7 @@ address a { color: #fff; text-decoration: underline; }
   align-items: center;
   gap: 10px;
   padding: 12px 14px 14px;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-left: 5px solid #1f8a4c;
   border-radius: 8px;
@@ -241,4 +243,170 @@ button:focus-visible {
   .site-header .nav-usuario,
   .selector-idioma { margin-left: 0; }
   .footer-grid { flex-direction: column; text-align: center; align-items: center; }
+}
+
+/* ====== Fase 6: modo oscuro y modo accesible ====== */
+/* Se activan con los botones del menú (js/config/preferencias.js) y se recuerdan en el navegador.
+   Solo en pantalla: al imprimir siempre sale en claro. */
+@media screen {
+  :root[data-tema="oscuro"] {
+    color-scheme: dark;
+    --color-primary: #3b78b5;
+    --color-primary-dark: #0a1826;
+    --color-accent: #f5a764;
+    --color-bg: #0e1721;
+    --color-surface: #16222e;
+    --color-line: #2c3a48;
+    --color-ink: #e6edf3;
+    --color-ink-soft: #a3b1bd;
+    --cancel: #ef6b6b;
+  }
+  :root[data-tema="oscuro"] h1, :root[data-tema="oscuro"] h2, :root[data-tema="oscuro"] h3 { color: var(--color-ink); }
+  :root[data-tema="oscuro"] main a:not([class]) { color: #8cc0f0; }
+  :root[data-tema="oscuro"] img { filter: brightness(0.9); }
+  :where(:root[data-tema="oscuro"]) :where(input, select, textarea) {
+    background-color: var(--color-surface); color: var(--color-ink); border-color: var(--color-line);
+  }
+  :root[data-tema="oscuro"] dialog { background: var(--color-surface); color: var(--color-ink); }
+
+  /* Modo accesible: letra más grande, más contraste, enlaces subrayados y sin animaciones */
+  :root[data-accesible] { font-size: 112.5%; }
+  :root[data-accesible]:not([data-tema="oscuro"]) { --color-ink: #000; --color-ink-soft: #2b3640; --color-line: #8a96a1; }
+  :root[data-accesible][data-tema="oscuro"] { --color-ink: #fff; --color-ink-soft: #d3dce4; --color-line: #6b7b8a; }
+  :root[data-accesible] body { line-height: 1.65; letter-spacing: 0.01em; }
+  :root[data-accesible] main a { text-decoration: underline; text-underline-offset: 3px; }
+  :root[data-accesible] :focus-visible { outline: 3px solid var(--color-accent) !important; outline-offset: 3px; }
+  :root[data-accesible] *, :root[data-accesible] *::before, :root[data-accesible] *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+  }
+}
+
+.preferencias { display: inline-flex; gap: 6px; margin-left: 10px; vertical-align: middle; }
+.btn-preferencia {
+  width: 34px; height: 34px; padding: 0; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 8px;
+  background: transparent; color: #fff; font: 700 0.85rem var(--font-body); cursor: pointer; line-height: 1;
+}
+.btn-preferencia:hover { border-color: var(--color-accent); }
+.btn-preferencia[aria-pressed="true"] { background: var(--color-accent); border-color: var(--color-accent); color: #10202f; }
+
+/* Animación al hacer scroll (inicio): los bloques aparecen al entrar en pantalla */
+.revelar { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.revelar.visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .revelar { opacity: 1; transform: none; transition: none; } }
+:root[data-accesible] .revelar { opacity: 1; transform: none; }
+
+/* Modo oscuro: fondos claros de cada página pasados a tonos oscuros del mismo color
+   (generado a partir de las hojas de cada página; si se agrega un fondo claro nuevo, añadirlo aquí) */
+@media screen {
+  :root[data-tema="oscuro"] .precio-vip { background: #453111; color: #f5cd99; }
+  :root[data-tema="oscuro"] .confirmacion-vip { background: #1e3928; }
+  :root[data-tema="oscuro"] .aviso-tabla { background: #453111; color: #f5cd99; border-color: #6f522a; }
+  :root[data-tema="oscuro"] .confirmacion-estacionamiento { background: #1e3928; }
+  :root[data-tema="oscuro"] .confirmacion-estacionamiento.error { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] .ticket-codigo { background: #1e3928; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .resumen-listo { background: #1e3928; }
+  :root[data-tema="oscuro"] .estado-registrado { background: #1e3928; }
+  :root[data-tema="oscuro"] .estado-atendido { background: #1b2a3c; color: #9fc5ef; }
+  :root[data-tema="oscuro"] .estado-cancelado { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] .fila-nueva { background: #203728; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .opcion-servicio input[value="vip"]:checked + .opcion-caja { background: #453111; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .servicio-normal { background: #252a32; color: #bbc7d3; }
+  :root[data-tema="oscuro"] .servicio-vip { background: #423114; }
+  :root[data-tema="oscuro"] .opcion-check input:checked + .opcion-check-caja { background: #453111; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .pago-pendiente { background: #423114; }
+  :root[data-tema="oscuro"] .pago-pagado { background: #1e3928; }
+  :root[data-tema="oscuro"] .pago-exonerado { background: #252a32; color: #bbc7d3; }
+  :root[data-tema="oscuro"] .aviso-solo-lectura { background: #453111; color: #f5cd99; border-color: #6f522a; }
+  :root[data-tema="oscuro"] .confirmacion-estacionamiento { background: #1e3928; }
+  :root[data-tema="oscuro"] .opcion-check input:checked + .opcion-check-caja { background: #453111; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .confirmacion-estacionamiento.error { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] .res-tipo { background: #1b2a3c; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .adm-chip { background: #252a32; color: #bbc7d3; }
+  :root[data-tema="oscuro"] .adm-chip-azul { background: #1b2a3c; color: #9fc5ef; }
+  :root[data-tema="oscuro"] .adm-chip-verde { background: #1e3928; }
+  :root[data-tema="oscuro"] .adm-chip-ambar { background: #423114; color: #fbd292; }
+  :root[data-tema="oscuro"] .adm-chip-rojo { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] .adm-aviso-tabla { background: #453111; color: #f5cd99; border-color: #6f522a; }
+  :root[data-tema="oscuro"] .select-turno.turno-manana { background: #453311; color: var(--color-ink); border-color: #6f562a; }
+  :root[data-tema="oscuro"] .select-turno.turno-tarde { background: #192a3e; color: var(--color-ink); border-color: #2f4a6a; }
+  :root[data-tema="oscuro"] .select-turno.turno-noche { background: #261a3c; color: var(--color-ink); border-color: #422f6a; }
+  :root[data-tema="oscuro"] .estado-placa.limpia { background: #203729; color: #a3ebc2; }
+  :root[data-tema="oscuro"] .estado-placa.bloqueada { background: #3e1818; color: #eaa3a3; }
+  :root[data-tema="oscuro"] .consejo { background: #453111; color: #f5cd99; border-color: #6f522a; }
+  :root[data-tema="oscuro"] .resumen-item { background: #262c31; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .confirmacion-formulario { background: #1e3928; }
+  :root[data-tema="oscuro"] .aviso-ampliar { background: #453111; color: #f5cd99; border-color: #6f522a; }
+  :root[data-tema="oscuro"] .nueva-salida { background: #1b2a3c; color: #9fc5ef; }
+  :root[data-tema="oscuro"] .resultado.ok { background: #1e3928; }
+  :root[data-tema="oscuro"] .resultado.error { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] .aviso-general { background: #1b2a3c; color: #9fc8ef; }
+  :root[data-tema="oscuro"] .aviso-general-alerta { background: #453511; color: #ffd58f; }
+  :root[data-tema="oscuro"] .aviso-general-urgente { background: #3e1818; color: #eaa3a3; }
+  :root[data-tema="oscuro"] tbody tr:hover { background: #212b36; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .fila-rechazada td { background: #3e1919; color: #e3aaaa; }
+  :root[data-tema="oscuro"] .salida-habilitado { background: #1e3928; border-color: #3d5c49; }
+  :root[data-tema="oscuro"] .salida-pendiente { background: #423114; border-color: #6e552b; }
+  :root[data-tema="oscuro"] .salida-cancelado { background: #3e1818; color: #e7a6a6; border-color: #693030; }
+  :root[data-tema="oscuro"] .ultimo-cobro { background: #1e3928; }
+  :root[data-tema="oscuro"] .fila-bloqueada td { background: #451111; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .chip-bloqueo { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] .alerta-bloqueo { background: #3e1818; color: #eaa3a3; }
+  :root[data-tema="oscuro"] .estado-caja.abierta { background: #203729; color: #a3ebc2; }
+  :root[data-tema="oscuro"] .estado-caja.cerrada { background: #422b15; color: #f2c59c; }
+  :root[data-tema="oscuro"] .muestra.ocupado { background: #272b30; color: var(--color-ink); border-color: #444d55; }
+  :root[data-tema="oscuro"] .asiento:disabled { background: #272b30; color: var(--color-ink); border-color: #444d55; }
+  :root[data-tema="oscuro"] .pase { background: #1e3928; }
+  :root[data-tema="oscuro"] .muestra { background: #1e3928; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .muestra.ocupado { background: #262c31; color: var(--color-ink); border-color: #434d56; }
+  :root[data-tema="oscuro"] .pase-salida.habilitada { background: #1e3928; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .pase-salida.pendiente { background: #453011; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .pase-salida.bloqueada { background: #451111; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .estado-registrado { background: #1e3928; }
+  :root[data-tema="oscuro"] .estado-atendido { background: #1b2a3c; color: #9fc5ef; }
+  :root[data-tema="oscuro"] .estado-cancelado { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] .btn-ampliar-fila:hover { background: #453111; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .btn-cancelar-fila:hover { background: #3e1818; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .fila-nueva { background: #203728; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .servicio-normal { background: #252a32; color: #bbc7d3; }
+  :root[data-tema="oscuro"] .servicio-vip { background: #423114; }
+  :root[data-tema="oscuro"] .pago-pendiente { background: #423114; }
+  :root[data-tema="oscuro"] .pago-pagado { background: #1e3928; }
+  :root[data-tema="oscuro"] .pago-exonerado { background: #252a32; color: #bbc7d3; }
+  :root[data-tema="oscuro"] .aviso-simulacion { background: #423114; }
+  :root[data-tema="oscuro"] .mensaje--info { background: #1b2a3c; color: #9fc5ef; }
+  :root[data-tema="oscuro"] .mensaje--exito { background: #1e3928; }
+  :root[data-tema="oscuro"] .mensaje--error { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] .info-turno { background: #1b2a3c; color: #9fc5ef; }
+  :root[data-tema="oscuro"] .confirmacion-estacionamiento { background: #1e3928; }
+  :root[data-tema="oscuro"] .confirmacion-estacionamiento.error { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] tbody tr:hover { background: #212b36; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .estado-registrado { background: #1e3928; }
+  :root[data-tema="oscuro"] .estado-atendido { background: #1b2a3c; color: #9fc5ef; }
+  :root[data-tema="oscuro"] .estado-cancelado { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] .turno-diurno { background: #423114; }
+  :root[data-tema="oscuro"] .turno-nocturno { background: #211e39; color: #b5aedf; }
+  :root[data-tema="oscuro"] .servicio-normal { background: #252a32; color: #bbc7d3; }
+  :root[data-tema="oscuro"] .servicio-vip { background: #423114; }
+  :root[data-tema="oscuro"] .pago-pendiente { background: #423114; }
+  :root[data-tema="oscuro"] .pago-pagado { background: #1e3928; }
+  :root[data-tema="oscuro"] .pago-exonerado { background: #252a32; color: #bbc7d3; }
+  :root[data-tema="oscuro"] .aviso-pago { background: #423114; }
+  :root[data-tema="oscuro"] .btn-entrada { background: #1e3928; border-color: #386146; }
+  :root[data-tema="oscuro"] .tipos label:has(input:checked) { background: #1c2a3b; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .confirmacion { background: #1e3928; }
+  :root[data-tema="oscuro"] .estado-reclamo { background: #1b2a3c; color: #9fc5ef; }
+  :root[data-tema="oscuro"] .estado-en_revision { background: #423114; color: #fbd292; }
+  :root[data-tema="oscuro"] .estado-resuelto { background: #1e3928; }
+  :root[data-tema="oscuro"] .resultados button.elegido { background: #453111; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .pedido.estado-listo { background: #1e3928; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .item.elegido { background: #453011; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .tarjeta-alerta { background: #451811; color: var(--color-ink); }
+  :root[data-tema="oscuro"] .tour-tipo { background: #1b2a3c; color: #9fc5ef; }
+  :root[data-tema="oscuro"] .tour-completo .tour-tipo { background: #1e3928; }
+  :root[data-tema="oscuro"] .tour-aventura .tour-tipo { background: #423114; color: #fbd292; }
+  :root[data-tema="oscuro"] .tv-estado.est-a-tiempo, :root[data-tema="oscuro"] .tv-estado.est-aterrizo, :root[data-tema="oscuro"] .tv-estado.est-programado { background: #1e3928; }
+  :root[data-tema="oscuro"] .tv-estado.est-embarcando, :root[data-tema="oscuro"] .tv-estado.est-aproximacion { background: #1b2a3c; color: #9fc5ef; }
+  :root[data-tema="oscuro"] .tv-estado.est-demorado { background: #423114; }
+  :root[data-tema="oscuro"] .tv-estado.est-cancelado { background: #3e1818; color: #e7a6a6; }
+  :root[data-tema="oscuro"] .tv-estado.est-cerrado, :root[data-tema="oscuro"] .tv-estado.est-despego { background: #252a32; color: #bbc7d3; }
 }

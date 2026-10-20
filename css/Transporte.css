@@ -122,7 +122,7 @@
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.15);
-  background: #fff;
+  background: var(--color-surface);
 }
 
 /* Validación en vivo */
@@ -276,7 +276,7 @@
 .ticket-reserva {
   display: flex;
   margin-top: 20px;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-left: 5px solid #1f8a4c;
   border-radius: 12px;
@@ -551,7 +551,7 @@ tbody tr:last-child td { border-bottom: none; }
 .opcion-servicio:hover .opcion-caja { border-color: #b9c5d0; transform: translateY(-1px); }
 .opcion-servicio input:checked + .opcion-caja {
   border-color: var(--color-primary);
-  background: #fff;
+  background: var(--color-surface);
   box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.12);
 }
 .opcion-servicio input[value="vip"]:checked + .opcion-caja {
@@ -609,7 +609,7 @@ tbody tr:last-child td { border-bottom: none; }
   flex-shrink: 0;
   border-radius: 6px;
   border: 2px solid #b9c5d0;
-  background: #fff;
+  background: var(--color-surface);
   display: flex;
   align-items: center;
   justify-content: center;

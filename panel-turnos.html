@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="imagenes/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0f2740">
+  <meta name="robots" content="noindex">
+  <title>Turnos del personal — Aeropuerto Internacional Qorikancha</title>
+  <meta name="description" content="Calendario semanal de turnos del personal del estacionamiento.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <script>try{var d=document.documentElement;if(localStorage.getItem("qorikancha.tema")==="oscuro")d.dataset.tema="oscuro";if(localStorage.getItem("qorikancha.accesible")==="1")d.dataset.accesible=""}catch(e){}</script>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="logo">Aeropuerto <strong>Qorikancha</strong></a>
+      <nav aria-label="Navegación principal">
+        <a href="index.html#inicio">Inicio</a>
+        <a href="login.html" id="nav-sesion">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+  <div id="menu-admin" data-pagina="turnos"></div>
+
+  <main class="adm-pagina">
+    <div class="wrap">
+      <div class="adm-cabecera">
+        <div>
+          <h1>Turnos del personal</h1>
+          <p class="adm-intro">Asigna el turno de cada persona para cada día. Los cambios se guardan al momento y cada quien los ve en «Mi turno».</p>
+        </div>
+        <div class="acciones">
+          <button type="button" id="semana-anterior" class="adm-btn adm-btn-borde" aria-label="Semana anterior">← Anterior</button>
+          <button type="button" id="semana-actual" class="adm-btn adm-btn-borde">Esta semana</button>
+          <button type="button" id="semana-siguiente" class="adm-btn adm-btn-borde" aria-label="Semana siguiente">Siguiente →</button>
+        </div>
+      </div>
+      <p id="aviso-tabla" class="adm-aviso-tabla" hidden></p>
+      <section class="adm-bloque" aria-labelledby="t-calendario">
+        <div class="adm-cabecera">
+          <h2 id="t-calendario">Semana del <span id="rango-semana"></span></h2>
+          <button type="button" id="copiar-semana" class="adm-btn">Copiar a la semana siguiente</button>
+        </div>
+        <ul class="leyenda-turnos">
+          <li class="turno-manana">Mañana 06:00 – 14:00</li>
+          <li class="turno-tarde">Tarde 14:00 – 22:00</li>
+          <li class="turno-noche">Noche 22:00 – 06:00</li>
+        </ul>
+        <div class="adm-tabla-scroll">
+          <table class="adm-tabla tabla-turnos">
+            <thead><tr id="cabecera-dias"><th>Persona</th></tr></thead>
+            <tbody id="tabla-turnos"></tbody>
+            <tfoot><tr id="cobertura"></tr></tfoot>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="logo">Aeropuerto <strong>Qorikancha</strong></p>
+        <p>Av. de la Aviación s/n, Cusco, Perú</p>
+        <p><a href="reclamos.html" class="libro-footer">📖 Libro de reclamaciones</a></p>
+      </div>
+      <address>
+        <a href="mailto:informes@aeropuertoqorikancha.pe">informes@aeropuertoqorikancha.pe</a><br>
+        Central telefónica: (084) 000-000
+      </address>
+    </div>
+  </footer>
+
+  <script type="module" src="js/panel/turnos-admin.js"></script>
+  <script type="module" src="js/panel/menu-admin.js"></script>
+  <script type="module" src="js/auth/nav-sesion.js"></script>
+  <script type="module" src="js/config/idioma.js"></script>
+
+</body>
+</html>

@@ -46,6 +46,7 @@
   cursor: pointer;
 }
 .btn-salida:hover { opacity: 0.92; }
+.btn-exceso { display: block; text-align: center; text-decoration: none; background: #d99121; }
 .btn-salida.cargando { opacity: 0.7; cursor: wait; }
 
 .historial { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }

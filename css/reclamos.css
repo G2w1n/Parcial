@@ -1,0 +1,36 @@
+/* css/reclamos.css — Libro de reclamaciones (fase 6) */
+.reclamos { padding: 36px 0 56px; }
+.libro-cabecera { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 22px; }
+.libro-icono { font-size: 2.6rem; line-height: 1; }
+.reclamos h1 { font-family: var(--font-display); font-size: 1.9rem; color: var(--color-primary); margin: 0 0 4px; }
+.section-intro { color: var(--color-ink-soft); margin: 0; max-width: 680px; }
+.reclamos-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; align-items: start; }
+.tarjeta-reclamo { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 14px; padding: 22px; }
+.tarjeta-reclamo h2 { font-family: var(--font-display); font-size: 1.15rem; margin: 0 0 14px; }
+.tipos { border: 0; padding: 0; margin: 0 0 14px; display: grid; gap: 8px; }
+.tipos legend { font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; }
+.tipos label { display: grid; grid-template-columns: auto auto 1fr; align-items: baseline; gap: 8px; padding: 10px 12px; border: 1px solid var(--color-line); border-radius: 10px; cursor: pointer; }
+.tipos label:has(input:checked) { border-color: var(--color-primary); background: #f3f7fc; }
+.tipos small { color: var(--color-ink-soft); }
+.fila { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.campo { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; min-width: 0; }
+.campo label { font-size: 0.88rem; font-weight: 600; }
+.campo input, .campo textarea, .fila-consulta input { font: 0.95rem var(--font-body); padding: 10px 12px; border: 1px solid var(--color-line); border-radius: 8px; background: var(--color-surface); color: var(--color-ink); min-width: 0; resize: vertical; }
+.campo input:focus, .campo textarea:focus, .fila-consulta input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(22, 58, 92, 0.12); }
+.acepto { display: flex; gap: 8px; align-items: center; font-size: 0.88rem; margin-bottom: 8px; }
+.error { min-height: 1em; color: #b53030; font-size: 0.85rem; margin: 0 0 10px; }
+.btn { position: relative; border: 1px solid var(--color-accent); border-radius: var(--radius); background: var(--color-accent); color: #fff; padding: 11px 20px; font: 700 0.92rem var(--font-body); cursor: pointer; }
+.btn:hover { opacity: 0.9; }
+.btn.cargando { opacity: 0.7; cursor: wait; }
+.btn-borde { background: var(--color-surface); color: var(--color-primary); border-color: var(--color-line); }
+.confirmacion { margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: #e3f6ea; color: #1f8a4c; display: grid; gap: 4px; font-size: 0.9rem; }
+.fila-consulta { display: flex; gap: 8px; margin-bottom: 12px; }
+.fila-consulta input { flex: 1; text-transform: uppercase; }
+.consulta-resultado p { margin: 0 0 8px; text-transform: none; }
+.consulta-resultado blockquote { margin: 8px 0; padding: 10px 14px; border-left: 4px solid var(--color-primary); background: var(--color-bg); border-radius: 0 8px 8px 0; }
+.consulta-resultado small { color: var(--color-ink-soft); }
+.estado-reclamo { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; background: #e3edf9; color: #1c5fa8; }
+.estado-en_revision { background: #fdf1de; color: #9a5f05; }
+.estado-resuelto { background: #e3f6ea; color: #1f8a4c; }
+.nota { color: var(--color-ink-soft); font-size: 0.82rem; margin: 12px 0 0; }
+@media (max-width: 820px) { .reclamos-grid, .fila { grid-template-columns: 1fr; } }
