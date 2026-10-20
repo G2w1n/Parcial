@@ -18,13 +18,16 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 - **Guía del pasajero**: pasos para tu primer vuelo, **calculadora de equipaje** por aerolínea, buscador de **objetos permitidos y prohibidos**, preguntas frecuentes con buscador y qué hacer si se pierde tu maleta.
 - **Descubre Cusco**: **clima en vivo** (Open-Meteo), consejos contra el **soroche**, altura de cada destino, **tours** con filtro y **conversor de monedas** con tasas del día.
 - **Idiomas**: selector de español, inglés y quechua en el menú. Las páginas de pasajeros, check-in y turismo están traducidas completas; en el resto se traducen el menú y el pie de página. El quechua es una traducción parcial.
-- **Servicios**: tiendas y restaurantes, objetos perdidos, taxis, buses y alquiler de autos.
+- **Mapa del terminal**: planos interactivos de los 2 niveles, con buscador, filtros por categoría, tiempo de espera estimado en el control de seguridad y **cómo llegar**.
+- **Estacionamiento**: mapa de espacios libres y ocupados (zona general, VIP y buses), tarifas y calculadora de costo.
+- **Servicios**: Sala VIP con reserva, Wi-Fi, servicios especiales (silla de ruedas, mascotas, menores), **calificaciones con estrellas**, tiendas y restaurantes con **pedidos para recoger**, objetos perdidos, taxis, buses y alquiler de autos.
 
 ### Cliente
-- **Reservar estacionamiento** con cotización en vivo: S/ 7.00 por hora o fracción, +50 % para bus o camión y +S/ 15.00 por zona techada VIP.
-- **Mis reservas**: lista con el estado de pago y botones para pagar, editar o ver el comprobante.
+- **Reservar estacionamiento** con cotización en vivo: S/ 7.00 por hora o fracción, tope de S/ 60.00 por día, **tarifa nocturna** de S/ 20.00 (entrada de 22:00 a 05:59, hasta 8 h), **-10 % en fin de semana**, +50 % para bus o camión y +S/ 15.00 por zona techada VIP.
+- **Mis reservas**: lista con el estado de pago y botones para pagar, editar, **ampliar la estadía** o ver el comprobante.
 - **Editar reserva** mientras esté registrada y sin pagar; el monto se recalcula.
-- **Pasarela de pago** con tarjeta (Visa, Mastercard, American Express) o billetera (AndiPay, PagoMóvil).
+- **Pasarela de pago** con tarjeta (Visa, Mastercard, American Express) o billetera (AndiPay, PagoMóvil), y **cupones de descuento**.
+- **Ampliar estadía** de una reserva pagada, pagando solo la diferencia.
 - **Comprobante** imprimible que habilita el pase de salida.
 
 ### Cajero
@@ -62,6 +65,9 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 ├── vuelos.html              Tablero de vuelos en vivo
 ├── aerolineas.html          Aerolíneas
 ├── checkin.html             Check-in en línea
+├── terminal.html            Mapa del terminal
+├── estacionamiento.html     Espacios libres, tarifas y calculadora
+├── ampliar.html             Ampliar estadía (cliente)
 ├── pasajero.html            Guía del pasajero
 ├── turismo.html             Descubre Cusco
 ├── Servicios.html, Objetos.html, tienda_restaurante.html
@@ -91,7 +97,12 @@ Sitio web del **Aeropuerto Internacional Qorikancha** (código CUZ): horarios de
 │   ├── vuelos/              Vuelos simulados, tablero y aerolíneas
 │   ├── pasajero/            Check-in, equipaje y objetos permitidos
 │   ├── turismo/             Clima, tours y monedas
+│   ├── terminal/            Plano del terminal y lugares
+│   ├── estacionamiento/     Mapa de espacios y ampliar estadía
+│   ├── servicios/           Sala VIP, calificaciones y pedidos
 │   └── vendor/              qrcode-generator 1.4.4 (MIT, Kazuhiko Arase)
+├── database/
+│   └── fase-4.sql           Tablas de cupones, ampliaciones, calificaciones y pedidos
 ├── imagenes/
 └── docs/capturas/
 ```
@@ -113,6 +124,10 @@ python -m http.server 8000
 ### Configurar la base de datos
 La cadena de conexión está en `js/config/neon-config.js`. Para usar tu propia base, cópiala desde el panel de Neon (*Connect → Connection string*).
 
+**Tablas de la fase 4:** abre `database/fase-4.sql`, pégalo en *Neon → SQL Editor* y pulsa *Run* (una sola vez; se puede repetir sin problemas). Crea las tablas `cupones`, `ampliaciones`, `calificaciones` y `pedidos`, y agrega las columnas `cupon` y `descuento` a `pagos`. Mientras no se ejecute, esas funciones muestran un aviso y el resto del sitio sigue funcionando.
+
+Cupones de prueba: `BIENVENIDO10` (10 %), `CUSCO5` (S/ 5 desde S/ 20), `VIAJERO20` (20 % desde S/ 50) y `VENCIDO` (para probar el error).
+
 ## Roles
 
 | Rol | Página de inicio | Cómo se obtiene |
@@ -127,6 +142,14 @@ La cadena de conexión está en `js/config/neon-config.js`. Para usar tu propia 
 Los vuelos no se guardan en la base de datos. Están en `js/vuelos/datos-vuelos.js` como un itinerario diario, y su estado se calcula con la hora de Cusco. Las demoras, cancelaciones y cambios de puerta se eligen al azar, pero son siempre los mismos para un mismo día, así el tablero se ve en vivo a cualquier hora. Para agregar o cambiar un vuelo, se edita el arreglo `ITINERARIO`.
 
 Enlaces directos: `vuelos.html?aerolinea=LA`, `vuelos.html?vuelo=LA2021` y `vuelos.html?tipo=llegada`.
+
+## Datos simulados
+
+- **Vuelos**: itinerario en `js/vuelos/datos-vuelos.js`.
+- **Plano del terminal**: lugares y zonas en `js/terminal/lugares.js`.
+- **Ocupación del estacionamiento**: suma las reservas en línea activas (reales) y una ocupación simulada de quienes llegan sin reserva.
+- **Tiempo de espera en seguridad**: se estima con la cantidad de vuelos que salen en las próximas 2 horas.
+- **Sala VIP**: la reserva se guarda solo en el navegador.
 
 ## Idiomas
 
@@ -155,6 +178,12 @@ La página de pago tiene botones que llenan el formulario automáticamente.
 | `pagos` | Cada intento de pago (aprobado o rechazado), canal, medio, cajero y verificación |
 | `banco_cuentas`, `banco_tarjetas` | Entidad emisora simulada para la pasarela |
 | `billeteras` | Billeteras electrónicas simuladas |
+| `cupones` | Cupones de descuento, con usos máximos y vencimiento (fase 4) |
+| `ampliaciones` | Horas extra pagadas sobre una reserva ya pagada (fase 4) |
+| `calificaciones` | Estrellas y comentarios de los servicios (fase 4) |
+| `pedidos` | Pedidos de comida para recoger y su estado (fase 4) |
+
+> `fecha_hora_entrada` se guarda en hora de Perú (como la escribe el formulario). De ella dependen la tarifa nocturna, el descuento de fin de semana y el mapa de espacios ocupados.
 
 ## Seguridad: notas del caso académico
 
